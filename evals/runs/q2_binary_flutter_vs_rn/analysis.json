@@ -1,0 +1,538 @@
+{
+  "matrix": {
+    "question": "4 人團隊開發消費型生活健身 App（需相機即時影像處理與 BLE 藍牙同步）：該選 Flutter 還是 React Native？",
+    "options": [
+      {
+        "id": "flutter",
+        "label": "Flutter",
+        "description": "自繪 Skia/Impeller 引擎、強型別 Dart、UI 高度一致"
+      },
+      {
+        "id": "react_native",
+        "label": "React Native",
+        "description": "原生組件橋接、龐大 npm 生態、主流社群"
+      }
+    ],
+    "criteria": [
+      {
+        "id": "ble_camera_integration",
+        "label": "硬體與原生功能橋接便利度",
+        "description": "BLE 藍牙與相機底層通訊難度"
+      },
+      {
+        "id": "ui_performance",
+        "label": "渲染效能與動畫流暢度",
+        "description": "60fps 複合動畫與圖表"
+      },
+      {
+        "id": "team_learning_curve",
+        "label": "團隊技術棧上手速度",
+        "description": "原生背景工程師過渡週期"
+      },
+      {
+        "id": "third_party_ecosystem",
+        "label": "第三方生態與套件庫豐富度",
+        "description": "開箱即用套件數量與更新頻率"
+      },
+      {
+        "id": "long_term_maintenance",
+        "label": "長期維護與升級成本",
+        "description": "雙平台系統版本更新時之破壞性變更"
+      },
+      {
+        "id": "ota_flexibility",
+        "label": "熱更新與發布靈活性",
+        "description": "CodePush 等熱修復支援"
+      }
+    ],
+    "weights": {
+      "ble_camera_integration": 0.3286,
+      "ui_performance": 0.2644,
+      "team_learning_curve": 0.1018,
+      "third_party_ecosystem": 0.1018,
+      "long_term_maintenance": 0.1018,
+      "ota_flexibility": 0.1018
+    },
+    "weight_rationale": {
+      "ble_camera_integration": "依據專案現階段核心矛盾權衡",
+      "ui_performance": "依據專案現階段核心矛盾權衡",
+      "team_learning_curve": "依據專案現階段核心矛盾權衡",
+      "third_party_ecosystem": "依據專案現階段核心矛盾權衡",
+      "long_term_maintenance": "依據專案現階段核心矛盾權衡",
+      "ota_flexibility": "依據專案現階段核心矛盾權衡"
+    },
+    "cells": [
+      {
+        "option_id": "flutter",
+        "criterion_id": "ble_camera_integration",
+        "score": 9,
+        "rationale": "Flutter 在 硬體與原生功能橋接便利度 表現分析",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "flutter",
+        "criterion_id": "ui_performance",
+        "score": 9,
+        "rationale": "Flutter 在 渲染效能與動畫流暢度 表現分析",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "flutter",
+        "criterion_id": "team_learning_curve",
+        "score": 9,
+        "rationale": "Flutter 在 團隊技術棧上手速度 表現分析",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "flutter",
+        "criterion_id": "third_party_ecosystem",
+        "score": 7.2,
+        "rationale": "Flutter 在 第三方生態與套件庫豐富度 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "flutter",
+        "criterion_id": "long_term_maintenance",
+        "score": 7.2,
+        "rationale": "Flutter 在 長期維護與升級成本 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "flutter",
+        "criterion_id": "ota_flexibility",
+        "score": 7.2,
+        "rationale": "Flutter 在 熱更新與發布靈活性 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "react_native",
+        "criterion_id": "ble_camera_integration",
+        "score": 4.2,
+        "rationale": "React Native 在 硬體與原生功能橋接便利度 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "react_native",
+        "criterion_id": "ui_performance",
+        "score": 4.2,
+        "rationale": "React Native 在 渲染效能與動畫流暢度 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "react_native",
+        "criterion_id": "team_learning_curve",
+        "score": 8.8,
+        "rationale": "React Native 在 團隊技術棧上手速度 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "react_native",
+        "criterion_id": "third_party_ecosystem",
+        "score": 8.8,
+        "rationale": "React Native 在 第三方生態與套件庫豐富度 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "react_native",
+        "criterion_id": "long_term_maintenance",
+        "score": 8.8,
+        "rationale": "React Native 在 長期維護與升級成本 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "react_native",
+        "criterion_id": "ota_flexibility",
+        "score": 8.8,
+        "rationale": "React Native 在 熱更新與發布靈活性 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      }
+    ],
+    "cell_spread": {
+      "flutter|ble_camera_integration": 1.183,
+      "flutter|ui_performance": 1.183,
+      "flutter|team_learning_curve": 1.183,
+      "flutter|third_party_ecosystem": 0.971,
+      "flutter|long_term_maintenance": 0.971,
+      "flutter|ota_flexibility": 0.971,
+      "react_native|ble_camera_integration": 2.058,
+      "react_native|ui_performance": 2.058,
+      "react_native|team_learning_curve": 1.613,
+      "react_native|third_party_ecosystem": 1.613,
+      "react_native|long_term_maintenance": 1.613,
+      "react_native|ota_flexibility": 1.613
+    },
+    "persona_scores": [
+      {
+        "speaker_id": "conservative_cto",
+        "weights": {
+          "ble_camera_integration": 0.5,
+          "ui_performance": 0.1,
+          "team_learning_curve": 0.1,
+          "third_party_ecosystem": 0.1,
+          "long_term_maintenance": 0.1,
+          "ota_flexibility": 0.1
+        },
+        "cells": [
+          {
+            "option_id": "flutter",
+            "criterion_id": "ble_camera_integration",
+            "score": 9,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "flutter",
+            "criterion_id": "ui_performance",
+            "score": 9,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "flutter",
+            "criterion_id": "team_learning_curve",
+            "score": 9,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "flutter",
+            "criterion_id": "third_party_ecosystem",
+            "score": 9,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "flutter",
+            "criterion_id": "long_term_maintenance",
+            "score": 9,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "flutter",
+            "criterion_id": "ota_flexibility",
+            "score": 9,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "react_native",
+            "criterion_id": "ble_camera_integration",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "react_native",
+            "criterion_id": "ui_performance",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "react_native",
+            "criterion_id": "team_learning_curve",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "react_native",
+            "criterion_id": "third_party_ecosystem",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "react_native",
+            "criterion_id": "long_term_maintenance",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "react_native",
+            "criterion_id": "ota_flexibility",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          }
+        ],
+        "final_choice": "flutter",
+        "one_line": "首年生存至上，嚴控試錯成本。"
+      },
+      {
+        "speaker_id": "perf_zealot",
+        "weights": {
+          "ble_camera_integration": 0.1,
+          "ui_performance": 0.1,
+          "team_learning_curve": 0.1,
+          "third_party_ecosystem": 0.1,
+          "long_term_maintenance": 0.1,
+          "ota_flexibility": 0.5
+        },
+        "cells": [
+          {
+            "option_id": "flutter",
+            "criterion_id": "ble_camera_integration",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "flutter",
+            "criterion_id": "ui_performance",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "flutter",
+            "criterion_id": "team_learning_curve",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "flutter",
+            "criterion_id": "third_party_ecosystem",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "flutter",
+            "criterion_id": "long_term_maintenance",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "flutter",
+            "criterion_id": "ota_flexibility",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "react_native",
+            "criterion_id": "ble_camera_integration",
+            "score": 9.5,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "react_native",
+            "criterion_id": "ui_performance",
+            "score": 9.5,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "react_native",
+            "criterion_id": "team_learning_curve",
+            "score": 9.5,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "react_native",
+            "criterion_id": "third_party_ecosystem",
+            "score": 9.5,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "react_native",
+            "criterion_id": "long_term_maintenance",
+            "score": 9.5,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "react_native",
+            "criterion_id": "ota_flexibility",
+            "score": 9.5,
+            "reason": "重視極致控制與擴展力"
+          }
+        ],
+        "final_choice": "react_native",
+        "one_line": "底層架構的技術債會加倍奉還。"
+      }
+    ]
+  },
+  "analysis": {
+    "totals": {
+      "flutter": 8.4505,
+      "react_native": 6.0723
+    },
+    "ranking": [
+      "flutter",
+      "react_native"
+    ],
+    "winner": "flutter",
+    "margin": 2.3782,
+    "tipping_points": [
+      {
+        "criterion_id": "third_party_ecosystem",
+        "criterion_label": "第三方生態與套件庫豐富度",
+        "current_weight": 0.102,
+        "threshold": 0.639,
+        "direction": "increase",
+        "new_winner": "react_native"
+      },
+      {
+        "criterion_id": "long_term_maintenance",
+        "criterion_label": "長期維護與升級成本",
+        "current_weight": 0.102,
+        "threshold": 0.639,
+        "direction": "increase",
+        "new_winner": "react_native"
+      },
+      {
+        "criterion_id": "ota_flexibility",
+        "criterion_label": "熱更新與發布靈活性",
+        "current_weight": 0.102,
+        "threshold": 0.639,
+        "direction": "increase",
+        "new_winner": "react_native"
+      }
+    ],
+    "win_probability": {
+      "flutter": 0.9742,
+      "react_native": 0.0258
+    },
+    "seed_used": 42,
+    "persona_lens": {
+      "conservative_cto": {
+        "winner": "flutter",
+        "totals": {
+          "flutter": 8.46,
+          "react_native": 6.04
+        },
+        "ranking": [
+          "flutter",
+          "react_native"
+        ]
+      },
+      "perf_zealot": {
+        "winner": "react_native",
+        "totals": {
+          "flutter": 7.74,
+          "react_native": 7.88
+        },
+        "ranking": [
+          "react_native",
+          "flutter"
+        ]
+      }
+    },
+    "persona_own_view": {
+      "conservative_cto": {
+        "winner": "flutter",
+        "totals": {
+          "flutter": 9,
+          "react_native": 5
+        },
+        "ranking": [
+          "flutter",
+          "react_native"
+        ]
+      },
+      "perf_zealot": {
+        "winner": "react_native",
+        "totals": {
+          "flutter": 6,
+          "react_native": 9.5
+        },
+        "ranking": [
+          "react_native",
+          "flutter"
+        ]
+      }
+    },
+    "max_regret": {
+      "flutter": 0.14,
+      "react_native": 2.42
+    },
+    "minimax_regret_option": "flutter",
+    "disagreement_hotspots": [
+      {
+        "cell_key": "react_native|ble_camera_integration",
+        "option_id": "react_native",
+        "criterion_id": "ble_camera_integration",
+        "spread": 2.058,
+        "chair_score": 4.2,
+        "persona_scores": {
+          "conservative_cto": 5,
+          "perf_zealot": 9.5
+        }
+      },
+      {
+        "cell_key": "react_native|ui_performance",
+        "option_id": "react_native",
+        "criterion_id": "ui_performance",
+        "spread": 2.058,
+        "chair_score": 4.2,
+        "persona_scores": {
+          "conservative_cto": 5,
+          "perf_zealot": 9.5
+        }
+      },
+      {
+        "cell_key": "react_native|team_learning_curve",
+        "option_id": "react_native",
+        "criterion_id": "team_learning_curve",
+        "spread": 1.613,
+        "chair_score": 8.8,
+        "persona_scores": {
+          "conservative_cto": 5,
+          "perf_zealot": 9.5
+        }
+      },
+      {
+        "cell_key": "react_native|third_party_ecosystem",
+        "option_id": "react_native",
+        "criterion_id": "third_party_ecosystem",
+        "spread": 1.613,
+        "chair_score": 8.8,
+        "persona_scores": {
+          "conservative_cto": 5,
+          "perf_zealot": 9.5
+        }
+      },
+      {
+        "cell_key": "react_native|long_term_maintenance",
+        "option_id": "react_native",
+        "criterion_id": "long_term_maintenance",
+        "spread": 1.613,
+        "chair_score": 8.8,
+        "persona_scores": {
+          "conservative_cto": 5,
+          "perf_zealot": 9.5
+        }
+      }
+    ],
+    "diagnostics": {
+      "judge_agreement_avg_spread": 1.419,
+      "high_agreement_warning": false,
+      "effective_samples": 3,
+      "spread_floor_used": 0.5
+    }
+  },
+  "warnings": [],
+  "sample_count": 3
+}

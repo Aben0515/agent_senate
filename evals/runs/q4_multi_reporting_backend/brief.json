@@ -1,0 +1,64 @@
+{
+  "restated_question": "內部營運報表系統（每日 200 萬筆事件、報表延遲容忍 1 小時）：該選 Kafka + Flink、cron + PostgreSQL、還是 ClickHouse？",
+  "decision_type": "multi_option",
+  "options": [
+    {
+      "id": "cron_postgres",
+      "label": "cron + PostgreSQL",
+      "description": "利用現有 Postgres 配合只讀副本與排程物化視圖"
+    },
+    {
+      "id": "clickhouse",
+      "label": "ClickHouse 獨立 OLAP",
+      "description": "引進列式存儲，高速 SQL 聚合"
+    },
+    {
+      "id": "kafka_flink",
+      "label": "Kafka + Flink 串流架構",
+      "description": "事件總線與即時串流計算引擎"
+    }
+  ],
+  "criteria": [
+    {
+      "id": "simplicity_tco",
+      "label": "架構極簡度與總持有成本",
+      "description": "最少活動零件、避免引入專人維護"
+    },
+    {
+      "id": "query_latency",
+      "label": "複雜報表查詢延遲",
+      "description": "數百萬行多維度 GROUP BY 回應時間"
+    },
+    {
+      "id": "future_scale",
+      "label": "規模擴展至千萬級潛力",
+      "description": "資料量增長 10 倍時的應對餘裕"
+    },
+    {
+      "id": "infra_cost",
+      "label": "硬體與伺服器費用",
+      "description": "雲端運算與存儲月帳單"
+    },
+    {
+      "id": "failure_recovery",
+      "label": "故障復原與除錯容易度",
+      "description": "任務掛掉重算與歷史回溯"
+    },
+    {
+      "id": "dev_learning_curve",
+      "label": "團隊學習曲線",
+      "description": "現有工程師上手與語法掌握速度"
+    }
+  ],
+  "context_facts": [
+    "數據源為各業務模組產生的審計與操作事件，總量約 200 萬筆，每秒尖峰約 100-300 事件",
+    "管理層僅需每小時看一次聚合報表，不需要秒級串流分析"
+  ],
+  "assumptions": [
+    {
+      "text": "業務優先活下來並驗證 PMF",
+      "why_needed": "界定資源優先級",
+      "impact_if_wrong": "重大時程延誤"
+    }
+  ]
+}

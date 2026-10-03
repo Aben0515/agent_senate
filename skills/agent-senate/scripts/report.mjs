@@ -5,7 +5,7 @@
  * hallucination-free report.md with precise numbers and tables.
  */
 
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { parseArgs } from 'node:util';
 import { pathToFileURL } from 'node:url';
 import { computeScoreboard } from './ledger.mjs';

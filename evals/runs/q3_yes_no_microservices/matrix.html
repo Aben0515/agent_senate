@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent Senate 決策權衡矩陣</title>
+<style>
+  :root {
+    --bg: #f6f6f8; --card: #ffffff; --ink: #1b1b22; --muted: #6a6a78; --line: #e2e2e9;
+    --accent: #6b3fd4; --win: #138a4b; --warn: #b45309; --bad: #c0264b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #131318; --card: #1c1c24; --ink: #ececf2; --muted: #9a9aaa; --line: #2e2e3a;
+      --accent: #a98bff; --win: #3ecf8e; --warn: #f5a524; --bad: #ff6b8b; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+    font: 15px/1.6 system-ui, "Noto Sans TC", "Microsoft JhengHei", sans-serif; }
+  main { max-width: 1080px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  h2 { font-size: 16px; margin: 0 0 12px; }
+  .sub { color: var(--muted); margin: 0 0 20px; font-size: 1.05rem; }
+  
+  /* Tabs */
+  .nav-tabs { display: flex; gap: 8px; border-bottom: 2px solid var(--line); margin-bottom: 20px; overflow-x: auto; padding-bottom: 4px; }
+  .nav-tab-btn { background: none; border: none; font: inherit; font-size: 15px; font-weight: 600; color: var(--muted); padding: 8px 16px; border-radius: 8px; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+  .nav-tab-btn:hover { color: var(--ink); background: var(--line); }
+  .nav-tab-btn[aria-selected="true"] { color: #fff; background: var(--accent); }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; margin-bottom: 16px; }
+  .verdict { border-left: 4px solid var(--win); }
+  .verdict .big { font-size: 26px; font-weight: 700; color: var(--win); }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); font-size: 12px; color: var(--muted); margin-left: 6px; }
+  .badge.win { background: var(--win); color: #fff; border-color: var(--win); }
+  .badge.warn { background: var(--warn); color: #fff; border-color: var(--warn); }
+
+  .bars > div { display: grid; grid-template-columns: 140px 1fr 56px; gap: 10px; align-items: center; margin: 6px 0; }
+  .bar { height: 12px; border-radius: 6px; background: var(--line); overflow: hidden; }
+  .bar > i { display: block; height: 100%; background: var(--accent); }
+  
+  .scroll { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; min-width: 560px; }
+  th, td { padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: center; }
+  th:first-child, td:first-child { text-align: left; min-width: 220px; }
+  td.cell { cursor: help; font-variant-numeric: tabular-nums; font-weight: 600; }
+  td.cell.hot::after { content: " 🔥"; font-size: 11px; }
+  tr.total td { font-weight: 700; border-top: 2px solid var(--line); }
+  td.winner, th.winner { color: var(--win); }
+  .crit-name { display: block; font-weight: 600; }
+  .crit-w { color: var(--muted); font-size: 12px; }
+  input[type=range] { width: 100%; accent-color: var(--accent); }
+  .lens button, .btn { font: inherit; padding: 4px 12px; margin: 0 6px 6px 0; border-radius: 999px;
+    border: 1px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer; }
+  .lens button[aria-pressed=true] { background: var(--accent); color: #fff; border-color: var(--accent); }
+  ul { margin: 6px 0; padding-left: 20px; }
+  li { margin: 4px 0; }
+  .sev-high { color: var(--bad); font-weight: 600; } .sev-medium { color: var(--warn); font-weight: 600; } .sev-low { color: var(--muted); }
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+  .muted { color: var(--muted); }
+  .quote { border-left: 3px solid var(--line); padding-left: 10px; color: var(--muted); margin: 6px 0; font-style: italic; }
+
+  /* Replay Player */
+  .replay-controls { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .replay-box { min-height: 180px; padding: 16px; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; margin-bottom: 12px; }
+  .speaker-badge { font-weight: bold; color: var(--accent); margin-bottom: 6px; }
+
+  /* Claim Graph */
+  .claims-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+  .claim-item { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px; cursor: pointer; }
+  .claim-item:hover, .claim-item.selected { border-color: var(--accent); }
+  .claim-item.target-highlight { border-color: var(--bad); background: rgba(192, 38, 75, 0.08); }
+
+  @media (max-width: 560px) { .bars > div { grid-template-columns: 90px 1fr 48px; } }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<main id="app"></main>
+<script id="payload" type="application/json">{"matrix":{"question":"既有 Django 單體架構（20 萬行代碼、8 人團隊、部署一次需 40 分鐘），是否該拆分為微服務架構？","options":[{"id":"keep_monolith_modularize","label":"維持單體但模組化 (Modular Monolith)","description":"梳理代碼邊界、優化測試與流水線、引入 Django apps 領域解耦"},{"id":"split_microservices","label":"全面拆分微服務","description":"拆為 6-8 個獨立微服務與 gRPC 呼叫"},{"id":"gradual_service_extraction","label":"漸進抽取單一最痛服務","description":"僅將報表與高頻任務抽出獨立"}],"criteria":[{"id":"ops_overhead","label":"維運負擔可控性","description":"無專職 SRE 下的監控、網路與部署難易度"},{"id":"delivery_cadence","label":"發布節奏與日常迭代","description":"解決部署衝突與日常提速"},{"id":"data_consistency","label":"資料一致性與事務保證","description":"跨領域操作不出現分佈式髒讀"},{"id":"org_cognitive_load","label":"團隊心智負擔與認知頻寬","description":"8 人小團隊理解整個系統的能力"},{"id":"migration_risk","label":"遷移風險與業務中斷率","description":"架構重構期間新功能停滯代價"},{"id":"fault_isolation","label":"故障爆炸半徑隔離","description":"單一模組崩潰是否拖垮全站"}],"weights":{"ops_overhead":0.3286,"delivery_cadence":0.2644,"data_consistency":0.1018,"org_cognitive_load":0.1018,"migration_risk":0.1018,"fault_isolation":0.1018},"weight_rationale":{"ops_overhead":"依據專案現階段核心矛盾權衡","delivery_cadence":"依據專案現階段核心矛盾權衡","data_consistency":"依據專案現階段核心矛盾權衡","org_cognitive_load":"依據專案現階段核心矛盾權衡","migration_risk":"依據專案現階段核心矛盾權衡","fault_isolation":"依據專案現階段核心矛盾權衡"},"cells":[{"option_id":"keep_monolith_modularize","criterion_id":"ops_overhead","score":9,"rationale":"維持單體但模組化 (Modular Monolith) 在 維運負擔可控性 表現分析","evidence_claim_ids":["cto.1"],"confidence":"high"},{"option_id":"keep_monolith_modularize","criterion_id":"delivery_cadence","score":9,"rationale":"維持單體但模組化 (Modular Monolith) 在 發布節奏與日常迭代 表現分析","evidence_claim_ids":["cto.1"],"confidence":"high"},{"option_id":"keep_monolith_modularize","criterion_id":"data_consistency","score":9,"rationale":"維持單體但模組化 (Modular Monolith) 在 資料一致性與事務保證 表現分析","evidence_claim_ids":["cto.1"],"confidence":"high"},{"option_id":"keep_monolith_modularize","criterion_id":"org_cognitive_load","score":7.2,"rationale":"維持單體但模組化 (Modular Monolith) 在 團隊心智負擔與認知頻寬 評估","evidence_claim_ids":["cto.1"],"confidence":"high"},{"option_id":"keep_monolith_modularize","criterion_id":"migration_risk","score":7.2,"rationale":"維持單體但模組化 (Modular Monolith) 在 遷移風險與業務中斷率 評估","evidence_claim_ids":["cto.1"],"confidence":"high"},{"option_id":"keep_monolith_modularize","criterion_id":"fault_isolation","score":7.2,"rationale":"維持單體但模組化 (Modular Monolith) 在 故障爆炸半徑隔離 評估","evidence_claim_ids":["cto.1"],"confidence":"high"},{"option_id":"split_microservices","criterion_id":"ops_overhead","score":4.2,"rationale":"全面拆分微服務 在 維運負擔可控性 評估","evidence_claim_ids":["cto.1"],"confidence":"high"},{"option_id":"split_microservices","criterion_id":"delivery_cadence","score":4.2,"rationale":"全面拆分微服務 在 發布節奏與日常迭代 評估","evidence_claim_ids":["cto.1"],"confidence":"high"},{"option_id":"split_microservices","criterion_id":"data_consistency","score":8.8,"rationale":"全面拆分微服務 在 資料一致性與事務保證 評估","evidence_claim_ids":["cto.1"],"confidence":"high"},{"option_id":"split_microservices","criterion_id":"org_cognitive_load","score":8.8,"rationale":"全面拆分微服務 在 團隊心智負擔與認知頻寬 評估","evidence_claim_ids":["cto.1"],"confidence":"high"},{"option_id":"split_microservices","criterion_id":"migration_risk","score":8.8,"rationale":"全面拆分微服務 在 遷移風險與業務中斷率 評估","evidence_claim_ids":["cto.1"],"confidence":"high"},{"option_id":"split_microservices","criterion_id":"fault_isolation","score":8.8,"rationale":"全面拆分微服務 在 故障爆炸半徑隔離 評估","evidence_claim_ids":["cto.1"],"confidence":"high"},{"option_id":"gradual_service_extraction","criterion_id":"ops_overhead","score":4.2,"rationale":"漸進抽取單一最痛服務 在 維運負擔可控性 評估","evidence_claim_ids":["cto.1"],"confidence":"high"},{"option_id":"gradual_service_extraction","criterion_id":"delivery_cadence","score":4.2,"rationale":"漸進抽取單一最痛服務 在 發布節奏與日常迭代 評估","evidence_claim_ids":["cto.1"],"confidence":"high"},{"option_id":"gradual_service_extraction","criterion_id":"data_consistency","score":8.8,"rationale":"漸進抽取單一最痛服務 在 資料一致性與事務保證 評估","evidence_claim_ids":["cto.1"],"confidence":"high"},{"option_id":"gradual_service_extraction","criterion_id":"org_cognitive_load","score":8.8,"rationale":"漸進抽取單一最痛服務 在 團隊心智負擔與認知頻寬 評估","evidence_claim_ids":["cto.1"],"confidence":"high"},{"option_id":"gradual_service_extraction","criterion_id":"migration_risk","score":8.8,"rationale":"漸進抽取單一最痛服務 在 遷移風險與業務中斷率 評估","evidence_claim_ids":["cto.1"],"confidence":"high"},{"option_id":"gradual_service_extraction","criterion_id":"fault_isolation","score":8.8,"rationale":"漸進抽取單一最痛服務 在 故障爆炸半徑隔離 評估","evidence_claim_ids":["cto.1"],"confidence":"high"}],"cell_spread":{"keep_monolith_modularize|ops_overhead":1.183,"keep_monolith_modularize|delivery_cadence":1.183,"keep_monolith_modularize|data_consistency":1.183,"keep_monolith_modularize|org_cognitive_load":0.971,"keep_monolith_modularize|migration_risk":0.971,"keep_monolith_modularize|fault_isolation":0.971,"split_microservices|ops_overhead":0.714,"split_microservices|delivery_cadence":0.714,"split_microservices|data_consistency":1.639,"split_microservices|org_cognitive_load":1.639,"split_microservices|migration_risk":1.639,"split_microservices|fault_isolation":1.639,"gradual_service_extraction|ops_overhead":2.058,"gradual_service_extraction|delivery_cadence":2.058,"gradual_service_extraction|data_consistency":1.613,"gradual_service_extraction|org_cognitive_load":1.613,"gradual_service_extraction|migration_risk":1.613,"gradual_service_extraction|fault_isolation":1.613},"persona_scores":[{"speaker_id":"conservative_cto","weights":{"ops_overhead":0.5,"delivery_cadence":0.1,"data_consistency":0.1,"org_cognitive_load":0.1,"migration_risk":0.1,"fault_isolation":0.1},"cells":[{"option_id":"keep_monolith_modularize","criterion_id":"ops_overhead","score":9,"reason":"符合實用保守原則"},{"option_id":"keep_monolith_modularize","criterion_id":"delivery_cadence","score":9,"reason":"符合實用保守原則"},{"option_id":"keep_monolith_modularize","criterion_id":"data_consistency","score":9,"reason":"符合實用保守原則"},{"option_id":"keep_monolith_modularize","criterion_id":"org_cognitive_load","score":9,"reason":"符合實用保守原則"},{"option_id":"keep_monolith_modularize","criterion_id":"migration_risk","score":9,"reason":"符合實用保守原則"},{"option_id":"keep_monolith_modularize","criterion_id":"fault_isolation","score":9,"reason":"符合實用保守原則"},{"option_id":"split_microservices","criterion_id":"ops_overhead","score":5,"reason":"符合實用保守原則"},{"option_id":"split_microservices","criterion_id":"delivery_cadence","score":5,"reason":"符合實用保守原則"},{"option_id":"split_microservices","criterion_id":"data_consistency","score":5,"reason":"符合實用保守原則"},{"option_id":"split_microservices","criterion_id":"org_cognitive_load","score":5,"reason":"符合實用保守原則"},{"option_id":"split_microservices","criterion_id":"migration_risk","score":5,"reason":"符合實用保守原則"},{"option_id":"split_microservices","criterion_id":"fault_isolation","score":5,"reason":"符合實用保守原則"},{"option_id":"gradual_service_extraction","criterion_id":"ops_overhead","score":5,"reason":"符合實用保守原則"},{"option_id":"gradual_service_extraction","criterion_id":"delivery_cadence","score":5,"reason":"符合實用保守原則"},{"option_id":"gradual_service_extraction","criterion_id":"data_consistency","score":5,"reason":"符合實用保守原則"},{"option_id":"gradual_service_extraction","criterion_id":"org_cognitive_load","score":5,"reason":"符合實用保守原則"},{"option_id":"gradual_service_extraction","criterion_id":"migration_risk","score":5,"reason":"符合實用保守原則"},{"option_id":"gradual_service_extraction","criterion_id":"fault_isolation","score":5,"reason":"符合實用保守原則"}],"final_choice":"keep_monolith_modularize","one_line":"首年生存至上，嚴控試錯成本。"},{"speaker_id":"perf_zealot","weights":{"ops_overhead":0.1,"delivery_cadence":0.1,"data_consistency":0.1,"org_cognitive_load":0.1,"migration_risk":0.1,"fault_isolation":0.5},"cells":[{"option_id":"keep_monolith_modularize","criterion_id":"ops_overhead","score":6,"reason":"重視極致控制與擴展力"},{"option_id":"keep_monolith_modularize","criterion_id":"delivery_cadence","score":6,"reason":"重視極致控制與擴展力"},{"option_id":"keep_monolith_modularize","criterion_id":"data_consistency","score":6,"reason":"重視極致控制與擴展力"},{"option_id":"keep_monolith_modularize","criterion_id":"org_cognitive_load","score":6,"reason":"重視極致控制與擴展力"},{"option_id":"keep_monolith_modularize","criterion_id":"migration_risk","score":6,"reason":"重視極致控制與擴展力"},{"option_id":"keep_monolith_modularize","criterion_id":"fault_isolation","score":6,"reason":"重視極致控制與擴展力"},{"option_id":"split_microservices","criterion_id":"ops_overhead","score":6,"reason":"重視極致控制與擴展力"},{"option_id":"split_microservices","criterion_id":"delivery_cadence","score":6,"reason":"重視極致控制與擴展力"},{"option_id":"split_microservices","criterion_id":"data_consistency","score":6,"reason":"重視極致控制與擴展力"},{"option_id":"split_microservices","criterion_id":"org_cognitive_load","score":6,"reason":"重視極致控制與擴展力"},{"option_id":"split_microservices","criterion_id":"migration_risk","score":6,"reason":"重視極致控制與擴展力"},{"option_id":"split_microservices","criterion_id":"fault_isolation","score":6,"reason":"重視極致控制與擴展力"},{"option_id":"gradual_service_extraction","criterion_id":"ops_overhead","score":9.5,"reason":"重視極致控制與擴展力"},{"option_id":"gradual_service_extraction","criterion_id":"delivery_cadence","score":9.5,"reason":"重視極致控制與擴展力"},{"option_id":"gradual_service_extraction","criterion_id":"data_consistency","score":9.5,"reason":"重視極致控制與擴展力"},{"option_id":"gradual_service_extraction","criterion_id":"org_cognitive_load","score":9.5,"reason":"重視極致控制與擴展力"},{"option_id":"gradual_service_extraction","criterion_id":"migration_risk","score":9.5,"reason":"重視極致控制與擴展力"},{"option_id":"gradual_service_extraction","criterion_id":"fault_isolation","score":9.5,"reason":"重視極致控制與擴展力"}],"final_choice":"gradual_service_extraction","one_line":"底層架構的技術債會加倍奉還。"}]},"analysis":{"totals":{"keep_monolith_modularize":8.4505,"split_microservices":6.0723,"gradual_service_extraction":6.0723},"ranking":["keep_monolith_modularize","gradual_service_extraction","split_microservices"],"winner":"keep_monolith_modularize","margin":2.3782,"tipping_points":[{"criterion_id":"org_cognitive_load","criterion_label":"團隊心智負擔與認知頻寬","current_weight":0.102,"threshold":0.639,"direction":"increase","new_winner":"gradual_service_extraction"},{"criterion_id":"migration_risk","criterion_label":"遷移風險與業務中斷率","current_weight":0.102,"threshold":0.639,"direction":"increase","new_winner":"gradual_service_extraction"},{"criterion_id":"fault_isolation","criterion_label":"故障爆炸半徑隔離","current_weight":0.102,"threshold":0.639,"direction":"increase","new_winner":"gradual_service_extraction"}],"win_probability":{"keep_monolith_modularize":0.9704,"split_microservices":0.0046,"gradual_service_extraction":0.025},"seed_used":42,"persona_lens":{"conservative_cto":{"winner":"keep_monolith_modularize","totals":{"keep_monolith_modularize":8.46,"split_microservices":6.04,"gradual_service_extraction":6.04},"ranking":["keep_monolith_modularize","gradual_service_extraction","split_microservices"]},"perf_zealot":{"winner":"gradual_service_extraction","totals":{"keep_monolith_modularize":7.74,"split_microservices":7.88,"gradual_service_extraction":7.88},"ranking":["gradual_service_extraction","split_microservices","keep_monolith_modularize"]}},"persona_own_view":{"conservative_cto":{"winner":"keep_monolith_modularize","totals":{"keep_monolith_modularize":9,"split_microservices":5,"gradual_service_extraction":5},"ranking":["keep_monolith_modularize","gradual_service_extraction","split_microservices"]},"perf_zealot":{"winner":"gradual_service_extraction","totals":{"keep_monolith_modularize":6,"split_microservices":6,"gradual_service_extraction":9.5},"ranking":["gradual_service_extraction","keep_monolith_modularize","split_microservices"]}},"max_regret":{"keep_monolith_modularize":0.14,"split_microservices":2.42,"gradual_service_extraction":2.42},"minimax_regret_option":"keep_monolith_modularize","disagreement_hotspots":[{"cell_key":"gradual_service_extraction|ops_overhead","option_id":"gradual_service_extraction","criterion_id":"ops_overhead","spread":2.058,"chair_score":4.2,"persona_scores":{"conservative_cto":5,"perf_zealot":9.5}},{"cell_key":"gradual_service_extraction|delivery_cadence","option_id":"gradual_service_extraction","criterion_id":"delivery_cadence","spread":2.058,"chair_score":4.2,"persona_scores":{"conservative_cto":5,"perf_zealot":9.5}},{"cell_key":"split_microservices|data_consistency","option_id":"split_microservices","criterion_id":"data_consistency","spread":1.639,"chair_score":8.8,"persona_scores":{"conservative_cto":5,"perf_zealot":6}},{"cell_key":"split_microservices|org_cognitive_load","option_id":"split_microservices","criterion_id":"org_cognitive_load","spread":1.639,"chair_score":8.8,"persona_scores":{"conservative_cto":5,"perf_zealot":6}},{"cell_key":"split_microservices|migration_risk","option_id":"split_microservices","criterion_id":"migration_risk","spread":1.639,"chair_score":8.8,"persona_scores":{"conservative_cto":5,"perf_zealot":6}}],"diagnostics":{"judge_agreement_avg_spread":1.39,"high_agreement_warning":false,"effective_samples":3,"spread_floor_used":0.5}},"warnings":[],"sample_count":3,"extras":{"verdict":{"recommended_option_id":"keep_monolith_modularize","confidence_label":"高","one_liner":"在當前情境事實約束下，強烈推薦 keep_monolith_modularize 作為最優解。","recommendation_text":"經過完整交叉質詢與敏感度分析，keep_monolith_modularize 在交付速度、維運簡單度與團隊心智負擔上取得決定性領先優勢。","conditions_to_flip":["若業務規模或核心約束在未來幾個月內發生 10 倍以上突變，方需考慮改選 gradual_service_extraction"]},"red_team":"【反方技術紅隊警示】若選擇 keep_monolith_modularize，團隊切不可因為初期的開發順遂而放鬆架構紀律。一旦未來出現特定極限計算或合規硬性限制，當初未選 gradual_service_extraction 將迫使團隊啟動局部的微服務抽取或重構。","key_tradeoffs":[{"title":"即時交付速度 vs 極致架構擴展性","gain":"快速上線驗證","cost":"承擔長期局部重構可能性"}],"blind_spots":[{"title":"團隊擴張時的認知負擔溢價","description":"新成員進駐後的系統邊界理解成本","severity":"medium","why_it_matters":"影響團隊擴展速度"}],"next_experiments":[{"title":"核心資料流原型壓測 Spike","description":"針對預估尖峰量級實施 2 天原型驗證","effort":"2 天","decides":"確認是否真有架構瓶頸風險"}],"highlights":[{"title":"最具殺傷力的商業提問","quote":"活到下一個季度","speaker_id":"conservative_cto","why":"精準直擊新創技術選型的本質"}],"mvp":{"speaker_id":"conservative_cto","comment":"始終緊扣業務生存與現金流硬約束"},"turns":[{"id":"chair_opening_1","type":"chair","kind":"opening","round":null,"text":"歡迎各位蒞臨 Agent Senate 虛擬內閣。今天議事日程為【Django 20萬行單體要不要拆微服務？】。請各位辯手就座，開門見山亮出立場與量級依據！","timestamp":"2026-10-03T23:22:49.481Z"},{"id":"turn_conservative_cto_opening_2","type":"debater","speaker":"conservative_cto","kind":"opening","round":null,"text":"我堅決推薦選擇 維持單體但模組化 (Modular Monolith)（keep_monolith_modularize）。理由在於團隊需要極致控制風險與交付成本。","full_text":"我堅決推薦選擇 維持單體但模組化 (Modular Monolith)（keep_monolith_modularize）。理由在於團隊需要極致控制風險與交付成本。\n\n```claims\n[{\"text\":\"維持單體但模組化 (Modular Monolith)可顯著降低初創期總持有成本與風險\",\"quote\":\"降低初創期總持有成本與風險\",\"kind\":\"estimate\",\"supports_option_ids\":[\"keep_monolith_modularize\"]},{\"text\":\"基礎設施複雜度會拖慢團隊核心業務推進\",\"quote\":\"拖慢團隊核心業務推進\",\"kind\":\"fact\",\"supports_option_ids\":[\"keep_monolith_modularize\"]}]\n```","claims":["cto.1","cto.2"],"concessions":[],"timestamp":"2026-10-03T23:22:49.481Z"},{"id":"turn_perf_zealot_opening_3","type":"debater","speaker":"perf_zealot","kind":"opening","round":null,"text":"我支持 全面拆分微服務（split_microservices）。\n> 【conservative_cto #cto.1】降低初創期總持有成本與風險。但是如果長期架構擴展性與極限性能有硬傷，後續重構代價將是 5 倍以上。","full_text":"我支持 全面拆分微服務（split_microservices）。\n> 【conservative_cto #cto.1】降低初創期總持有成本與風險。但是如果長期架構擴展性與極限性能有硬傷，後續重構代價將是 5 倍以上。\n\n```claims\n[{\"text\":\"全面拆分微服務在長期擴展性與底層控制力具備不可替代優勢\",\"quote\":\"長期擴展性具備不可替代優勢\",\"kind\":\"value\",\"supports_option_ids\":[\"split_microservices\"],\"attacks_claim_ids\":[\"cto.1\"]}]\n```","claims":["vex.1"],"concessions":[],"timestamp":"2026-10-03T23:22:49.481Z"},{"id":"turn_kiss_hacker_opening_4","type":"debater","speaker":"kiss_hacker","kind":"opening","round":null,"text":"我選擇最務實的方案 keep_monolith_modularize。在 1,500 RPS 與 3 人小團隊約束下，任何沒有算過帳的過度架構都是工程師的自嗨。最少活動零件原則才是真理。","full_text":"我選擇最務實的方案 keep_monolith_modularize。在 1,500 RPS 與 3 人小團隊約束下，任何沒有算過帳的過度架構都是工程師的自嗨。最少活動零件原則才是真理。\n\n```claims\n[{\"text\":\"現有負載下簡約架構完全足夠支撐，不要為不存在的規模做設計\",\"quote\":\"不要為不存在的規模做設計\",\"kind\":\"proposal\",\"supports_option_ids\":[\"keep_monolith_modularize\"]}]\n```","claims":["kiss.1"],"concessions":[],"timestamp":"2026-10-03T23:22:49.481Z"},{"id":"chair_directive_1","type":"chair","kind":"directive","round":1,"text":"戰況總結：交鋒焦點聚焦於即時交付 vs 長期擴展性。請各辯手針對具體量級數據展開正面質詢！@perf_zealot，請說明如果流量在 1 年內達到 5,000 QPS，成本相差多少？","timestamp":"2026-10-03T23:22:49.481Z"},{"id":"turn_perf_zealot_rebuttal_1","type":"debater","speaker":"perf_zealot","kind":"rebuttal","round":1,"text":"> 【conservative_cto #cto.1】降低初創期總持有成本與風險\n【讓步 #vex.1】我承認在業務初期首年，3 人團隊生存交付確實排在第一位。但是若延遲突破 50ms，我們必須看清長期技術債的複利效應。","full_text":"> 【conservative_cto #cto.1】降低初創期總持有成本與風險\n【讓步 #vex.1】我承認在業務初期首年，3 人團隊生存交付確實排在第一位。但是若延遲突破 50ms，我們必須看清長期技術債的複利效應。\n\n```claims\n[{\"text\":\"預先做好領域邊界規劃可兼顧當期速度與未來遷移\",\"quote\":\"預先做好領域邊界規劃\",\"kind\":\"proposal\",\"supports_option_ids\":[\"keep_monolith_modularize\"],\"concedes_claim_ids\":[\"vex.1\"]}]\n```","claims":["vex.2"],"concessions":["vex.1"],"timestamp":"2026-10-03T23:22:49.481Z"},{"id":"turn_conservative_cto_rebuttal_1","type":"debater","speaker":"conservative_cto","kind":"rebuttal","round":1,"text":"> 【perf_zealot #vex.1】長期擴展性具備不可替代優勢。\n若公司在第 1 年就因過早最佳化把 300 萬資金燒光，五年後的擴展性只是幻影。","full_text":"> 【perf_zealot #vex.1】長期擴展性具備不可替代優勢。\n若公司在第 1 年就因過早最佳化把 300 萬資金燒光，五年後的擴展性只是幻影。\n\n```claims\n[{\"text\":\"新創團隊的第一法則是活到下一個季度\",\"quote\":\"活到下一個季度\",\"kind\":\"value\",\"supports_option_ids\":[\"keep_monolith_modularize\"]}]\n```","claims":["cto.3"],"concessions":[],"timestamp":"2026-10-03T23:22:49.481Z"},{"id":"turn_kiss_hacker_rebuttal_1","type":"debater","speaker":"kiss_hacker","kind":"rebuttal","round":1,"text":"> 【perf_zealot #vex.1】預先做好領域邊界規劃\n把它刪掉，看看誰會哭？在單台 4 核心 8GB 伺服器上，把不必要的 10 個微服務活動零件全數剃除。","full_text":"> 【perf_zealot #vex.1】預先做好領域邊界規劃\n把它刪掉，看看誰會哭？在單台 4 核心 8GB 伺服器上，把不必要的 10 個微服務活動零件全數剃除。\n\n```claims\n[{\"text\":\"遵循奧卡姆剃刀，先用最小可行方案上線驗證反饋\",\"quote\":\"先用最小可行方案上線驗證反饋\",\"kind\":\"proposal\",\"supports_option_ids\":[\"keep_monolith_modularize\"]}]\n```","claims":["kiss.2"],"concessions":[],"timestamp":"2026-10-03T23:22:49.481Z"},{"id":"chair_directive_2","type":"chair","kind":"directive","round":2,"text":"交叉質詢第 2 輪結束：主要交鋒點已充分辯論，現在進入鋼人論證與結辯！","timestamp":"2026-10-03T23:22:49.481Z"},{"id":"turn_conservative_cto_steelman_10","type":"debater","speaker":"conservative_cto","kind":"steelman","round":null,"text":"我為 gradual_service_extraction 做最強辯護：如果未來流量出現 10 倍指數級增長，當初奠定的硬核架構將展現巨大的免重構優勢。這動搖了我 25%。","full_text":"我為 gradual_service_extraction 做最強辯護：如果未來流量出現 10 倍指數級增長，當初奠定的硬核架構將展現巨大的免重構優勢。這動搖了我 25%。","claims":[],"concessions":[],"timestamp":"2026-10-03T23:22:49.481Z"},{"id":"turn_perf_zealot_steelman_11","type":"debater","speaker":"perf_zealot","kind":"steelman","round":null,"text":"我為 keep_monolith_modularize 做最強辯護：在商業市場上，交付速度就是生命線，新人快速接盤是抗風險護城河。這動搖了我 35%。","full_text":"我為 keep_monolith_modularize 做最強辯護：在商業市場上，交付速度就是生命線，新人快速接盤是抗風險護城河。這動搖了我 35%。","claims":[],"concessions":[],"timestamp":"2026-10-03T23:22:49.481Z"},{"id":"turn_kiss_hacker_steelman_12","type":"debater","speaker":"kiss_hacker","kind":"steelman","round":null,"text":"我承認對手在極限可靠性上的深刻思考，這促使我認識到簡約架構依然必須保留清晰的模組邊界。","full_text":"我承認對手在極限可靠性上的深刻思考，這促使我認識到簡約架構依然必須保留清晰的模組邊界。","claims":[],"concessions":[],"timestamp":"2026-10-03T23:22:49.481Z"},{"id":"turn_conservative_cto_closing_13","type":"debater","speaker":"conservative_cto","kind":"closing","round":null,"text":"結辯：我最終堅定推薦 keep_monolith_modularize。若團隊全員本已精通次選技術且預算無限，我的建議為錯。","full_text":"結辯：我最終堅定推薦 keep_monolith_modularize。若團隊全員本已精通次選技術且預算無限，我的建議為錯。","claims":[],"concessions":[],"timestamp":"2026-10-03T23:22:49.481Z"},{"id":"turn_perf_zealot_closing_14","type":"debater","speaker":"perf_zealot","kind":"closing","round":null,"text":"結辯：我維持對底層擴展性的警示，但尊重團隊當前的交付邊界。若業務本質為低頻系統，keep_monolith_modularize 是務實選擇。","full_text":"結辯：我維持對底層擴展性的警示，但尊重團隊當前的交付邊界。若業務本質為低頻系統，keep_monolith_modularize 是務實選擇。","claims":[],"concessions":[],"timestamp":"2026-10-03T23:22:49.481Z"},{"id":"turn_kiss_hacker_closing_15","type":"debater","speaker":"kiss_hacker","kind":"closing","round":null,"text":"結辯：我堅定推薦 keep_monolith_modularize。先交付業務價值，再針對真實瓶頸優化。","full_text":"結辯：我堅定推薦 keep_monolith_modularize。先交付業務價值，再針對真實瓶頸優化。","claims":[],"concessions":[],"timestamp":"2026-10-03T23:22:49.481Z"}],"claims":{"cto.1":{"id":"cto.1","speaker":"conservative_cto","turn_kind":"opening","round":null,"text":"維持單體但模組化 (Modular Monolith)可顯著降低初創期總持有成本與風險","quote":"降低初創期總持有成本與風險","kind":"estimate","supports_option_ids":["keep_monolith_modularize"],"attacks_claim_ids":[],"concedes_claim_ids":[],"status":"attacked","attacked_by":["vex.1","vex.2"],"fact_check":{"claim_id":"cto.1","verdict":"plausible","note":"架構複雜度與交付週期成正比"}},"cto.2":{"id":"cto.2","speaker":"conservative_cto","turn_kind":"opening","round":null,"text":"基礎設施複雜度會拖慢團隊核心業務推進","quote":"拖慢團隊核心業務推進","kind":"fact","supports_option_ids":["keep_monolith_modularize"],"attacks_claim_ids":[],"concedes_claim_ids":[],"status":"open","attacked_by":[],"fact_check":null},"vex.1":{"id":"vex.1","speaker":"perf_zealot","turn_kind":"opening","round":null,"text":"全面拆分微服務在長期擴展性與底層控制力具備不可替代優勢","quote":"長期擴展性具備不可替代優勢","kind":"value","supports_option_ids":["split_microservices"],"attacks_claim_ids":["cto.1"],"concedes_claim_ids":[],"status":"conceded","attacked_by":["vex.2","cto.3","kiss.2"],"fact_check":null},"kiss.1":{"id":"kiss.1","speaker":"kiss_hacker","turn_kind":"opening","round":null,"text":"現有負載下簡約架構完全足夠支撐，不要為不存在的規模做設計","quote":"不要為不存在的規模做設計","kind":"proposal","supports_option_ids":["keep_monolith_modularize"],"attacks_claim_ids":[],"concedes_claim_ids":[],"status":"open","attacked_by":[],"fact_check":null},"vex.2":{"id":"vex.2","speaker":"perf_zealot","turn_kind":"rebuttal","round":1,"text":"預先做好領域邊界規劃可兼顧當期速度與未來遷移","quote":"預先做好領域邊界規劃","kind":"proposal","supports_option_ids":["keep_monolith_modularize"],"attacks_claim_ids":["cto.1","vex.1"],"concedes_claim_ids":["vex.1"],"status":"open","attacked_by":[],"fact_check":null},"cto.3":{"id":"cto.3","speaker":"conservative_cto","turn_kind":"rebuttal","round":1,"text":"新創團隊的第一法則是活到下一個季度","quote":"活到下一個季度","kind":"value","supports_option_ids":["keep_monolith_modularize"],"attacks_claim_ids":["vex.1"],"concedes_claim_ids":[],"status":"open","attacked_by":[],"fact_check":null},"kiss.2":{"id":"kiss.2","speaker":"kiss_hacker","turn_kind":"rebuttal","round":1,"text":"遵循奧卡姆剃刀，先用最小可行方案上線驗證反饋","quote":"先用最小可行方案上線驗證反饋","kind":"proposal","supports_option_ids":["keep_monolith_modularize"],"attacks_claim_ids":["vex.1"],"concedes_claim_ids":[],"status":"open","attacked_by":[],"fact_check":null}},"transcript":"# 完整辯論逐字稿：既有 Django 單體架構（20 萬行代碼、8 人團隊、部署一次需 40 分鐘），是否該拆分為微服務架構？\n\n> 建立時間：2026-10-03T23:22:49.481Z\n\n## 決策簡報與情境約束\n\n- **問題**：既有 Django 單體架構（20 萬行代碼、8 人團隊、部署一次需 40 分鐘），是否該拆分為微服務架構？\n- **候選方案**：`keep_monolith_modularize` (維持單體但模組化 (Modular Monolith))、`split_microservices` (全面拆分微服務)、`gradual_service_extraction` (漸進抽取單一最痛服務)\n- **情境事實**：\n  - 系統運營 4 年，核心業務邏輯高度耦合，單元測試執行需 25 分鐘，CI/CD 部署耗時 40 分鐘\n  - 團隊共 8 人，經常發生部署衝突，但目前基礎設施維運僅有 1 名兼職 SRE\n\n---\n\n## 辯論完整進程\n\n### ⚖️ 天秤主席 ｜ opening\n\n歡迎各位蒞臨 Agent Senate 虛擬內閣。今天議事日程為【Django 20萬行單體要不要拆微服務？】。請各位辯手就座，開門見山亮出立場與量級依據！\n\n---\n\n### conservative_cto ｜ opening\n\n我堅決推薦選擇 維持單體但模組化 (Modular Monolith)（keep_monolith_modularize）。理由在於團隊需要極致控制風險與交付成本。\n\n> 提出論點：`#cto.1`, `#cto.2`\n\n---\n\n### perf_zealot ｜ opening\n\n我支持 全面拆分微服務（split_microservices）。\n> 【conservative_cto #cto.1】降低初創期總持有成本與風險。但是如果長期架構擴展性與極限性能有硬傷，後續重構代價將是 5 倍以上。\n\n> 提出論點：`#vex.1`\n\n---\n\n### kiss_hacker ｜ opening\n\n我選擇最務實的方案 keep_monolith_modularize。在 1,500 RPS 與 3 人小團隊約束下，任何沒有算過帳的過度架構都是工程師的自嗨。最少活動零件原則才是真理。\n\n> 提出論點：`#kiss.1`\n\n---\n\n### ⚖️ 天秤主席 ｜ directive (第 1 輪)\n\n戰況總結：交鋒焦點聚焦於即時交付 vs 長期擴展性。請各辯手針對具體量級數據展開正面質詢！@perf_zealot，請說明如果流量在 1 年內達到 5,000 QPS，成本相差多少？\n\n---\n\n### perf_zealot ｜ rebuttal (第 1 輪)\n\n> 【conservative_cto #cto.1】降低初創期總持有成本與風險\n【讓步 #vex.1】我承認在業務初期首年，3 人團隊生存交付確實排在第一位。但是若延遲突破 50ms，我們必須看清長期技術債的複利效應。\n\n> 提出論點：`#vex.2`\n\n---\n\n### conservative_cto ｜ rebuttal (第 1 輪)\n\n> 【perf_zealot #vex.1】長期擴展性具備不可替代優勢。\n若公司在第 1 年就因過早最佳化把 300 萬資金燒光，五年後的擴展性只是幻影。\n\n> 提出論點：`#cto.3`\n\n---\n\n### kiss_hacker ｜ rebuttal (第 1 輪)\n\n> 【perf_zealot #vex.1】預先做好領域邊界規劃\n把它刪掉，看看誰會哭？在單台 4 核心 8GB 伺服器上，把不必要的 10 個微服務活動零件全數剃除。\n\n> 提出論點：`#kiss.2`\n\n---\n\n### ⚖️ 天秤主席 ｜ directive (第 2 輪)\n\n交叉質詢第 2 輪結束：主要交鋒點已充分辯論，現在進入鋼人論證與結辯！\n\n---\n\n### conservative_cto ｜ steelman\n\n我為 gradual_service_extraction 做最強辯護：如果未來流量出現 10 倍指數級增長，當初奠定的硬核架構將展現巨大的免重構優勢。這動搖了我 25%。\n\n---\n\n### perf_zealot ｜ steelman\n\n我為 keep_monolith_modularize 做最強辯護：在商業市場上，交付速度就是生命線，新人快速接盤是抗風險護城河。這動搖了我 35%。\n\n---\n\n### kiss_hacker ｜ steelman\n\n我承認對手在極限可靠性上的深刻思考，這促使我認識到簡約架構依然必須保留清晰的模組邊界。\n\n---\n\n### conservative_cto ｜ closing\n\n結辯：我最終堅定推薦 keep_monolith_modularize。若團隊全員本已精通次選技術且預算無限，我的建議為錯。\n\n---\n\n### perf_zealot ｜ closing\n\n結辯：我維持對底層擴展性的警示，但尊重團隊當前的交付邊界。若業務本質為低頻系統，keep_monolith_modularize 是務實選擇。\n\n---\n\n### kiss_hacker ｜ closing\n\n結辯：我堅定推薦 keep_monolith_modularize。先交付業務價值，再針對真實瓶頸優化。\n\n---\n\n## 最終論點索引表\n\n- #cto.1 (estimate, conservative_cto) [⚔️被攻擊] (⚔️來自: vex.1, vex.2) 維持單體但模組化 (Modular Monolith)可顯著降低初創期總持有成本與風險 ／ 原文：「降低初創期總持有成本與風險」\n- #cto.2 (fact, conservative_cto) [⏳開放] 基礎設施複雜度會拖慢團隊核心業務推進 ／ 原文：「拖慢團隊核心業務推進」\n- #vex.1 (value, perf_zealot) [💔已讓步] (⚔️來自: vex.2, cto.3, kiss.2) 全面拆分微服務在長期擴展性與底層控制力具備不可替代優勢 ／ 原文：「長期擴展性具備不可替代優勢」\n- #kiss.1 (proposal, kiss_hacker) [⏳開放] 現有負載下簡約架構完全足夠支撐，不要為不存在的規模做設計 ／ 原文：「不要為不存在的規模做設計」\n- #vex.2 (proposal, perf_zealot) [⏳開放] 預先做好領域邊界規劃可兼顧當期速度與未來遷移 ／ 原文：「預先做好領域邊界規劃」\n- #cto.3 (value, conservative_cto) [⏳開放] 新創團隊的第一法則是活到下一個季度 ／ 原文：「活到下一個季度」\n- #kiss.2 (proposal, kiss_hacker) [⏳開放] 遵循奧卡姆剃刀，先用最小可行方案上線驗證反饋 ／ 原文：「先用最小可行方案上線驗證反饋」\n\n## 辯手計分板\n\n| 辯手 | 論點數 | 攻擊命中 | 主動讓步 | 被標謬誤 | 查核標記 | MVP得分 |\n|---|---:|---:|---:|---:|---:|---:|\n| conservative_cto | 3 | 1 | 0 | 0 | 0 | **3** |\n| perf_zealot | 2 | 1 | 1 | 0 | 0 | **4** |\n| kiss_hacker | 2 | 1 | 0 | 0 | 0 | **3** |"}}</script>
+<script>
+(function () {
+  "use strict";
+  var DATA = JSON.parse(document.getElementById("payload").textContent.replace(/^\/\*__DATA__\*\//, ""));
+  var M = DATA.matrix, A = DATA.analysis, X = DATA.extras || {};
+  var app = document.getElementById("app");
+
+  function h(tag, attrs) {
+    var el = document.createElement(tag);
+    if (attrs) Object.keys(attrs).forEach(function (k) {
+      if (k === "class") el.className = attrs[k];
+      else if (k === "style") el.setAttribute("style", attrs[k]);
+      else if (k.indexOf("on") === 0) el.addEventListener(k.slice(2), attrs[k]);
+      else el.setAttribute(k, attrs[k]);
+    });
+    for (var i = 2; i < arguments.length; i++) {
+      var c = arguments[i];
+      if (c == null || c === false) continue;
+      if (Array.isArray(c)) c.forEach(function (x) { if (x != null) el.appendChild(typeof x === "object" ? x : document.createTextNode(String(x))); });
+      else el.appendChild(typeof c === "object" ? c : document.createTextNode(String(c)));
+    }
+    return el;
+  }
+  var pct = function (x) { return Math.round(x * 100) + "%"; };
+  var optLabel = {}; M.options.forEach(function (o) { optLabel[o.id] = o.label || o.id; });
+  var critLabel = {}; M.criteria.forEach(function (c) { critLabel[c.id] = c.label || c.id; });
+  var personaInfo = {}; (X.personas || []).forEach(function (p) { personaInfo[p.id] = p; });
+  var pname = function (id) { var p = personaInfo[id]; return p ? (p.emoji || "") + " " + (p.short_name || p.display_name || id) : id; };
+
+  var score = {}, spread = M.cell_spread || {}, cellInfo = {};
+  M.cells.forEach(function (c) { score[c.option_id + "|" + c.criterion_id] = c.score; cellInfo[c.option_id + "|" + c.criterion_id] = c; });
+  var hotKeys = {}; (A.disagreement_hotspots || []).slice(0, 3).forEach(function (x) { hotKeys[x.cell_key] = true; });
+
+  var chairW = Object.assign({}, M.weights);
+  var W = Object.assign({}, chairW);
+  var activeLens = "chair";
+
+  function normalize(w) {
+    var t = 0; M.criteria.forEach(function (c) { t += Math.max(0, w[c.id] || 0); });
+    var o = {}; M.criteria.forEach(function (c) { o[c.id] = t > 0 ? Math.max(0, w[c.id] || 0) / t : 1 / M.criteria.length; });
+    return o;
+  }
+  function totals(w) {
+    var n = normalize(w), t = {};
+    M.options.forEach(function (o) {
+      var s = 0; M.criteria.forEach(function (c) { s += n[c.id] * (score[o.id + "|" + c.id] || 5); });
+      t[o.id] = s;
+    });
+    return t;
+  }
+  function winnerOf(t) {
+    return Object.keys(t).sort(function (a, b) {
+      return Math.abs(t[a] - t[b]) > 1e-9 ? t[b] - t[a] : ((A.win_probability[b] || 0) - (A.win_probability[a] || 0)) || (a < b ? -1 : 1);
+    })[0];
+  }
+
+  // Header
+  app.appendChild(h("h1", null, "⚖️ Agent Senate 決策權衡矩陣"));
+  app.appendChild(h("p", { class: "sub" }, M.question));
+
+  // Navigation Tabs
+  var tabNav = h("div", { class: "nav-tabs" });
+  var tabMatrixBtn = h("button", { class: "nav-tab-btn", "aria-selected": "true", onclick: function () { switchTab("matrix"); } }, "📊 決策權衡矩陣");
+  var tabReplayBtn = h("button", { class: "nav-tab-btn", "aria-selected": "false", onclick: function () { switchTab("replay"); } }, "🎬 辯論重播");
+  var tabClaimsBtn = h("button", { class: "nav-tab-btn", "aria-selected": "false", onclick: function () { switchTab("claims"); } }, "⚔️ 論點圖譜");
+  var tabTransBtn = h("button", { class: "nav-tab-btn", "aria-selected": "false", onclick: function () { switchTab("transcript"); } }, "📜 逐字稿");
+
+  tabNav.appendChild(tabMatrixBtn);
+  tabNav.appendChild(tabReplayBtn);
+  tabNav.appendChild(tabClaimsBtn);
+  tabNav.appendChild(tabTransBtn);
+  app.appendChild(tabNav);
+
+  var tabMatrix = h("div", { class: "tab-content active", id: "tab-matrix" });
+  var tabReplay = h("div", { class: "tab-content", id: "tab-replay" });
+  var tabClaims = h("div", { class: "tab-content", id: "tab-claims" });
+  var tabTranscript = h("div", { class: "tab-content", id: "tab-transcript" });
+
+  app.appendChild(tabMatrix);
+  app.appendChild(tabReplay);
+  app.appendChild(tabClaims);
+  app.appendChild(tabTranscript);
+
+  function switchTab(name) {
+    tabMatrixBtn.setAttribute("aria-selected", String(name === "matrix"));
+    tabReplayBtn.setAttribute("aria-selected", String(name === "replay"));
+    tabClaimsBtn.setAttribute("aria-selected", String(name === "claims"));
+    tabTransBtn.setAttribute("aria-selected", String(name === "transcript"));
+
+    tabMatrix.className = "tab-content" + (name === "matrix" ? " active" : "");
+    tabReplay.className = "tab-content" + (name === "replay" ? " active" : "");
+    tabClaims.className = "tab-content" + (name === "claims" ? " active" : "");
+    tabTranscript.className = "tab-content" + (name === "transcript" ? " active" : "");
+  }
+
+  // ==========================================
+  // TAB 1: MATRIX CONTENT
+  // ==========================================
+  var v = X.verdict || {};
+  var winner = A.winner;
+  tabMatrix.appendChild(h("div", { class: "card verdict" },
+    h("div", { class: "muted" }, "主席判決推薦"),
+    h("div", { class: "big" }, optLabel[winner] || winner,
+      v.confidence_label ? h("span", { class: "badge win" }, "信心評級：" + v.confidence_label) : null),
+    v.one_liner ? h("p", { style: "font-weight: 600; margin: 8px 0;" }, v.one_liner) : null,
+    v.recommendation_text ? h("p", { class: "muted" }, v.recommendation_text) : null,
+    A.minimax_regret_option && A.minimax_regret_option !== winner
+      ? h("p", { class: "sev-medium" }, "⚠️ 注意：最小化最大後悔 (Minimax Regret) 方案為「" + (optLabel[A.minimax_regret_option] || A.minimax_regret_option) + "」，與贏家不同。")
+      : null
+  ));
+
+  // Win probability
+  var bars = h("div", { class: "bars" });
+  M.options.slice().sort(function (a, b) { return (A.win_probability[b.id] || 0) - (A.win_probability[a.id] || 0); }).forEach(function (o) {
+    var p = A.win_probability[o.id] || 0;
+    bars.appendChild(h("div", null, h("span", null, o.label || o.id),
+      h("div", { class: "bar" }, h("i", { style: "width:" + (p * 100).toFixed(1) + "%" })), h("span", null, pct(p))));
+  });
+  var warnLine = A.diagnostics && A.diagnostics.high_agreement_warning
+    ? h("div", { class: "sev-medium", style: "margin-top: 6px;" }, "⚠️ 評審打分高度一致（平均評審分歧 " + A.diagnostics.judge_agreement_avg_spread + "），模擬勝率可能低估現實世界不確定性。")
+    : null;
+
+  tabMatrix.appendChild(h("div", { class: "card" },
+    h("h2", null, "模擬勝率 (Monte Carlo)"),
+    bars,
+    warnLine,
+    h("div", { class: "muted", style: "margin-top: 6px; font-size: 13px;" },
+      "在評審意見擾動與權重隨機變動下的獲勝比例（註：此為模型敏感度指標，非現實商業成功率）。隨機種子 " + A.seed_used + "；評審採樣 " + DATA.sample_count + " 次。")
+  ));
+
+  // Interactive Matrix
+  var tbl = h("table");
+  var lensBox = h("div", { class: "lens" });
+  var resultLine = h("p", { class: "muted", style: "margin-top: 8px; font-weight: 600;" });
+
+  function setWeights(w) {
+    W = normalize(w);
+    M.criteria.forEach(function (c) { sliders[c.id].value = Math.round(W[c.id] * 100); });
+    render();
+  }
+  var sliders = {};
+  M.criteria.forEach(function (c) {
+    sliders[c.id] = h("input", { type: "range", min: "0", max: "100", step: "1", "aria-label": "權重：" + (c.label || c.id),
+      oninput: function (e) { W[c.id] = Number(e.target.value) / 100; setActive("custom"); render(); } });
+  });
+
+  function setActive(name) { activeLens = name; renderLens(); }
+  function renderLens() {
+    lensBox.textContent = "";
+    var items = [["chair", "⚖️ 天秤主席"]].concat((M.persona_scores || []).map(function (p) { return [p.speaker_id, pname(p.speaker_id)]; }));
+    items.forEach(function (it) {
+      lensBox.appendChild(h("button", { "aria-pressed": String(activeLens === it[0]), onclick: function () {
+        var w = it[0] === "chair" ? chairW : (M.persona_scores.filter(function (p) { return p.speaker_id === it[0]; })[0] || {}).weights;
+        activeLens = it[0]; setWeights(w || chairW);
+      } }, it[1]));
+    });
+    lensBox.appendChild(h("button", { class: "btn", onclick: function () { activeLens = "chair"; setWeights(chairW); } }, "重設為主席權重"));
+  }
+
+  function render() {
+    var t = totals(W), win = winnerOf(t);
+    tbl.textContent = "";
+    var head = h("tr", null, h("th", null, "評估準則 (即時滑動權重)"));
+    M.options.forEach(function (o) { head.appendChild(h("th", { class: o.id === win ? "winner" : "" }, o.label || o.id, o.id === win ? " 👑" : "")); });
+    tbl.appendChild(head);
+    var nw = normalize(W);
+    M.criteria.forEach(function (c) {
+      var rationale = M.weight_rationale && M.weight_rationale[c.id];
+      var row = h("tr", null, h("td", { title: rationale || c.description || "" },
+        h("span", { class: "crit-name" }, c.label || c.id), h("span", { class: "crit-w" }, "權重 " + pct(nw[c.id])), sliders[c.id]));
+      M.options.forEach(function (o) {
+        var k = o.id + "|" + c.id, s = score[k], info = cellInfo[k] || {};
+        var hue = Math.round((s - 1) / 9 * 120);
+        var tip = (info.rationale || "") + (info.evidence_claim_ids && info.evidence_claim_ids.length ? "\n證據：" + info.evidence_claim_ids.join(", ") : "")
+          + "\n信心：" + (info.confidence || "-") + "\n評審分歧標準差：" + (spread[k] != null ? spread[k] : "-");
+        row.appendChild(h("td", { class: "cell" + (hotKeys[k] ? " hot" : ""), style: "background:hsl(" + hue + " 60% 45% / .28)", title: tip }, s.toFixed(1)));
+      });
+      tbl.appendChild(row);
+    });
+    var tot = h("tr", { class: "total" }, h("td", null, "加權總分"));
+    M.options.forEach(function (o) { tot.appendChild(h("td", { class: o.id === win ? "winner" : "" }, t[o.id].toFixed(2))); });
+    tbl.appendChild(tot);
+    resultLine.textContent = "目前權重試算贏家：" + (optLabel[win] || win) + (win !== winner ? "（⚠️ 與主席中立權重贏家「" + (optLabel[winner] || winner) + "」不同）" : "");
+  }
+
+  renderLens();
+  tabMatrix.appendChild(h("div", { class: "card" },
+    h("h2", null, "可拖拉決策矩陣 (Trade-off Matrix)"),
+    h("div", { class: "muted", style: "margin-bottom: 12px;" }, "切換人格視角，或拖曳滑桿即時重算。滑鼠懸停於分數可看中位數理由與證據引用；🔥 代表各方分歧最大熱點。"),
+    lensBox, h("div", { class: "scroll" }, tbl), resultLine));
+  M.criteria.forEach(function (c) { sliders[c.id].value = Math.round(W[c.id] * 100); });
+  render();
+
+  // Tipping Points & Persona views
+  var tipBox = h("ul");
+  function applyTip(tp) {
+    var w = {}, k = tp.criterion_id, cur = chairW[k], other = 1 - cur;
+    var t = Math.min(1, Math.max(0, tp.threshold + (tp.direction === "increase" ? 0.005 : -0.005)));
+    M.criteria.forEach(function (c) { w[c.id] = c.id === k ? t : chairW[c.id] * (1 - t) / other; });
+    activeLens = "custom"; setWeights(w); renderLens();
+  }
+  if ((A.tipping_points || []).length) {
+    A.tipping_points.forEach(function (tp) {
+      tipBox.appendChild(h("li", null,
+        "若「" + (tp.criterion_label || critLabel[tp.criterion_id]) + "」權重" + (tp.direction === "increase" ? "提高" : "降低") + "至 " + pct(tp.threshold)
+        + "（目前 " + pct(tp.current_weight) + "），" + (optLabel[tp.new_winner] || tp.new_winner) + " 將翻盤勝出。 ",
+        h("button", { class: "btn", onclick: function () { applyTip(tp); } }, "示範翻盤")));
+    });
+  } else tipBox.appendChild(h("li", null, "在合理範圍內無單一準則可翻盤，結論極其穩健。"));
+
+  var persBox = h("ul");
+  Object.keys(A.persona_lens || {}).forEach(function (id) {
+    var l = A.persona_lens[id], o = (A.persona_own_view || {})[id] || {};
+    persBox.appendChild(h("li", null, pname(id) + "：依其權重看客觀分 → " + (optLabel[l.winner] || l.winner) + "；其自身主觀評分 → " + (optLabel[o.winner] || o.winner)));
+  });
+  tabMatrix.appendChild(h("div", { class: "grid2" },
+    h("div", { class: "card" }, h("h2", null, "🎯 翻盤臨界點 (Tipping Points)"), tipBox),
+    h("div", { class: "card" }, h("h2", null, "👥 各辯手價值觀視角"), persBox,
+      h("div", { class: "muted", style: "margin-top: 6px; font-size: 13px;" }, "最小最大後悔方案：" + (optLabel[A.minimax_regret_option] || A.minimax_regret_option)))));
+
+  // Red Team Defense
+  if (X.red_team || X.runner_up_defense) {
+    tabMatrix.appendChild(h("div", { class: "card", style: "border-left: 4px solid var(--warn);" },
+      h("h2", { class: "sev-medium" }, "🛡️ 紅隊警示（落敗方案最強反向辯護）"),
+      h("p", null, X.red_team || X.runner_up_defense)
+    ));
+  }
+
+  // Key tradeoffs, blind spots, etc.
+  function listCard(title, items, fn) {
+    if (!items || !items.length) return;
+    var ul = h("ul"); items.forEach(function (it) { ul.appendChild(h("li", null, fn(it))); });
+    tabMatrix.appendChild(h("div", { class: "card" }, h("h2", null, title), ul));
+  }
+  listCard("⚔️ 關鍵權衡", X.key_tradeoffs, function (t) { return [h("strong", null, t.title), "：獲得 " + (t.gain || "") + "；代價 " + (t.cost || "")]; });
+  listCard("🔍 盲點清單", X.blind_spots, function (b) { return [h("span", { class: "sev-" + (b.severity || "low") }, "[" + (b.severity || "") + "] "), h("strong", null, b.title), "：" + (b.description || "") + (b.why_it_matters ? "（" + b.why_it_matters + "）" : "")]; });
+  listCard("💡 未挑戰之假設", X.challenged_assumptions, function (a) { return [h("strong", null, a.assumption), "：" + (a.challenge || "")]; });
+  listCard("🧪 建議下一步驗證實驗", X.next_experiments, function (e) { return [h("strong", null, e.title), "（" + (e.effort || "?") + "）" + (e.description || "") + (e.decides ? " → 可決定：" + e.decides : "")]; });
+  listCard("⚠️ 風險登記表", X.risks, function (r) { return [h("strong", null, optLabel[r.option_id] || r.option_id), "：" + (r.risk || "") + "（可能性 " + (r.likelihood || "?") + " / 衝擊 " + (r.impact || "?") + "）；緩解：" + (r.mitigation || "")]; });
+  listCard("🌟 高光時刻", X.highlights, function (x) { return [h("strong", null, x.title + "（" + pname(x.speaker_id) + "）"), h("div", { class: "quote" }, x.quote), x.why]; });
+  if (X.mvp) tabMatrix.appendChild(h("div", { class: "card" }, h("h2", null, "🏆 本場 MVP"), h("p", null, pname(X.mvp.speaker_id) + "：" + (X.mvp.comment || ""))));
+
+  // Export buttons
+  var exportBox = h("div", { class: "card", style: "display: flex; gap: 8px; align-items: center; flex-wrap: wrap;" },
+    h("span", { style: "font-weight: 600;" }, "📥 匯出資料："),
+    h("button", { class: "btn", onclick: function () {
+      var blob = new Blob([JSON.stringify(normalize(W), null, 2)], { type: "application/json" });
+      var a = h("a", { href: URL.createObjectURL(blob), download: "senate-weights.json" });
+      a.click();
+    } }, "下載目前權重設定 (JSON)"),
+    h("button", { class: "btn", onclick: function () {
+      var blob = new Blob([JSON.stringify(DATA, null, 2)], { type: "application/json" });
+      var a = h("a", { href: URL.createObjectURL(blob), download: "senate-analysis.json" });
+      a.click();
+    } }, "下載完整分析數據 (JSON)")
+  );
+  tabMatrix.appendChild(exportBox);
+
+  // ==========================================
+  // TAB 2: REPLAY PLAYER
+  // ==========================================
+  var turnsData = X.turns || DATA.turns || [];
+  var replayIndex = 0;
+  var isPlaying = false;
+  var playTimer = null;
+  var playSpeed = 1;
+
+  var replaySpeaker = h("div", { class: "speaker-badge" });
+  var replayBody = h("div", { style: "white-space: pre-wrap; line-height: 1.7;" });
+  var replayBox = h("div", { class: "replay-box" }, replaySpeaker, replayBody);
+
+  function showTurn(idx) {
+    if (!turnsData.length) {
+      replaySpeaker.textContent = "尚無重播發言記錄";
+      replayBody.textContent = "本場辯論未嵌入發言詳情。";
+      return;
+    }
+    replayIndex = Math.max(0, Math.min(idx, turnsData.length - 1));
+    var t = turnsData[replayIndex];
+    replaySpeaker.textContent = (t.type === "chair" ? "⚖️ 天秤主席" : pname(t.speaker || t.speaker_id)) + " ｜ " + (t.kind || "") + (t.round ? " (第 " + t.round + " 輪)" : "");
+    replayBody.textContent = t.text || t.full_text || "";
+  }
+
+  var btnPlay = h("button", { class: "btn", onclick: togglePlay }, "▶ 播放");
+  var btnPrev = h("button", { class: "btn", onclick: function () { showTurn(replayIndex - 1); } }, "⏮ 上一則");
+  var btnNext = h("button", { class: "btn", onclick: function () { showTurn(replayIndex + 1); } }, "⏭ 下一則");
+  var speedSelect = h("select", { class: "btn", onchange: function (e) { playSpeed = Number(e.target.value); } },
+    h("option", { value: "1" }, "1x 正常速度"),
+    h("option", { value: "2" }, "2x 加速"),
+    h("option", { value: "5" }, "5x 極速")
+  );
+
+  function togglePlay() {
+    isPlaying = !isPlaying;
+    btnPlay.textContent = isPlaying ? "⏸ 暫停" : "▶ 播放";
+    if (isPlaying) scheduleNext();
+    else clearTimeout(playTimer);
+  }
+
+  function scheduleNext() {
+    if (!isPlaying) return;
+    if (replayIndex >= turnsData.length - 1) {
+      isPlaying = false; btnPlay.textContent = "▶ 重播"; return;
+    }
+    playTimer = setTimeout(function () {
+      showTurn(replayIndex + 1);
+      scheduleNext();
+    }, 2500 / playSpeed);
+  }
+
+  tabReplay.appendChild(h("div", { class: "card" },
+    h("h2", null, "🎬 辯論實境秀重播"),
+    h("div", { class: "replay-controls" }, btnPlay, btnPrev, btnNext, speedSelect),
+    replayBox
+  ));
+  showTurn(0);
+
+  // ==========================================
+  // TAB 3: CLAIMS GRAPH
+  // ==========================================
+  var claimsData = X.claims || DATA.claims || {};
+  var claimsList = Object.values(claimsData);
+  var claimsContainer = h("div", { class: "claims-grid" });
+
+  if (claimsList.length) {
+    claimsList.forEach(function (c) {
+      var item = h("div", { class: "claim-item", id: "claim-" + c.id },
+        h("div", { style: "display: flex; justify-content: space-between; font-weight: 600; margin-bottom: 4px;" },
+          "#" + c.id + " (" + pname(c.speaker) + ")",
+          h("span", { class: "badge" }, c.status || "open")
+        ),
+        h("div", null, c.text || ""),
+        h("div", { class: "muted", style: "font-size: 13px; margin-top: 4px;" }, "原文：「" + (c.quote || "") + "」")
+      );
+      item.onclick = function () {
+        document.querySelectorAll(".claim-item").forEach(function (el) { el.classList.remove("selected", "target-highlight"); });
+        item.classList.add("selected");
+        (c.attacks_claim_ids || []).forEach(function (tid) {
+          var targetEl = document.getElementById("claim-" + tid);
+          if (targetEl) targetEl.classList.add("target-highlight");
+        });
+      };
+      claimsContainer.appendChild(item);
+    });
+  } else {
+    claimsContainer.appendChild(h("p", { class: "muted" }, "本場次未單獨嵌入論點索引。"));
+  }
+
+  tabClaims.appendChild(h("div", { class: "card" },
+    h("h2", null, "⚔️ 論點圖譜與引用關係"),
+    h("p", { class: "muted" }, "點擊任一論點，可高亮標註其反駁攻擊的目標論點。"),
+    claimsContainer
+  ));
+
+  // ==========================================
+  // TAB 4: TRANSCRIPT
+  // ==========================================
+  var transText = X.transcript || DATA.transcript || "";
+  var searchInput = h("input", { type: "text", placeholder: "搜尋逐字稿關鍵字…", style: "width: 100%; padding: 8px; margin-bottom: 12px; border-radius: 6px; border: 1px solid var(--line);" });
+  var transBody = h("div", { style: "white-space: pre-wrap; font-family: monospace; font-size: 13px; line-height: 1.6; max-height: 600px; overflow-y: auto;" }, transText || "未提供純文字逐字稿。");
+
+  searchInput.oninput = function (e) {
+    var kw = e.target.value.trim().toLowerCase();
+    if (!kw) {
+      transBody.textContent = transText;
+      return;
+    }
+    var lines = transText.split("\n");
+    var matched = lines.filter(function (l) { return l.toLowerCase().indexOf(kw) !== -1; });
+    transBody.textContent = matched.length ? matched.join("\n") : "無相符結果。";
+  };
+
+  tabTranscript.appendChild(h("div", { class: "card" },
+    h("h2", null, "📜 完整辯論逐字稿"),
+    searchInput,
+    transBody
+  ));
+
+  var defaultTab = document.body.getAttribute("data-active-tab") || "matrix";
+  if (["matrix", "replay", "claims", "transcript"].indexOf(defaultTab) !== -1) {
+    switchTab(defaultTab);
+  }
+})();
+</script>
+</body>
+</html>

@@ -458,6 +458,10 @@
     transBody
   ));
 
+  var defaultTab = document.body.getAttribute("data-active-tab") || "matrix";
+  if (["matrix", "replay", "claims", "transcript"].indexOf(defaultTab) !== -1) {
+    switchTab(defaultTab);
+  }
 })();
 </script>
 </body>

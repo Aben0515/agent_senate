@@ -1,0 +1,64 @@
+{
+  "restated_question": "IoT 閘道器（ARM、256MB RAM、需遠端 OTA 更新）資料收集服務：該選 Rust、Go 還是 C？",
+  "decision_type": "multi_option",
+  "options": [
+    {
+      "id": "rust",
+      "label": "Rust",
+      "description": "零成本抽象、記憶體安全無 GC、極致資源利用"
+    },
+    {
+      "id": "go",
+      "label": "Go",
+      "description": "標準庫豐富、跨平台交叉編譯極佳、內建協程"
+    },
+    {
+      "id": "c",
+      "label": "C 語言",
+      "description": "最極致精簡、無任何 runtime、歷史最久"
+    }
+  ],
+  "criteria": [
+    {
+      "id": "memory_footprint",
+      "label": "記憶體佔用極限控制",
+      "description": "嚴格壓制在 30MB 內無 GC 膨脹"
+    },
+    {
+      "id": "memory_safety",
+      "label": "記憶體溢位安全與無崩潰",
+      "description": "杜絕野指針與緩衝區溢位"
+    },
+    {
+      "id": "cross_compile_ota",
+      "label": "交叉編譯與 OTA 升級體積",
+      "description": "單一靜態二進位檔體積與網路分發"
+    },
+    {
+      "id": "concurrency_io",
+      "label": "多通訊埠並發採集便利度",
+      "description": "多路串口與 MQTT 連線排程"
+    },
+    {
+      "id": "dev_velocity_maintain",
+      "label": "開發速度與現代工具鏈",
+      "description": "套件管理、單元測試與現代語法"
+    },
+    {
+      "id": "bus_factor",
+      "label": "招募與維護風險",
+      "description": "能接手嵌入式代碼的人才池"
+    }
+  ],
+  "context_facts": [
+    "硬體為嵌入式 Linux (ARM32/64)，記憶體嚴格限制在 256MB，需同時跑系統與收集服務",
+    "需穩定處理 RS-485/Modbus 感測器通訊與 MQTT 上報，現場維修極其昂貴，不可出現 panic 當機"
+  ],
+  "assumptions": [
+    {
+      "text": "業務優先活下來並驗證 PMF",
+      "why_needed": "界定資源優先級",
+      "impact_if_wrong": "重大時程延誤"
+    }
+  ]
+}

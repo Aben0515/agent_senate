@@ -1,0 +1,693 @@
+{
+  "question": "3 人新創團隊做 B2B SaaS 後端，預計一年內拓展至 500 家企業客戶，團隊熟 Python：該選 Go 還是 Rust？",
+  "options": [
+    {
+      "id": "go",
+      "label": "Go 語言",
+      "description": "高開發速度、廣泛招募池、生態完備"
+    },
+    {
+      "id": "rust",
+      "label": "Rust 語言",
+      "description": "極致性能、無 GC 停頓、編譯期記憶體安全"
+    }
+  ],
+  "criteria": [
+    {
+      "id": "delivery_velocity",
+      "label": "交付速度",
+      "description": "首版上線與每週功能迭代所需時間"
+    },
+    {
+      "id": "learning_curve",
+      "label": "學習與上手曲線",
+      "description": "Python 背景工程師轉型所需時間"
+    },
+    {
+      "id": "hiring_and_bus_factor",
+      "label": "招募池與替換風險",
+      "description": "市場人才供應量與離職容錯"
+    },
+    {
+      "id": "ops_observability",
+      "label": "維運排錯與可觀測性",
+      "description": "pprof、Sentry 與 APM 整合度"
+    },
+    {
+      "id": "resource_efficiency",
+      "label": "資源效率與硬體成本",
+      "description": "高並發下的記憶體佔用與 CPU 利用率"
+    },
+    {
+      "id": "b2b_ecosystem",
+      "label": "B2B 生態成熟度",
+      "description": "SSO/SAML、ORM、審計日誌開箱即用度"
+    }
+  ],
+  "chairSamples": [
+    {
+      "weights": {
+        "delivery_velocity": 0.35,
+        "learning_curve": 0.25,
+        "hiring_and_bus_factor": 0.1,
+        "ops_observability": 0.1,
+        "resource_efficiency": 0.1,
+        "b2b_ecosystem": 0.1
+      },
+      "weight_rationale": {
+        "delivery_velocity": "依據專案現階段核心矛盾權衡",
+        "learning_curve": "依據專案現階段核心矛盾權衡",
+        "hiring_and_bus_factor": "依據專案現階段核心矛盾權衡",
+        "ops_observability": "依據專案現階段核心矛盾權衡",
+        "resource_efficiency": "依據專案現階段核心矛盾權衡",
+        "b2b_ecosystem": "依據專案現階段核心矛盾權衡"
+      },
+      "cells": [
+        {
+          "option_id": "go",
+          "criterion_id": "delivery_velocity",
+          "score": 9,
+          "rationale": "Go 語言 在 交付速度 表現分析",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "learning_curve",
+          "score": 9,
+          "rationale": "Go 語言 在 學習與上手曲線 表現分析",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "hiring_and_bus_factor",
+          "score": 9,
+          "rationale": "Go 語言 在 招募池與替換風險 表現分析",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "ops_observability",
+          "score": 7.5,
+          "rationale": "Go 語言 在 維運排錯與可觀測性 表現分析",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "resource_efficiency",
+          "score": 7.5,
+          "rationale": "Go 語言 在 資源效率與硬體成本 表現分析",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "b2b_ecosystem",
+          "score": 7.5,
+          "rationale": "Go 語言 在 B2B 生態成熟度 表現分析",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "delivery_velocity",
+          "score": 4.5,
+          "rationale": "Rust 語言 在 交付速度 表現分析",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "learning_curve",
+          "score": 4.5,
+          "rationale": "Rust 語言 在 學習與上手曲線 表現分析",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "hiring_and_bus_factor",
+          "score": 8.5,
+          "rationale": "Rust 語言 在 招募池與替換風險 表現分析",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "ops_observability",
+          "score": 8.5,
+          "rationale": "Rust 語言 在 維運排錯與可觀測性 表現分析",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "resource_efficiency",
+          "score": 8.5,
+          "rationale": "Rust 語言 在 資源效率與硬體成本 表現分析",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "b2b_ecosystem",
+          "score": 8.5,
+          "rationale": "Rust 語言 在 B2B 生態成熟度 表現分析",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        }
+      ]
+    },
+    {
+      "weights": {
+        "delivery_velocity": 0.3,
+        "learning_curve": 0.25,
+        "hiring_and_bus_factor": 0.1,
+        "ops_observability": 0.1,
+        "resource_efficiency": 0.1,
+        "b2b_ecosystem": 0.1
+      },
+      "weight_rationale": {
+        "delivery_velocity": "團隊技能與交付速度優先",
+        "learning_curve": "團隊技能與交付速度優先",
+        "hiring_and_bus_factor": "團隊技能與交付速度優先",
+        "ops_observability": "團隊技能與交付速度優先",
+        "resource_efficiency": "團隊技能與交付速度優先",
+        "b2b_ecosystem": "團隊技能與交付速度優先"
+      },
+      "cells": [
+        {
+          "option_id": "go",
+          "criterion_id": "delivery_velocity",
+          "score": 8.8,
+          "rationale": "Go 語言 在 交付速度 評估",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "learning_curve",
+          "score": 8.8,
+          "rationale": "Go 語言 在 學習與上手曲線 評估",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "hiring_and_bus_factor",
+          "score": 8.8,
+          "rationale": "Go 語言 在 招募池與替換風險 評估",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "ops_observability",
+          "score": 7.2,
+          "rationale": "Go 語言 在 維運排錯與可觀測性 評估",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "resource_efficiency",
+          "score": 7.2,
+          "rationale": "Go 語言 在 資源效率與硬體成本 評估",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "b2b_ecosystem",
+          "score": 7.2,
+          "rationale": "Go 語言 在 B2B 生態成熟度 評估",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "delivery_velocity",
+          "score": 4.2,
+          "rationale": "Rust 語言 在 交付速度 評估",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "learning_curve",
+          "score": 4.2,
+          "rationale": "Rust 語言 在 學習與上手曲線 評估",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "hiring_and_bus_factor",
+          "score": 8.8,
+          "rationale": "Rust 語言 在 招募池與替換風險 評估",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "ops_observability",
+          "score": 8.8,
+          "rationale": "Rust 語言 在 維運排錯與可觀測性 評估",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "resource_efficiency",
+          "score": 8.8,
+          "rationale": "Rust 語言 在 資源效率與硬體成本 評估",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "b2b_ecosystem",
+          "score": 8.8,
+          "rationale": "Rust 語言 在 B2B 生態成熟度 評估",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        }
+      ]
+    },
+    {
+      "weights": {
+        "delivery_velocity": 0.32,
+        "learning_curve": 0.28,
+        "hiring_and_bus_factor": 0.1,
+        "ops_observability": 0.1,
+        "resource_efficiency": 0.1,
+        "b2b_ecosystem": 0.1
+      },
+      "weight_rationale": {
+        "delivery_velocity": "綜合總持有成本考量",
+        "learning_curve": "綜合總持有成本考量",
+        "hiring_and_bus_factor": "綜合總持有成本考量",
+        "ops_observability": "綜合總持有成本考量",
+        "resource_efficiency": "綜合總持有成本考量",
+        "b2b_ecosystem": "綜合總持有成本考量"
+      },
+      "cells": [
+        {
+          "option_id": "go",
+          "criterion_id": "delivery_velocity",
+          "score": 9,
+          "rationale": "Go 語言 在 交付速度 綜合考量",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "learning_curve",
+          "score": 9,
+          "rationale": "Go 語言 在 學習與上手曲線 綜合考量",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "hiring_and_bus_factor",
+          "score": 9,
+          "rationale": "Go 語言 在 招募池與替換風險 綜合考量",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "ops_observability",
+          "score": 7,
+          "rationale": "Go 語言 在 維運排錯與可觀測性 綜合考量",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "resource_efficiency",
+          "score": 7,
+          "rationale": "Go 語言 在 資源效率與硬體成本 綜合考量",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "b2b_ecosystem",
+          "score": 7,
+          "rationale": "Go 語言 在 B2B 生態成熟度 綜合考量",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "delivery_velocity",
+          "score": 4,
+          "rationale": "Rust 語言 在 交付速度 綜合考量",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "learning_curve",
+          "score": 4,
+          "rationale": "Rust 語言 在 學習與上手曲線 綜合考量",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "hiring_and_bus_factor",
+          "score": 9,
+          "rationale": "Rust 語言 在 招募池與替換風險 綜合考量",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "ops_observability",
+          "score": 9,
+          "rationale": "Rust 語言 在 維運排錯與可觀測性 綜合考量",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "resource_efficiency",
+          "score": 9,
+          "rationale": "Rust 語言 在 資源效率與硬體成本 綜合考量",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "b2b_ecosystem",
+          "score": 9,
+          "rationale": "Rust 語言 在 B2B 生態成熟度 綜合考量",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        }
+      ]
+    }
+  ],
+  "personaScores": [
+    {
+      "speaker_id": "conservative_cto",
+      "final_choice": "go",
+      "weights": {
+        "delivery_velocity": 0.5,
+        "learning_curve": 0.1,
+        "hiring_and_bus_factor": 0.1,
+        "ops_observability": 0.1,
+        "resource_efficiency": 0.1,
+        "b2b_ecosystem": 0.1
+      },
+      "cells": [
+        {
+          "option_id": "go",
+          "criterion_id": "delivery_velocity",
+          "score": 9,
+          "reason": "符合實用保守原則"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "learning_curve",
+          "score": 9,
+          "reason": "符合實用保守原則"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "hiring_and_bus_factor",
+          "score": 9,
+          "reason": "符合實用保守原則"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "ops_observability",
+          "score": 9,
+          "reason": "符合實用保守原則"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "resource_efficiency",
+          "score": 9,
+          "reason": "符合實用保守原則"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "b2b_ecosystem",
+          "score": 9,
+          "reason": "符合實用保守原則"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "delivery_velocity",
+          "score": 5,
+          "reason": "符合實用保守原則"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "learning_curve",
+          "score": 5,
+          "reason": "符合實用保守原則"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "hiring_and_bus_factor",
+          "score": 5,
+          "reason": "符合實用保守原則"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "ops_observability",
+          "score": 5,
+          "reason": "符合實用保守原則"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "resource_efficiency",
+          "score": 5,
+          "reason": "符合實用保守原則"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "b2b_ecosystem",
+          "score": 5,
+          "reason": "符合實用保守原則"
+        }
+      ],
+      "one_line": "首年生存至上，嚴控試錯成本。"
+    },
+    {
+      "speaker_id": "perf_zealot",
+      "final_choice": "rust",
+      "weights": {
+        "delivery_velocity": 0.1,
+        "learning_curve": 0.1,
+        "hiring_and_bus_factor": 0.1,
+        "ops_observability": 0.1,
+        "resource_efficiency": 0.1,
+        "b2b_ecosystem": 0.5
+      },
+      "cells": [
+        {
+          "option_id": "go",
+          "criterion_id": "delivery_velocity",
+          "score": 6,
+          "reason": "重視極致控制與擴展力"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "learning_curve",
+          "score": 6,
+          "reason": "重視極致控制與擴展力"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "hiring_and_bus_factor",
+          "score": 6,
+          "reason": "重視極致控制與擴展力"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "ops_observability",
+          "score": 6,
+          "reason": "重視極致控制與擴展力"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "resource_efficiency",
+          "score": 6,
+          "reason": "重視極致控制與擴展力"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "b2b_ecosystem",
+          "score": 6,
+          "reason": "重視極致控制與擴展力"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "delivery_velocity",
+          "score": 9.5,
+          "reason": "重視極致控制與擴展力"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "learning_curve",
+          "score": 9.5,
+          "reason": "重視極致控制與擴展力"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "hiring_and_bus_factor",
+          "score": 9.5,
+          "reason": "重視極致控制與擴展力"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "ops_observability",
+          "score": 9.5,
+          "reason": "重視極致控制與擴展力"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "resource_efficiency",
+          "score": 9.5,
+          "reason": "重視極致控制與擴展力"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "b2b_ecosystem",
+          "score": 9.5,
+          "reason": "重視極致控制與擴展力"
+        }
+      ],
+      "one_line": "底層架構的技術債會加倍奉還。"
+    }
+  ],
+  "seed": 42,
+  "extras": {
+    "verdict": {
+      "recommended_option_id": "go",
+      "confidence_label": "高",
+      "one_liner": "在當前情境事實約束下，強烈推薦 go 作為最優解。",
+      "recommendation_text": "經過完整交叉質詢與敏感度分析，go 在交付速度、維運簡單度與團隊心智負擔上取得決定性領先優勢。",
+      "conditions_to_flip": [
+        "若業務規模或核心約束在未來幾個月內發生 10 倍以上突變，方需考慮改選 rust"
+      ]
+    },
+    "red_team": "【反方技術紅隊警示】若選擇 go，團隊切不可因為初期的開發順遂而放鬆架構紀律。一旦未來出現特定極限計算或合規硬性限制，當初未選 rust 將迫使團隊啟動局部的微服務抽取或重構。",
+    "key_tradeoffs": [
+      {
+        "title": "即時交付速度 vs 極致架構擴展性",
+        "gain": "快速上線驗證",
+        "cost": "承擔長期局部重構可能性"
+      }
+    ],
+    "blind_spots": [
+      {
+        "title": "團隊擴張時的認知負擔溢價",
+        "description": "新成員進駐後的系統邊界理解成本",
+        "severity": "medium",
+        "why_it_matters": "影響團隊擴展速度"
+      }
+    ],
+    "next_experiments": [
+      {
+        "title": "核心資料流原型壓測 Spike",
+        "description": "針對預估尖峰量級實施 2 天原型驗證",
+        "effort": "2 天",
+        "decides": "確認是否真有架構瓶頸風險"
+      }
+    ],
+    "highlights": [
+      {
+        "title": "最具殺傷力的商業提問",
+        "quote": "活到下一個季度",
+        "speaker_id": "conservative_cto",
+        "why": "精準直擊新創技術選型的本質"
+      }
+    ],
+    "mvp": {
+      "speaker_id": "conservative_cto",
+      "comment": "始終緊扣業務生存與現金流硬約束"
+    }
+  }
+}

@@ -1,0 +1,475 @@
+{
+  "version": 1,
+  "question": "3 人新創做 B2B SaaS 後端，一年內預計 500 家企業客戶，團隊熟 Python，該選 Go 還是 Rust？",
+  "brief": {
+    "options": [
+      {
+        "id": "go",
+        "label": "Go",
+        "description": "Google 開發的靜態強型別語言，以極簡語法、內建 Goroutine 並發與快速編譯著稱，雲原生與 Web 生態成熟。"
+      },
+      {
+        "id": "rust",
+        "label": "Rust",
+        "description": "Mozilla 發起的系統級語言，以所有權借用檢查實現無 GC 記憶體安全、零成本抽象與極致尾延遲控制。"
+      }
+    ],
+    "criteria": [
+      {
+        "id": "delivery_velocity",
+        "label": "交付與迭代速度",
+        "description": "前半年業務功能快速驗證、頻繁修改業務邏輯的開發效率（越高越好）"
+      },
+      {
+        "id": "learning_curve",
+        "label": "學習與上手曲線",
+        "description": "Python 工程師轉型並達到可安全上生產環境水準的難易度（越高越好）"
+      },
+      {
+        "id": "ops_observability",
+        "label": "維運排錯與可觀測性",
+        "description": "線上問題定位、pprof、APM 與排程崩潰隔離容錯（越高越好）"
+      },
+      {
+        "id": "hiring_and_bus_factor",
+        "label": "招募池與替換風險",
+        "description": "擴編招募候選人基數、薪資溢價與人員離職替換承受力（越高越好）"
+      },
+      {
+        "id": "resource_efficiency",
+        "label": "資源效率與硬體成本",
+        "description": "伺服器記憶體佔用、帳單成本與極限吞吐（越高越好）"
+      },
+      {
+        "id": "b2b_ecosystem",
+        "label": "企業生態與工具鏈成熟度",
+        "description": "SSO/SAML、ORM、企業周邊 SDK 與資料模型演進彈性（越高越好）"
+      }
+    ],
+    "context_facts": [
+      "團隊規模為 3 名工程師，具豐富 Python 經驗",
+      "B2B SaaS 後端，預計一年內 500 家企業客戶",
+      "尖峰負載約 200 ~ 1,500 RPS，瓶頸 95% 在資料庫與外部 API"
+    ]
+  },
+  "created_at": "2026-10-03T23:13:33.824Z",
+  "turns": [
+    {
+      "id": "chair_opening_1",
+      "type": "chair",
+      "kind": "opening",
+      "round": null,
+      "text": "歡迎各位蒞臨 Agent Senate 虛擬內閣。今天議程為 3 人新創 B2B SaaS 後端選型（Go vs Rust）。請三位辯手展開開場陳述！",
+      "timestamp": "2026-10-03T23:13:33.824Z"
+    },
+    {
+      "id": "turn_perf_zealot_opening_2",
+      "type": "debater",
+      "speaker": "perf_zealot",
+      "kind": "opening",
+      "round": null,
+      "text": "我選 Rust：慢不是 bug，是商業模式的漏洞，初期用垃圾回收省下的時間，後期全數加倍奉還在尾延遲與雲端帳單上。p99 延遲穩鎖在 5ms 內。",
+      "full_text": "我選 Rust：慢不是 bug，是商業模式的漏洞，初期用垃圾回收省下的時間，後期全數加倍奉還在尾延遲與雲端帳單上。p99 延遲穩鎖在 5ms 內。\n\n```claims\n[\n  {\"text\":\"Rust無GC提供微秒級與極低p99尾延遲\",\"quote\":\"p99 穩鎖在 5ms 內\",\"kind\":\"value\",\"supports_option_ids\":[\"rust\"]},\n  {\"text\":\"Rust極致記憶體與CPU效率可壓低SaaS雲端帳單3倍\",\"quote\":\"單核 RPS 提升 3~4 倍\",\"kind\":\"estimate\",\"supports_option_ids\":[\"rust\"]},\n  {\"text\":\"Rust編譯期型別系統徹底杜絕生產環境空指針\",\"quote\":\"型別系統抹殺線上 panic\",\"kind\":\"fact\",\"supports_option_ids\":[\"rust\"]}\n]\n```",
+      "claims": [
+        "vex.1",
+        "vex.2",
+        "vex.3"
+      ],
+      "concessions": [],
+      "timestamp": "2026-10-03T23:13:33.825Z"
+    },
+    {
+      "id": "turn_kiss_hacker_opening_3",
+      "type": "debater",
+      "speaker": "kiss_hacker",
+      "kind": "opening",
+      "round": null,
+      "text": "我堅決選擇 go：3 人新創生死關頭，活下來靠的是今天交付功能，不是跟編譯器搏鬥寫出零成本抽象。1500 RPS 瓶頸在資料庫 IO。",
+      "full_text": "我堅決選擇 go：3 人新創生死關頭，活下來靠的是今天交付功能，不是跟編譯器搏鬥寫出零成本抽象。1500 RPS 瓶頸在資料庫 IO。\n\n```claims\n[\n  {\"text\":\"Python背景轉Go僅需數日即可交付，轉Rust學習成本極高\",\"quote\":\"轉 Go 只要週末兩天\",\"kind\":\"fact\",\"supports_option_ids\":[\"go\"]},\n  {\"text\":\"1500 RPS瓶頸在資料庫IO，單台Go足夠應付\",\"quote\":\"瓶頸 100% 在 Postgres\",\"kind\":\"estimate\",\"supports_option_ids\":[\"go\"]}\n]\n```",
+      "claims": [
+        "kiss.1",
+        "kiss.2"
+      ],
+      "concessions": [],
+      "timestamp": "2026-10-03T23:13:33.825Z"
+    },
+    {
+      "id": "turn_conservative_cto_opening_4",
+      "type": "debater",
+      "speaker": "conservative_cto",
+      "kind": "opening",
+      "round": null,
+      "text": "我毫不猶豫選擇 Go：你們只有 3 個人、一年期限，選 Rust 是拿公司的命去幫工程師刷履歷。交付人月與學習成本最重要。",
+      "full_text": "我毫不猶豫選擇 Go：你們只有 3 個人、一年期限，選 Rust 是拿公司的命去幫工程師刷履歷。交付人月與學習成本最重要。\n\n```claims\n[\n  {\"text\":\"3人團隊選Go能在一週內上手交付\",\"quote\":\"看一週語法就能寫出安全上線的 CRUD\",\"kind\":\"estimate\",\"supports_option_ids\":[\"go\"]},\n  {\"text\":\"500企客尖峰1500 RPS瓶頸在DB與外部API\",\"quote\":\"瓶頸 95% 在 Postgres 鎖表\",\"kind\":\"fact\",\"supports_option_ids\":[\"go\"]}\n]\n```",
+      "claims": [
+        "cto.1",
+        "cto.2"
+      ],
+      "concessions": [],
+      "timestamp": "2026-10-03T23:13:33.825Z"
+    },
+    {
+      "id": "chair_directive_1",
+      "type": "chair",
+      "kind": "directive",
+      "round": 1,
+      "text": "戰況總結：各方立場鮮明。@Vex，請說明在 1,500 RPS 規模下，Go 的 GC 到底會對 B2B 業務造成什麼不可挽回的損失？",
+      "timestamp": "2026-10-03T23:13:33.825Z"
+    },
+    {
+      "id": "turn_perf_zealot_rebuttal_1",
+      "type": "debater",
+      "speaker": "perf_zealot",
+      "kind": "rebuttal",
+      "round": 1,
+      "text": "【讓步 #vex.2】在 1,500 RPS 純 API 轉發下，算力帳單差 3 倍確實高估；【讓步 #vex.3】我承認編譯期無法消除邏輯死鎖。\n> 【陳CTO #cto.1】看一週語法就能寫出安全上線的 CRUD\n但是大資料報表匯出時逃逸分析會吃掉大量記憶體。",
+      "full_text": "【讓步 #vex.2】在 1,500 RPS 純 API 轉發下，算力帳單差 3 倍確實高估；【讓步 #vex.3】我承認編譯期無法消除邏輯死鎖。\n> 【陳CTO #cto.1】看一週語法就能寫出安全上線的 CRUD\n但是大資料報表匯出時逃逸分析會吃掉大量記憶體。\n\n```claims\n[\n  {\"text\":\"Go的GC與逃逸分析黑箱是高並發SLA的致命隱患\",\"quote\":\"逃逸分析會吃掉大量記憶體\",\"kind\":\"proposal\",\"supports_option_ids\":[\"rust\"],\"concedes_claim_ids\":[\"vex.2\",\"vex.3\"]}\n]\n```",
+      "claims": [
+        "vex.4"
+      ],
+      "concessions": [
+        "vex.2",
+        "vex.3"
+      ],
+      "timestamp": "2026-10-03T23:13:33.825Z"
+    },
+    {
+      "id": "turn_conservative_cto_rebuttal_1",
+      "type": "debater",
+      "speaker": "conservative_cto",
+      "kind": "rebuttal",
+      "round": 1,
+      "text": "> 【Vex #vex.1】p99 穩鎖在 5ms 內\n在 20ms DB IO 面前，5ms CPU 差異毫無商業意義。B2B 企客必備 SSO 與審計生態 Go 成熟度完勝。",
+      "full_text": "> 【Vex #vex.1】p99 穩鎖在 5ms 內\n在 20ms DB IO 面前，5ms CPU 差異毫無商業意義。B2B 企客必備 SSO 與審計生態 Go 成熟度完勝。\n\n```claims\n[\n  {\"text\":\"B2B企客必備SSO與審計生態Go成熟度完勝Rust\",\"quote\":\"SSO 與審計生態 Go 成熟度完勝\",\"kind\":\"estimate\",\"supports_option_ids\":[\"go\"]}\n]\n```",
+      "claims": [
+        "cto.3"
+      ],
+      "concessions": [],
+      "timestamp": "2026-10-03T23:13:33.825Z"
+    },
+    {
+      "id": "turn_kiss_hacker_rebuttal_1",
+      "type": "debater",
+      "speaker": "kiss_hacker",
+      "kind": "rebuttal",
+      "round": 1,
+      "text": "【讓步 #kiss.1】我修正說法為 1~2 週建立 production-ready 服務。\n把這層微容器隔離刪掉，看看誰會哭？Postgres 多租戶隔離足矣。",
+      "full_text": "【讓步 #kiss.1】我修正說法為 1~2 週建立 production-ready 服務。\n把這層微容器隔離刪掉，看看誰會哭？Postgres 多租戶隔離足矣。\n\n```claims\n[\n  {\"text\":\"Postgres多租戶邏輯隔離搭配Go完全無需微容器硬隔離複雜度\",\"quote\":\"Postgres 多租戶隔離足矣\",\"kind\":\"proposal\",\"supports_option_ids\":[\"go\"],\"concedes_claim_ids\":[\"kiss.1\"]}\n]\n```",
+      "claims": [
+        "kiss.3"
+      ],
+      "concessions": [
+        "kiss.1"
+      ],
+      "timestamp": "2026-10-03T23:13:33.825Z"
+    },
+    {
+      "id": "chair_directive_2",
+      "type": "chair",
+      "kind": "directive",
+      "round": 2,
+      "text": "交叉質詢第 2 輪：雙方已對維運成本形成交鋒，請進行鋼人論證與結辯！",
+      "timestamp": "2026-10-03T23:13:33.825Z"
+    },
+    {
+      "id": "turn_conservative_cto_steelman_10",
+      "type": "debater",
+      "speaker": "conservative_cto",
+      "kind": "steelman",
+      "round": null,
+      "text": "我為 Rust 做最強辯護：如果這家 SaaS 涉及極度敏感的金融審計與零信任，Rust 的無畏並發與型別狀態模式能提供數學級的安全防護。這動搖了我 25%。",
+      "full_text": "我為 Rust 做最強辯護：如果這家 SaaS 涉及極度敏感的金融審計與零信任，Rust 的無畏並發與型別狀態模式能提供數學級的安全防護。這動搖了我 25%。",
+      "claims": [],
+      "concessions": [],
+      "timestamp": "2026-10-03T23:13:33.825Z"
+    },
+    {
+      "id": "turn_perf_zealot_steelman_11",
+      "type": "debater",
+      "speaker": "perf_zealot",
+      "kind": "steelman",
+      "round": null,
+      "text": "我為 Go 做最強辯護：在商業市場上，Time-to-Market 是生命線。Go 擁有無與倫比的工程師共識，新人能在 48 小時內接盤。這動搖了我 35%。",
+      "full_text": "我為 Go 做最強辯護：在商業市場上，Time-to-Market 是生命線。Go 擁有無與倫比的工程師共識，新人能在 48 小時內接盤。這動搖了我 35%。",
+      "claims": [],
+      "concessions": [],
+      "timestamp": "2026-10-03T23:13:33.825Z"
+    },
+    {
+      "id": "turn_kiss_hacker_steelman_12",
+      "type": "debater",
+      "speaker": "kiss_hacker",
+      "kind": "steelman",
+      "round": null,
+      "text": "我為 Rust 做最強辯護：Rust 的 Result 與錯誤處理語意強制工程師面對每個邊界情況，能打造近乎無人值守的高穩定服務。這動搖了我 20%。",
+      "full_text": "我為 Rust 做最強辯護：Rust 的 Result 與錯誤處理語意強制工程師面對每個邊界情況，能打造近乎無人值守的高穩定服務。這動搖了我 20%。",
+      "claims": [],
+      "concessions": [],
+      "timestamp": "2026-10-03T23:13:33.825Z"
+    },
+    {
+      "id": "turn_conservative_cto_closing_13",
+      "type": "debater",
+      "speaker": "conservative_cto",
+      "kind": "closing",
+      "round": null,
+      "text": "結辯：我最終維持推薦 Go。若創始 3 人均精通 Rust，我的建議為錯。",
+      "full_text": "結辯：我最終維持推薦 Go。若創始 3 人均精通 Rust，我的建議為錯。",
+      "claims": [],
+      "concessions": [],
+      "timestamp": "2026-10-03T23:13:33.825Z"
+    },
+    {
+      "id": "turn_perf_zealot_closing_14",
+      "type": "debater",
+      "speaker": "perf_zealot",
+      "kind": "closing",
+      "round": null,
+      "text": "結辯：我堅持推薦 Rust。若純做低頻內部 CRUD，Go 是安全選擇。",
+      "full_text": "結辯：我堅持推薦 Rust。若純做低頻內部 CRUD，Go 是安全選擇。",
+      "claims": [],
+      "concessions": [],
+      "timestamp": "2026-10-03T23:13:33.825Z"
+    },
+    {
+      "id": "turn_kiss_hacker_closing_15",
+      "type": "debater",
+      "speaker": "kiss_hacker",
+      "kind": "closing",
+      "round": null,
+      "text": "結辯：我最終維持推薦 Go。若要自研底層資料庫存儲引擎，那必須選 Rust。",
+      "full_text": "結辯：我最終維持推薦 Go。若要自研底層資料庫存儲引擎，那必須選 Rust。",
+      "claims": [],
+      "concessions": [],
+      "timestamp": "2026-10-03T23:13:33.825Z"
+    }
+  ],
+  "chair_events": [
+    {
+      "id": "chair_opening_1",
+      "type": "chair",
+      "kind": "opening",
+      "round": null,
+      "text": "歡迎各位蒞臨 Agent Senate 虛擬內閣。今天議程為 3 人新創 B2B SaaS 後端選型（Go vs Rust）。請三位辯手展開開場陳述！",
+      "timestamp": "2026-10-03T23:13:33.824Z"
+    },
+    {
+      "id": "chair_directive_1",
+      "type": "chair",
+      "kind": "directive",
+      "round": 1,
+      "text": "戰況總結：各方立場鮮明。@Vex，請說明在 1,500 RPS 規模下，Go 的 GC 到底會對 B2B 業務造成什麼不可挽回的損失？",
+      "timestamp": "2026-10-03T23:13:33.825Z"
+    },
+    {
+      "id": "chair_directive_2",
+      "type": "chair",
+      "kind": "directive",
+      "round": 2,
+      "text": "交叉質詢第 2 輪：雙方已對維運成本形成交鋒，請進行鋼人論證與結辯！",
+      "timestamp": "2026-10-03T23:13:33.825Z"
+    }
+  ],
+  "claims": {
+    "vex.1": {
+      "id": "vex.1",
+      "speaker": "perf_zealot",
+      "turn_kind": "opening",
+      "round": null,
+      "text": "Rust無GC提供微秒級與極低p99尾延遲",
+      "quote": "p99 穩鎖在 5ms 內",
+      "kind": "value",
+      "supports_option_ids": [
+        "rust"
+      ],
+      "attacks_claim_ids": [],
+      "concedes_claim_ids": [],
+      "status": "attacked",
+      "attacked_by": [
+        "cto.3"
+      ],
+      "fact_check": null
+    },
+    "vex.2": {
+      "id": "vex.2",
+      "speaker": "perf_zealot",
+      "turn_kind": "opening",
+      "round": null,
+      "text": "Rust極致記憶體與CPU效率可壓低SaaS雲端帳單3倍",
+      "quote": "單核 RPS 提升 3~4 倍",
+      "kind": "estimate",
+      "supports_option_ids": [
+        "rust"
+      ],
+      "attacks_claim_ids": [],
+      "concedes_claim_ids": [],
+      "status": "conceded",
+      "attacked_by": [
+        "vex.4"
+      ],
+      "fact_check": null
+    },
+    "vex.3": {
+      "id": "vex.3",
+      "speaker": "perf_zealot",
+      "turn_kind": "opening",
+      "round": null,
+      "text": "Rust編譯期型別系統徹底杜絕生產環境空指針",
+      "quote": "型別系統抹殺線上 panic",
+      "kind": "fact",
+      "supports_option_ids": [
+        "rust"
+      ],
+      "attacks_claim_ids": [],
+      "concedes_claim_ids": [],
+      "status": "conceded",
+      "attacked_by": [
+        "vex.4"
+      ],
+      "fact_check": null
+    },
+    "kiss.1": {
+      "id": "kiss.1",
+      "speaker": "kiss_hacker",
+      "turn_kind": "opening",
+      "round": null,
+      "text": "Python背景轉Go僅需數日即可交付，轉Rust學習成本極高",
+      "quote": "轉 Go 只要週末兩天",
+      "kind": "fact",
+      "supports_option_ids": [
+        "go"
+      ],
+      "attacks_claim_ids": [],
+      "concedes_claim_ids": [],
+      "status": "conceded",
+      "attacked_by": [
+        "kiss.3"
+      ],
+      "fact_check": null
+    },
+    "kiss.2": {
+      "id": "kiss.2",
+      "speaker": "kiss_hacker",
+      "turn_kind": "opening",
+      "round": null,
+      "text": "1500 RPS瓶頸在資料庫IO，單台Go足夠應付",
+      "quote": "瓶頸 100% 在 Postgres",
+      "kind": "estimate",
+      "supports_option_ids": [
+        "go"
+      ],
+      "attacks_claim_ids": [],
+      "concedes_claim_ids": [],
+      "status": "open",
+      "attacked_by": [],
+      "fact_check": null
+    },
+    "cto.1": {
+      "id": "cto.1",
+      "speaker": "conservative_cto",
+      "turn_kind": "opening",
+      "round": null,
+      "text": "3人團隊選Go能在一週內上手交付",
+      "quote": "看一週語法就能寫出安全上線的 CRUD",
+      "kind": "estimate",
+      "supports_option_ids": [
+        "go"
+      ],
+      "attacks_claim_ids": [],
+      "concedes_claim_ids": [],
+      "status": "attacked",
+      "attacked_by": [
+        "vex.4"
+      ],
+      "fact_check": null
+    },
+    "cto.2": {
+      "id": "cto.2",
+      "speaker": "conservative_cto",
+      "turn_kind": "opening",
+      "round": null,
+      "text": "500企客尖峰1500 RPS瓶頸在DB與外部API",
+      "quote": "瓶頸 95% 在 Postgres 鎖表",
+      "kind": "fact",
+      "supports_option_ids": [
+        "go"
+      ],
+      "attacks_claim_ids": [],
+      "concedes_claim_ids": [],
+      "status": "open",
+      "attacked_by": [],
+      "fact_check": null
+    },
+    "vex.4": {
+      "id": "vex.4",
+      "speaker": "perf_zealot",
+      "turn_kind": "rebuttal",
+      "round": 1,
+      "text": "Go的GC與逃逸分析黑箱是高並發SLA的致命隱患",
+      "quote": "逃逸分析會吃掉大量記憶體",
+      "kind": "proposal",
+      "supports_option_ids": [
+        "rust"
+      ],
+      "attacks_claim_ids": [
+        "vex.2",
+        "vex.3",
+        "cto.1"
+      ],
+      "concedes_claim_ids": [
+        "vex.2",
+        "vex.3"
+      ],
+      "status": "open",
+      "attacked_by": [],
+      "fact_check": null
+    },
+    "cto.3": {
+      "id": "cto.3",
+      "speaker": "conservative_cto",
+      "turn_kind": "rebuttal",
+      "round": 1,
+      "text": "B2B企客必備SSO與審計生態Go成熟度完勝Rust",
+      "quote": "SSO 與審計生態 Go 成熟度完勝",
+      "kind": "estimate",
+      "supports_option_ids": [
+        "go"
+      ],
+      "attacks_claim_ids": [
+        "vex.1"
+      ],
+      "concedes_claim_ids": [],
+      "status": "open",
+      "attacked_by": [],
+      "fact_check": null
+    },
+    "kiss.3": {
+      "id": "kiss.3",
+      "speaker": "kiss_hacker",
+      "turn_kind": "rebuttal",
+      "round": 1,
+      "text": "Postgres多租戶邏輯隔離搭配Go完全無需微容器硬隔離複雜度",
+      "quote": "Postgres 多租戶隔離足矣",
+      "kind": "proposal",
+      "supports_option_ids": [
+        "go"
+      ],
+      "attacks_claim_ids": [
+        "kiss.1"
+      ],
+      "concedes_claim_ids": [
+        "kiss.1"
+      ],
+      "status": "open",
+      "attacked_by": [],
+      "fact_check": null
+    }
+  },
+  "speaker_counters": {
+    "vex": 4,
+    "kiss": 3,
+    "cto": 3
+  },
+  "fallacies": [],
+  "fact_checks": []
+}

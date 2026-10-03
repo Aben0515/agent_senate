@@ -1,0 +1,693 @@
+{
+  "matrix": {
+    "question": "內部營運報表系統（每日 200 萬筆事件、報表延遲容忍 1 小時）：該選 Kafka + Flink、cron + PostgreSQL、還是 ClickHouse？",
+    "options": [
+      {
+        "id": "cron_postgres",
+        "label": "cron + PostgreSQL",
+        "description": "利用現有 Postgres 配合只讀副本與排程物化視圖"
+      },
+      {
+        "id": "clickhouse",
+        "label": "ClickHouse 獨立 OLAP",
+        "description": "引進列式存儲，高速 SQL 聚合"
+      },
+      {
+        "id": "kafka_flink",
+        "label": "Kafka + Flink 串流架構",
+        "description": "事件總線與即時串流計算引擎"
+      }
+    ],
+    "criteria": [
+      {
+        "id": "simplicity_tco",
+        "label": "架構極簡度與總持有成本",
+        "description": "最少活動零件、避免引入專人維護"
+      },
+      {
+        "id": "query_latency",
+        "label": "複雜報表查詢延遲",
+        "description": "數百萬行多維度 GROUP BY 回應時間"
+      },
+      {
+        "id": "future_scale",
+        "label": "規模擴展至千萬級潛力",
+        "description": "資料量增長 10 倍時的應對餘裕"
+      },
+      {
+        "id": "infra_cost",
+        "label": "硬體與伺服器費用",
+        "description": "雲端運算與存儲月帳單"
+      },
+      {
+        "id": "failure_recovery",
+        "label": "故障復原與除錯容易度",
+        "description": "任務掛掉重算與歷史回溯"
+      },
+      {
+        "id": "dev_learning_curve",
+        "label": "團隊學習曲線",
+        "description": "現有工程師上手與語法掌握速度"
+      }
+    ],
+    "weights": {
+      "simplicity_tco": 0.3286,
+      "query_latency": 0.2644,
+      "future_scale": 0.1018,
+      "infra_cost": 0.1018,
+      "failure_recovery": 0.1018,
+      "dev_learning_curve": 0.1018
+    },
+    "weight_rationale": {
+      "simplicity_tco": "依據專案現階段核心矛盾權衡",
+      "query_latency": "依據專案現階段核心矛盾權衡",
+      "future_scale": "依據專案現階段核心矛盾權衡",
+      "infra_cost": "依據專案現階段核心矛盾權衡",
+      "failure_recovery": "依據專案現階段核心矛盾權衡",
+      "dev_learning_curve": "依據專案現階段核心矛盾權衡"
+    },
+    "cells": [
+      {
+        "option_id": "cron_postgres",
+        "criterion_id": "simplicity_tco",
+        "score": 9,
+        "rationale": "cron + PostgreSQL 在 架構極簡度與總持有成本 表現分析",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "cron_postgres",
+        "criterion_id": "query_latency",
+        "score": 9,
+        "rationale": "cron + PostgreSQL 在 複雜報表查詢延遲 表現分析",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "cron_postgres",
+        "criterion_id": "future_scale",
+        "score": 9,
+        "rationale": "cron + PostgreSQL 在 規模擴展至千萬級潛力 表現分析",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "cron_postgres",
+        "criterion_id": "infra_cost",
+        "score": 7.2,
+        "rationale": "cron + PostgreSQL 在 硬體與伺服器費用 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "cron_postgres",
+        "criterion_id": "failure_recovery",
+        "score": 7.2,
+        "rationale": "cron + PostgreSQL 在 故障復原與除錯容易度 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "cron_postgres",
+        "criterion_id": "dev_learning_curve",
+        "score": 7.2,
+        "rationale": "cron + PostgreSQL 在 團隊學習曲線 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "clickhouse",
+        "criterion_id": "simplicity_tco",
+        "score": 4.2,
+        "rationale": "ClickHouse 獨立 OLAP 在 架構極簡度與總持有成本 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "clickhouse",
+        "criterion_id": "query_latency",
+        "score": 4.2,
+        "rationale": "ClickHouse 獨立 OLAP 在 複雜報表查詢延遲 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "clickhouse",
+        "criterion_id": "future_scale",
+        "score": 8.8,
+        "rationale": "ClickHouse 獨立 OLAP 在 規模擴展至千萬級潛力 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "clickhouse",
+        "criterion_id": "infra_cost",
+        "score": 8.8,
+        "rationale": "ClickHouse 獨立 OLAP 在 硬體與伺服器費用 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "clickhouse",
+        "criterion_id": "failure_recovery",
+        "score": 8.8,
+        "rationale": "ClickHouse 獨立 OLAP 在 故障復原與除錯容易度 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "clickhouse",
+        "criterion_id": "dev_learning_curve",
+        "score": 8.8,
+        "rationale": "ClickHouse 獨立 OLAP 在 團隊學習曲線 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "kafka_flink",
+        "criterion_id": "simplicity_tco",
+        "score": 4.2,
+        "rationale": "Kafka + Flink 串流架構 在 架構極簡度與總持有成本 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "kafka_flink",
+        "criterion_id": "query_latency",
+        "score": 4.2,
+        "rationale": "Kafka + Flink 串流架構 在 複雜報表查詢延遲 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "kafka_flink",
+        "criterion_id": "future_scale",
+        "score": 8.8,
+        "rationale": "Kafka + Flink 串流架構 在 規模擴展至千萬級潛力 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "kafka_flink",
+        "criterion_id": "infra_cost",
+        "score": 8.8,
+        "rationale": "Kafka + Flink 串流架構 在 硬體與伺服器費用 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "kafka_flink",
+        "criterion_id": "failure_recovery",
+        "score": 8.8,
+        "rationale": "Kafka + Flink 串流架構 在 故障復原與除錯容易度 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "kafka_flink",
+        "criterion_id": "dev_learning_curve",
+        "score": 8.8,
+        "rationale": "Kafka + Flink 串流架構 在 團隊學習曲線 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      }
+    ],
+    "cell_spread": {
+      "cron_postgres|simplicity_tco": 1.183,
+      "cron_postgres|query_latency": 1.183,
+      "cron_postgres|future_scale": 1.183,
+      "cron_postgres|infra_cost": 0.971,
+      "cron_postgres|failure_recovery": 0.971,
+      "cron_postgres|dev_learning_curve": 0.971,
+      "clickhouse|simplicity_tco": 2.058,
+      "clickhouse|query_latency": 2.058,
+      "clickhouse|future_scale": 1.613,
+      "clickhouse|infra_cost": 1.613,
+      "clickhouse|failure_recovery": 1.613,
+      "clickhouse|dev_learning_curve": 1.613,
+      "kafka_flink|simplicity_tco": 0.714,
+      "kafka_flink|query_latency": 0.714,
+      "kafka_flink|future_scale": 1.639,
+      "kafka_flink|infra_cost": 1.639,
+      "kafka_flink|failure_recovery": 1.639,
+      "kafka_flink|dev_learning_curve": 1.639
+    },
+    "persona_scores": [
+      {
+        "speaker_id": "conservative_cto",
+        "weights": {
+          "simplicity_tco": 0.5,
+          "query_latency": 0.1,
+          "future_scale": 0.1,
+          "infra_cost": 0.1,
+          "failure_recovery": 0.1,
+          "dev_learning_curve": 0.1
+        },
+        "cells": [
+          {
+            "option_id": "cron_postgres",
+            "criterion_id": "simplicity_tco",
+            "score": 9,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "cron_postgres",
+            "criterion_id": "query_latency",
+            "score": 9,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "cron_postgres",
+            "criterion_id": "future_scale",
+            "score": 9,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "cron_postgres",
+            "criterion_id": "infra_cost",
+            "score": 9,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "cron_postgres",
+            "criterion_id": "failure_recovery",
+            "score": 9,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "cron_postgres",
+            "criterion_id": "dev_learning_curve",
+            "score": 9,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "clickhouse",
+            "criterion_id": "simplicity_tco",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "clickhouse",
+            "criterion_id": "query_latency",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "clickhouse",
+            "criterion_id": "future_scale",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "clickhouse",
+            "criterion_id": "infra_cost",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "clickhouse",
+            "criterion_id": "failure_recovery",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "clickhouse",
+            "criterion_id": "dev_learning_curve",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "kafka_flink",
+            "criterion_id": "simplicity_tco",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "kafka_flink",
+            "criterion_id": "query_latency",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "kafka_flink",
+            "criterion_id": "future_scale",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "kafka_flink",
+            "criterion_id": "infra_cost",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "kafka_flink",
+            "criterion_id": "failure_recovery",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "kafka_flink",
+            "criterion_id": "dev_learning_curve",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          }
+        ],
+        "final_choice": "cron_postgres",
+        "one_line": "首年生存至上，嚴控試錯成本。"
+      },
+      {
+        "speaker_id": "perf_zealot",
+        "weights": {
+          "simplicity_tco": 0.1,
+          "query_latency": 0.1,
+          "future_scale": 0.1,
+          "infra_cost": 0.1,
+          "failure_recovery": 0.1,
+          "dev_learning_curve": 0.5
+        },
+        "cells": [
+          {
+            "option_id": "cron_postgres",
+            "criterion_id": "simplicity_tco",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "cron_postgres",
+            "criterion_id": "query_latency",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "cron_postgres",
+            "criterion_id": "future_scale",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "cron_postgres",
+            "criterion_id": "infra_cost",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "cron_postgres",
+            "criterion_id": "failure_recovery",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "cron_postgres",
+            "criterion_id": "dev_learning_curve",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "clickhouse",
+            "criterion_id": "simplicity_tco",
+            "score": 9.5,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "clickhouse",
+            "criterion_id": "query_latency",
+            "score": 9.5,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "clickhouse",
+            "criterion_id": "future_scale",
+            "score": 9.5,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "clickhouse",
+            "criterion_id": "infra_cost",
+            "score": 9.5,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "clickhouse",
+            "criterion_id": "failure_recovery",
+            "score": 9.5,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "clickhouse",
+            "criterion_id": "dev_learning_curve",
+            "score": 9.5,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "kafka_flink",
+            "criterion_id": "simplicity_tco",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "kafka_flink",
+            "criterion_id": "query_latency",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "kafka_flink",
+            "criterion_id": "future_scale",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "kafka_flink",
+            "criterion_id": "infra_cost",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "kafka_flink",
+            "criterion_id": "failure_recovery",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "kafka_flink",
+            "criterion_id": "dev_learning_curve",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          }
+        ],
+        "final_choice": "clickhouse",
+        "one_line": "底層架構的技術債會加倍奉還。"
+      }
+    ]
+  },
+  "analysis": {
+    "totals": {
+      "cron_postgres": 8.4505,
+      "clickhouse": 6.0723,
+      "kafka_flink": 6.0723
+    },
+    "ranking": [
+      "cron_postgres",
+      "clickhouse",
+      "kafka_flink"
+    ],
+    "winner": "cron_postgres",
+    "margin": 2.3782,
+    "tipping_points": [
+      {
+        "criterion_id": "infra_cost",
+        "criterion_label": "硬體與伺服器費用",
+        "current_weight": 0.102,
+        "threshold": 0.639,
+        "direction": "increase",
+        "new_winner": "clickhouse"
+      },
+      {
+        "criterion_id": "failure_recovery",
+        "criterion_label": "故障復原與除錯容易度",
+        "current_weight": 0.102,
+        "threshold": 0.639,
+        "direction": "increase",
+        "new_winner": "clickhouse"
+      },
+      {
+        "criterion_id": "dev_learning_curve",
+        "criterion_label": "團隊學習曲線",
+        "current_weight": 0.102,
+        "threshold": 0.639,
+        "direction": "increase",
+        "new_winner": "clickhouse"
+      }
+    ],
+    "win_probability": {
+      "cron_postgres": 0.9696,
+      "clickhouse": 0.024,
+      "kafka_flink": 0.0064
+    },
+    "seed_used": 42,
+    "persona_lens": {
+      "conservative_cto": {
+        "winner": "cron_postgres",
+        "totals": {
+          "cron_postgres": 8.46,
+          "clickhouse": 6.04,
+          "kafka_flink": 6.04
+        },
+        "ranking": [
+          "cron_postgres",
+          "clickhouse",
+          "kafka_flink"
+        ]
+      },
+      "perf_zealot": {
+        "winner": "clickhouse",
+        "totals": {
+          "cron_postgres": 7.74,
+          "clickhouse": 7.88,
+          "kafka_flink": 7.88
+        },
+        "ranking": [
+          "clickhouse",
+          "kafka_flink",
+          "cron_postgres"
+        ]
+      }
+    },
+    "persona_own_view": {
+      "conservative_cto": {
+        "winner": "cron_postgres",
+        "totals": {
+          "cron_postgres": 9,
+          "clickhouse": 5,
+          "kafka_flink": 5
+        },
+        "ranking": [
+          "cron_postgres",
+          "clickhouse",
+          "kafka_flink"
+        ]
+      },
+      "perf_zealot": {
+        "winner": "clickhouse",
+        "totals": {
+          "cron_postgres": 6,
+          "clickhouse": 9.5,
+          "kafka_flink": 6
+        },
+        "ranking": [
+          "clickhouse",
+          "cron_postgres",
+          "kafka_flink"
+        ]
+      }
+    },
+    "max_regret": {
+      "cron_postgres": 0.14,
+      "clickhouse": 2.42,
+      "kafka_flink": 2.42
+    },
+    "minimax_regret_option": "cron_postgres",
+    "disagreement_hotspots": [
+      {
+        "cell_key": "clickhouse|simplicity_tco",
+        "option_id": "clickhouse",
+        "criterion_id": "simplicity_tco",
+        "spread": 2.058,
+        "chair_score": 4.2,
+        "persona_scores": {
+          "conservative_cto": 5,
+          "perf_zealot": 9.5
+        }
+      },
+      {
+        "cell_key": "clickhouse|query_latency",
+        "option_id": "clickhouse",
+        "criterion_id": "query_latency",
+        "spread": 2.058,
+        "chair_score": 4.2,
+        "persona_scores": {
+          "conservative_cto": 5,
+          "perf_zealot": 9.5
+        }
+      },
+      {
+        "cell_key": "kafka_flink|future_scale",
+        "option_id": "kafka_flink",
+        "criterion_id": "future_scale",
+        "spread": 1.639,
+        "chair_score": 8.8,
+        "persona_scores": {
+          "conservative_cto": 5,
+          "perf_zealot": 6
+        }
+      },
+      {
+        "cell_key": "kafka_flink|infra_cost",
+        "option_id": "kafka_flink",
+        "criterion_id": "infra_cost",
+        "spread": 1.639,
+        "chair_score": 8.8,
+        "persona_scores": {
+          "conservative_cto": 5,
+          "perf_zealot": 6
+        }
+      },
+      {
+        "cell_key": "kafka_flink|failure_recovery",
+        "option_id": "kafka_flink",
+        "criterion_id": "failure_recovery",
+        "spread": 1.639,
+        "chair_score": 8.8,
+        "persona_scores": {
+          "conservative_cto": 5,
+          "perf_zealot": 6
+        }
+      }
+    ],
+    "diagnostics": {
+      "judge_agreement_avg_spread": 1.39,
+      "high_agreement_warning": false,
+      "effective_samples": 3,
+      "spread_floor_used": 0.5
+    }
+  },
+  "warnings": [],
+  "sample_count": 3
+}

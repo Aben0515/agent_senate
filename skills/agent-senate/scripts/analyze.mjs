@@ -9,9 +9,10 @@
 // Usage:  node analyze.mjs <input.json> [--out <dir>]
 // Writes: <dir>/analysis.json and <dir>/matrix.html  (dir defaults to input's folder)
 
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { generateTranscriptMarkdown } from './ledger.mjs';
 
 const EPS = 1e-9;
 const key = (o, c) => `${o}|${c}`;
@@ -508,8 +509,33 @@ function main() {
   mkdirSync(outDir, { recursive: true });
   const analysisPath = join(outDir, 'analysis.json');
   const htmlPath = join(outDir, 'matrix.html');
+
+  // Inject state.json (turns, claims, transcript) if present
+  const stateIdx = args.indexOf('--state');
+  let statePath = stateIdx >= 0 ? args[stateIdx + 1] : null;
+  if (!statePath) {
+    const candidate1 = join(dirname(resolve(file)), 'state.json');
+    const candidate2 = join(outDir, 'state.json');
+    if (existsSync(candidate1)) statePath = candidate1;
+    else if (existsSync(candidate2)) statePath = candidate2;
+  }
+
+  const extras = { ...(input.extras ?? {}) };
+  if (statePath && existsSync(statePath)) {
+    try {
+      const state = JSON.parse(readFileSync(statePath, 'utf8'));
+      if (state.turns && !extras.turns) extras.turns = state.turns;
+      if (state.claims && !extras.claims) extras.claims = state.claims;
+      if (!extras.transcript && typeof generateTranscriptMarkdown === 'function') {
+        extras.transcript = generateTranscriptMarkdown(state);
+      }
+    } catch (err) {
+      console.warn(`warning: failed to merge state.json from ${statePath}: ${err.message}`);
+    }
+  }
+
   writeFileSync(analysisPath, JSON.stringify(result, null, 2), 'utf8');
-  writeFileSync(htmlPath, renderHtml(result, input.extras ?? {}), 'utf8');
+  writeFileSync(htmlPath, renderHtml(result, extras), 'utf8');
   const a = result.analysis;
   console.log(
     JSON.stringify(

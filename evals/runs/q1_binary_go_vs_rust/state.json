@@ -1,0 +1,432 @@
+{
+  "version": 1,
+  "question": "3 人新創團隊做 B2B SaaS 後端，預計一年內拓展至 500 家企業客戶，團隊熟 Python：該選 Go 還是 Rust？",
+  "brief": {
+    "restated_question": "3 人新創團隊做 B2B SaaS 後端，預計一年內拓展至 500 家企業客戶，團隊熟 Python：該選 Go 還是 Rust？",
+    "decision_type": "binary",
+    "options": [
+      {
+        "id": "go",
+        "label": "Go 語言",
+        "description": "高開發速度、廣泛招募池、生態完備"
+      },
+      {
+        "id": "rust",
+        "label": "Rust 語言",
+        "description": "極致性能、無 GC 停頓、編譯期記憶體安全"
+      }
+    ],
+    "criteria": [
+      {
+        "id": "delivery_velocity",
+        "label": "交付速度",
+        "description": "首版上線與每週功能迭代所需時間"
+      },
+      {
+        "id": "learning_curve",
+        "label": "學習與上手曲線",
+        "description": "Python 背景工程師轉型所需時間"
+      },
+      {
+        "id": "hiring_and_bus_factor",
+        "label": "招募池與替換風險",
+        "description": "市場人才供應量與離職容錯"
+      },
+      {
+        "id": "ops_observability",
+        "label": "維運排錯與可觀測性",
+        "description": "pprof、Sentry 與 APM 整合度"
+      },
+      {
+        "id": "resource_efficiency",
+        "label": "資源效率與硬體成本",
+        "description": "高並發下的記憶體佔用與 CPU 利用率"
+      },
+      {
+        "id": "b2b_ecosystem",
+        "label": "B2B 生態成熟度",
+        "description": "SSO/SAML、ORM、審計日誌開箱即用度"
+      }
+    ],
+    "context_facts": [
+      "團隊規模為 3 名工程師，具豐富 Python 經驗",
+      "B2B SaaS 後端，預計一年內 500 家企業客戶",
+      "尖峰負載約 200 ~ 1,500 RPS，瓶頸 95% 在資料庫與外部 API"
+    ],
+    "assumptions": [
+      {
+        "text": "業務優先活下來並驗證 PMF",
+        "why_needed": "界定資源優先級",
+        "impact_if_wrong": "重大時程延誤"
+      }
+    ]
+  },
+  "created_at": "2026-10-03T23:22:48.922Z",
+  "turns": [
+    {
+      "id": "chair_opening_1",
+      "type": "chair",
+      "kind": "opening",
+      "round": null,
+      "text": "歡迎各位蒞臨 Agent Senate 虛擬內閣。今天議事日程為【3 人新創 B2B SaaS 後端：Go 還是 Rust？】。請各位辯手就座，開門見山亮出立場與量級依據！",
+      "timestamp": "2026-10-03T23:22:48.923Z"
+    },
+    {
+      "id": "turn_conservative_cto_opening_2",
+      "type": "debater",
+      "speaker": "conservative_cto",
+      "kind": "opening",
+      "round": null,
+      "text": "我堅決推薦選擇 Go 語言（go）。理由在於團隊需要極致控制風險與交付成本。",
+      "full_text": "我堅決推薦選擇 Go 語言（go）。理由在於團隊需要極致控制風險與交付成本。\n\n```claims\n[{\"text\":\"Go 語言可顯著降低初創期總持有成本與風險\",\"quote\":\"降低初創期總持有成本與風險\",\"kind\":\"estimate\",\"supports_option_ids\":[\"go\"]},{\"text\":\"基礎設施複雜度會拖慢團隊核心業務推進\",\"quote\":\"拖慢團隊核心業務推進\",\"kind\":\"fact\",\"supports_option_ids\":[\"go\"]}]\n```",
+      "claims": [
+        "cto.1",
+        "cto.2"
+      ],
+      "concessions": [],
+      "timestamp": "2026-10-03T23:22:48.923Z"
+    },
+    {
+      "id": "turn_perf_zealot_opening_3",
+      "type": "debater",
+      "speaker": "perf_zealot",
+      "kind": "opening",
+      "round": null,
+      "text": "我支持 Rust 語言（rust）。\n> 【conservative_cto #cto.1】降低初創期總持有成本與風險。但是如果長期架構擴展性與極限性能有硬傷，後續重構代價將是 5 倍以上。",
+      "full_text": "我支持 Rust 語言（rust）。\n> 【conservative_cto #cto.1】降低初創期總持有成本與風險。但是如果長期架構擴展性與極限性能有硬傷，後續重構代價將是 5 倍以上。\n\n```claims\n[{\"text\":\"Rust 語言在長期擴展性與底層控制力具備不可替代優勢\",\"quote\":\"長期擴展性具備不可替代優勢\",\"kind\":\"value\",\"supports_option_ids\":[\"rust\"],\"attacks_claim_ids\":[\"cto.1\"]}]\n```",
+      "claims": [
+        "vex.1"
+      ],
+      "concessions": [],
+      "timestamp": "2026-10-03T23:22:48.924Z"
+    },
+    {
+      "id": "turn_kiss_hacker_opening_4",
+      "type": "debater",
+      "speaker": "kiss_hacker",
+      "kind": "opening",
+      "round": null,
+      "text": "我選擇最務實的方案 go。在 1,500 RPS 與 3 人小團隊約束下，任何沒有算過帳的過度架構都是工程師的自嗨。最少活動零件原則才是真理。",
+      "full_text": "我選擇最務實的方案 go。在 1,500 RPS 與 3 人小團隊約束下，任何沒有算過帳的過度架構都是工程師的自嗨。最少活動零件原則才是真理。\n\n```claims\n[{\"text\":\"現有負載下簡約架構完全足夠支撐，不要為不存在的規模做設計\",\"quote\":\"不要為不存在的規模做設計\",\"kind\":\"proposal\",\"supports_option_ids\":[\"go\"]}]\n```",
+      "claims": [
+        "kiss.1"
+      ],
+      "concessions": [],
+      "timestamp": "2026-10-03T23:22:48.924Z"
+    },
+    {
+      "id": "chair_directive_1",
+      "type": "chair",
+      "kind": "directive",
+      "round": 1,
+      "text": "戰況總結：交鋒焦點聚焦於即時交付 vs 長期擴展性。請各辯手針對具體量級數據展開正面質詢！@perf_zealot，請說明如果流量在 1 年內達到 5,000 QPS，成本相差多少？",
+      "timestamp": "2026-10-03T23:22:48.924Z"
+    },
+    {
+      "id": "turn_perf_zealot_rebuttal_1",
+      "type": "debater",
+      "speaker": "perf_zealot",
+      "kind": "rebuttal",
+      "round": 1,
+      "text": "> 【conservative_cto #cto.1】降低初創期總持有成本與風險\n【讓步 #vex.1】我承認在業務初期首年，3 人團隊生存交付確實排在第一位。但是若延遲突破 50ms，我們必須看清長期技術債的複利效應。",
+      "full_text": "> 【conservative_cto #cto.1】降低初創期總持有成本與風險\n【讓步 #vex.1】我承認在業務初期首年，3 人團隊生存交付確實排在第一位。但是若延遲突破 50ms，我們必須看清長期技術債的複利效應。\n\n```claims\n[{\"text\":\"預先做好領域邊界規劃可兼顧當期速度與未來遷移\",\"quote\":\"預先做好領域邊界規劃\",\"kind\":\"proposal\",\"supports_option_ids\":[\"go\"],\"concedes_claim_ids\":[\"vex.1\"]}]\n```",
+      "claims": [
+        "vex.2"
+      ],
+      "concessions": [
+        "vex.1"
+      ],
+      "timestamp": "2026-10-03T23:22:48.924Z"
+    },
+    {
+      "id": "turn_conservative_cto_rebuttal_1",
+      "type": "debater",
+      "speaker": "conservative_cto",
+      "kind": "rebuttal",
+      "round": 1,
+      "text": "> 【perf_zealot #vex.1】長期擴展性具備不可替代優勢。\n若公司在第 1 年就因過早最佳化把 300 萬資金燒光，五年後的擴展性只是幻影。",
+      "full_text": "> 【perf_zealot #vex.1】長期擴展性具備不可替代優勢。\n若公司在第 1 年就因過早最佳化把 300 萬資金燒光，五年後的擴展性只是幻影。\n\n```claims\n[{\"text\":\"新創團隊的第一法則是活到下一個季度\",\"quote\":\"活到下一個季度\",\"kind\":\"value\",\"supports_option_ids\":[\"go\"]}]\n```",
+      "claims": [
+        "cto.3"
+      ],
+      "concessions": [],
+      "timestamp": "2026-10-03T23:22:48.924Z"
+    },
+    {
+      "id": "turn_kiss_hacker_rebuttal_1",
+      "type": "debater",
+      "speaker": "kiss_hacker",
+      "kind": "rebuttal",
+      "round": 1,
+      "text": "> 【perf_zealot #vex.1】預先做好領域邊界規劃\n把它刪掉，看看誰會哭？在單台 4 核心 8GB 伺服器上，把不必要的 10 個微服務活動零件全數剃除。",
+      "full_text": "> 【perf_zealot #vex.1】預先做好領域邊界規劃\n把它刪掉，看看誰會哭？在單台 4 核心 8GB 伺服器上，把不必要的 10 個微服務活動零件全數剃除。\n\n```claims\n[{\"text\":\"遵循奧卡姆剃刀，先用最小可行方案上線驗證反饋\",\"quote\":\"先用最小可行方案上線驗證反饋\",\"kind\":\"proposal\",\"supports_option_ids\":[\"go\"]}]\n```",
+      "claims": [
+        "kiss.2"
+      ],
+      "concessions": [],
+      "timestamp": "2026-10-03T23:22:48.924Z"
+    },
+    {
+      "id": "chair_directive_2",
+      "type": "chair",
+      "kind": "directive",
+      "round": 2,
+      "text": "交叉質詢第 2 輪結束：主要交鋒點已充分辯論，現在進入鋼人論證與結辯！",
+      "timestamp": "2026-10-03T23:22:48.924Z"
+    },
+    {
+      "id": "turn_conservative_cto_steelman_10",
+      "type": "debater",
+      "speaker": "conservative_cto",
+      "kind": "steelman",
+      "round": null,
+      "text": "我為 rust 做最強辯護：如果未來流量出現 10 倍指數級增長，當初奠定的硬核架構將展現巨大的免重構優勢。這動搖了我 25%。",
+      "full_text": "我為 rust 做最強辯護：如果未來流量出現 10 倍指數級增長，當初奠定的硬核架構將展現巨大的免重構優勢。這動搖了我 25%。",
+      "claims": [],
+      "concessions": [],
+      "timestamp": "2026-10-03T23:22:48.924Z"
+    },
+    {
+      "id": "turn_perf_zealot_steelman_11",
+      "type": "debater",
+      "speaker": "perf_zealot",
+      "kind": "steelman",
+      "round": null,
+      "text": "我為 go 做最強辯護：在商業市場上，交付速度就是生命線，新人快速接盤是抗風險護城河。這動搖了我 35%。",
+      "full_text": "我為 go 做最強辯護：在商業市場上，交付速度就是生命線，新人快速接盤是抗風險護城河。這動搖了我 35%。",
+      "claims": [],
+      "concessions": [],
+      "timestamp": "2026-10-03T23:22:48.924Z"
+    },
+    {
+      "id": "turn_kiss_hacker_steelman_12",
+      "type": "debater",
+      "speaker": "kiss_hacker",
+      "kind": "steelman",
+      "round": null,
+      "text": "我承認對手在極限可靠性上的深刻思考，這促使我認識到簡約架構依然必須保留清晰的模組邊界。",
+      "full_text": "我承認對手在極限可靠性上的深刻思考，這促使我認識到簡約架構依然必須保留清晰的模組邊界。",
+      "claims": [],
+      "concessions": [],
+      "timestamp": "2026-10-03T23:22:48.924Z"
+    },
+    {
+      "id": "turn_conservative_cto_closing_13",
+      "type": "debater",
+      "speaker": "conservative_cto",
+      "kind": "closing",
+      "round": null,
+      "text": "結辯：我最終堅定推薦 go。若團隊全員本已精通次選技術且預算無限，我的建議為錯。",
+      "full_text": "結辯：我最終堅定推薦 go。若團隊全員本已精通次選技術且預算無限，我的建議為錯。",
+      "claims": [],
+      "concessions": [],
+      "timestamp": "2026-10-03T23:22:48.924Z"
+    },
+    {
+      "id": "turn_perf_zealot_closing_14",
+      "type": "debater",
+      "speaker": "perf_zealot",
+      "kind": "closing",
+      "round": null,
+      "text": "結辯：我維持對底層擴展性的警示，但尊重團隊當前的交付邊界。若業務本質為低頻系統，go 是務實選擇。",
+      "full_text": "結辯：我維持對底層擴展性的警示，但尊重團隊當前的交付邊界。若業務本質為低頻系統，go 是務實選擇。",
+      "claims": [],
+      "concessions": [],
+      "timestamp": "2026-10-03T23:22:48.924Z"
+    },
+    {
+      "id": "turn_kiss_hacker_closing_15",
+      "type": "debater",
+      "speaker": "kiss_hacker",
+      "kind": "closing",
+      "round": null,
+      "text": "結辯：我堅定推薦 go。先交付業務價值，再針對真實瓶頸優化。",
+      "full_text": "結辯：我堅定推薦 go。先交付業務價值，再針對真實瓶頸優化。",
+      "claims": [],
+      "concessions": [],
+      "timestamp": "2026-10-03T23:22:48.924Z"
+    }
+  ],
+  "chair_events": [
+    {
+      "id": "chair_opening_1",
+      "type": "chair",
+      "kind": "opening",
+      "round": null,
+      "text": "歡迎各位蒞臨 Agent Senate 虛擬內閣。今天議事日程為【3 人新創 B2B SaaS 後端：Go 還是 Rust？】。請各位辯手就座，開門見山亮出立場與量級依據！",
+      "timestamp": "2026-10-03T23:22:48.923Z"
+    },
+    {
+      "id": "chair_directive_1",
+      "type": "chair",
+      "kind": "directive",
+      "round": 1,
+      "text": "戰況總結：交鋒焦點聚焦於即時交付 vs 長期擴展性。請各辯手針對具體量級數據展開正面質詢！@perf_zealot，請說明如果流量在 1 年內達到 5,000 QPS，成本相差多少？",
+      "timestamp": "2026-10-03T23:22:48.924Z"
+    },
+    {
+      "id": "chair_directive_2",
+      "type": "chair",
+      "kind": "directive",
+      "round": 2,
+      "text": "交叉質詢第 2 輪結束：主要交鋒點已充分辯論，現在進入鋼人論證與結辯！",
+      "timestamp": "2026-10-03T23:22:48.924Z"
+    }
+  ],
+  "claims": {
+    "cto.1": {
+      "id": "cto.1",
+      "speaker": "conservative_cto",
+      "turn_kind": "opening",
+      "round": null,
+      "text": "Go 語言可顯著降低初創期總持有成本與風險",
+      "quote": "降低初創期總持有成本與風險",
+      "kind": "estimate",
+      "supports_option_ids": [
+        "go"
+      ],
+      "attacks_claim_ids": [],
+      "concedes_claim_ids": [],
+      "status": "attacked",
+      "attacked_by": [
+        "vex.1",
+        "vex.2"
+      ],
+      "fact_check": {
+        "claim_id": "cto.1",
+        "verdict": "plausible",
+        "note": "架構複雜度與交付週期成正比"
+      }
+    },
+    "cto.2": {
+      "id": "cto.2",
+      "speaker": "conservative_cto",
+      "turn_kind": "opening",
+      "round": null,
+      "text": "基礎設施複雜度會拖慢團隊核心業務推進",
+      "quote": "拖慢團隊核心業務推進",
+      "kind": "fact",
+      "supports_option_ids": [
+        "go"
+      ],
+      "attacks_claim_ids": [],
+      "concedes_claim_ids": [],
+      "status": "open",
+      "attacked_by": [],
+      "fact_check": null
+    },
+    "vex.1": {
+      "id": "vex.1",
+      "speaker": "perf_zealot",
+      "turn_kind": "opening",
+      "round": null,
+      "text": "Rust 語言在長期擴展性與底層控制力具備不可替代優勢",
+      "quote": "長期擴展性具備不可替代優勢",
+      "kind": "value",
+      "supports_option_ids": [
+        "rust"
+      ],
+      "attacks_claim_ids": [
+        "cto.1"
+      ],
+      "concedes_claim_ids": [],
+      "status": "conceded",
+      "attacked_by": [
+        "vex.2",
+        "cto.3",
+        "kiss.2"
+      ],
+      "fact_check": null
+    },
+    "kiss.1": {
+      "id": "kiss.1",
+      "speaker": "kiss_hacker",
+      "turn_kind": "opening",
+      "round": null,
+      "text": "現有負載下簡約架構完全足夠支撐，不要為不存在的規模做設計",
+      "quote": "不要為不存在的規模做設計",
+      "kind": "proposal",
+      "supports_option_ids": [
+        "go"
+      ],
+      "attacks_claim_ids": [],
+      "concedes_claim_ids": [],
+      "status": "open",
+      "attacked_by": [],
+      "fact_check": null
+    },
+    "vex.2": {
+      "id": "vex.2",
+      "speaker": "perf_zealot",
+      "turn_kind": "rebuttal",
+      "round": 1,
+      "text": "預先做好領域邊界規劃可兼顧當期速度與未來遷移",
+      "quote": "預先做好領域邊界規劃",
+      "kind": "proposal",
+      "supports_option_ids": [
+        "go"
+      ],
+      "attacks_claim_ids": [
+        "cto.1",
+        "vex.1"
+      ],
+      "concedes_claim_ids": [
+        "vex.1"
+      ],
+      "status": "open",
+      "attacked_by": [],
+      "fact_check": null
+    },
+    "cto.3": {
+      "id": "cto.3",
+      "speaker": "conservative_cto",
+      "turn_kind": "rebuttal",
+      "round": 1,
+      "text": "新創團隊的第一法則是活到下一個季度",
+      "quote": "活到下一個季度",
+      "kind": "value",
+      "supports_option_ids": [
+        "go"
+      ],
+      "attacks_claim_ids": [
+        "vex.1"
+      ],
+      "concedes_claim_ids": [],
+      "status": "open",
+      "attacked_by": [],
+      "fact_check": null
+    },
+    "kiss.2": {
+      "id": "kiss.2",
+      "speaker": "kiss_hacker",
+      "turn_kind": "rebuttal",
+      "round": 1,
+      "text": "遵循奧卡姆剃刀，先用最小可行方案上線驗證反饋",
+      "quote": "先用最小可行方案上線驗證反饋",
+      "kind": "proposal",
+      "supports_option_ids": [
+        "go"
+      ],
+      "attacks_claim_ids": [
+        "vex.1"
+      ],
+      "concedes_claim_ids": [],
+      "status": "open",
+      "attacked_by": [],
+      "fact_check": null
+    }
+  },
+  "speaker_counters": {
+    "cto": 3,
+    "vex": 2,
+    "kiss": 2
+  },
+  "fallacies": [],
+  "fact_checks": [
+    {
+      "claim_id": "cto.1",
+      "verdict": "plausible",
+      "note": "架構複雜度與交付週期成正比"
+    }
+  ]
+}

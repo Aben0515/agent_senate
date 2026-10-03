@@ -1,0 +1,950 @@
+{
+  "question": "內部營運報表系統（每日 200 萬筆事件、報表延遲容忍 1 小時）：該選 Kafka + Flink、cron + PostgreSQL、還是 ClickHouse？",
+  "options": [
+    {
+      "id": "cron_postgres",
+      "label": "cron + PostgreSQL",
+      "description": "利用現有 Postgres 配合只讀副本與排程物化視圖"
+    },
+    {
+      "id": "clickhouse",
+      "label": "ClickHouse 獨立 OLAP",
+      "description": "引進列式存儲，高速 SQL 聚合"
+    },
+    {
+      "id": "kafka_flink",
+      "label": "Kafka + Flink 串流架構",
+      "description": "事件總線與即時串流計算引擎"
+    }
+  ],
+  "criteria": [
+    {
+      "id": "simplicity_tco",
+      "label": "架構極簡度與總持有成本",
+      "description": "最少活動零件、避免引入專人維護"
+    },
+    {
+      "id": "query_latency",
+      "label": "複雜報表查詢延遲",
+      "description": "數百萬行多維度 GROUP BY 回應時間"
+    },
+    {
+      "id": "future_scale",
+      "label": "規模擴展至千萬級潛力",
+      "description": "資料量增長 10 倍時的應對餘裕"
+    },
+    {
+      "id": "infra_cost",
+      "label": "硬體與伺服器費用",
+      "description": "雲端運算與存儲月帳單"
+    },
+    {
+      "id": "failure_recovery",
+      "label": "故障復原與除錯容易度",
+      "description": "任務掛掉重算與歷史回溯"
+    },
+    {
+      "id": "dev_learning_curve",
+      "label": "團隊學習曲線",
+      "description": "現有工程師上手與語法掌握速度"
+    }
+  ],
+  "chairSamples": [
+    {
+      "weights": {
+        "simplicity_tco": 0.35,
+        "query_latency": 0.25,
+        "future_scale": 0.1,
+        "infra_cost": 0.1,
+        "failure_recovery": 0.1,
+        "dev_learning_curve": 0.1
+      },
+      "weight_rationale": {
+        "simplicity_tco": "依據專案現階段核心矛盾權衡",
+        "query_latency": "依據專案現階段核心矛盾權衡",
+        "future_scale": "依據專案現階段核心矛盾權衡",
+        "infra_cost": "依據專案現階段核心矛盾權衡",
+        "failure_recovery": "依據專案現階段核心矛盾權衡",
+        "dev_learning_curve": "依據專案現階段核心矛盾權衡"
+      },
+      "cells": [
+        {
+          "option_id": "cron_postgres",
+          "criterion_id": "simplicity_tco",
+          "score": 9,
+          "rationale": "cron + PostgreSQL 在 架構極簡度與總持有成本 表現分析",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "cron_postgres",
+          "criterion_id": "query_latency",
+          "score": 9,
+          "rationale": "cron + PostgreSQL 在 複雜報表查詢延遲 表現分析",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "cron_postgres",
+          "criterion_id": "future_scale",
+          "score": 9,
+          "rationale": "cron + PostgreSQL 在 規模擴展至千萬級潛力 表現分析",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "cron_postgres",
+          "criterion_id": "infra_cost",
+          "score": 7.5,
+          "rationale": "cron + PostgreSQL 在 硬體與伺服器費用 表現分析",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "cron_postgres",
+          "criterion_id": "failure_recovery",
+          "score": 7.5,
+          "rationale": "cron + PostgreSQL 在 故障復原與除錯容易度 表現分析",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "cron_postgres",
+          "criterion_id": "dev_learning_curve",
+          "score": 7.5,
+          "rationale": "cron + PostgreSQL 在 團隊學習曲線 表現分析",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "clickhouse",
+          "criterion_id": "simplicity_tco",
+          "score": 4.5,
+          "rationale": "ClickHouse 獨立 OLAP 在 架構極簡度與總持有成本 表現分析",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "clickhouse",
+          "criterion_id": "query_latency",
+          "score": 4.5,
+          "rationale": "ClickHouse 獨立 OLAP 在 複雜報表查詢延遲 表現分析",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "clickhouse",
+          "criterion_id": "future_scale",
+          "score": 8.5,
+          "rationale": "ClickHouse 獨立 OLAP 在 規模擴展至千萬級潛力 表現分析",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "clickhouse",
+          "criterion_id": "infra_cost",
+          "score": 8.5,
+          "rationale": "ClickHouse 獨立 OLAP 在 硬體與伺服器費用 表現分析",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "clickhouse",
+          "criterion_id": "failure_recovery",
+          "score": 8.5,
+          "rationale": "ClickHouse 獨立 OLAP 在 故障復原與除錯容易度 表現分析",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "clickhouse",
+          "criterion_id": "dev_learning_curve",
+          "score": 8.5,
+          "rationale": "ClickHouse 獨立 OLAP 在 團隊學習曲線 表現分析",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "kafka_flink",
+          "criterion_id": "simplicity_tco",
+          "score": 4.5,
+          "rationale": "Kafka + Flink 串流架構 在 架構極簡度與總持有成本 表現分析",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "kafka_flink",
+          "criterion_id": "query_latency",
+          "score": 4.5,
+          "rationale": "Kafka + Flink 串流架構 在 複雜報表查詢延遲 表現分析",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "kafka_flink",
+          "criterion_id": "future_scale",
+          "score": 8.5,
+          "rationale": "Kafka + Flink 串流架構 在 規模擴展至千萬級潛力 表現分析",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "kafka_flink",
+          "criterion_id": "infra_cost",
+          "score": 8.5,
+          "rationale": "Kafka + Flink 串流架構 在 硬體與伺服器費用 表現分析",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "kafka_flink",
+          "criterion_id": "failure_recovery",
+          "score": 8.5,
+          "rationale": "Kafka + Flink 串流架構 在 故障復原與除錯容易度 表現分析",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "kafka_flink",
+          "criterion_id": "dev_learning_curve",
+          "score": 8.5,
+          "rationale": "Kafka + Flink 串流架構 在 團隊學習曲線 表現分析",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        }
+      ]
+    },
+    {
+      "weights": {
+        "simplicity_tco": 0.3,
+        "query_latency": 0.25,
+        "future_scale": 0.1,
+        "infra_cost": 0.1,
+        "failure_recovery": 0.1,
+        "dev_learning_curve": 0.1
+      },
+      "weight_rationale": {
+        "simplicity_tco": "團隊技能與交付速度優先",
+        "query_latency": "團隊技能與交付速度優先",
+        "future_scale": "團隊技能與交付速度優先",
+        "infra_cost": "團隊技能與交付速度優先",
+        "failure_recovery": "團隊技能與交付速度優先",
+        "dev_learning_curve": "團隊技能與交付速度優先"
+      },
+      "cells": [
+        {
+          "option_id": "cron_postgres",
+          "criterion_id": "simplicity_tco",
+          "score": 8.8,
+          "rationale": "cron + PostgreSQL 在 架構極簡度與總持有成本 評估",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "cron_postgres",
+          "criterion_id": "query_latency",
+          "score": 8.8,
+          "rationale": "cron + PostgreSQL 在 複雜報表查詢延遲 評估",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "cron_postgres",
+          "criterion_id": "future_scale",
+          "score": 8.8,
+          "rationale": "cron + PostgreSQL 在 規模擴展至千萬級潛力 評估",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "cron_postgres",
+          "criterion_id": "infra_cost",
+          "score": 7.2,
+          "rationale": "cron + PostgreSQL 在 硬體與伺服器費用 評估",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "cron_postgres",
+          "criterion_id": "failure_recovery",
+          "score": 7.2,
+          "rationale": "cron + PostgreSQL 在 故障復原與除錯容易度 評估",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "cron_postgres",
+          "criterion_id": "dev_learning_curve",
+          "score": 7.2,
+          "rationale": "cron + PostgreSQL 在 團隊學習曲線 評估",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "clickhouse",
+          "criterion_id": "simplicity_tco",
+          "score": 4.2,
+          "rationale": "ClickHouse 獨立 OLAP 在 架構極簡度與總持有成本 評估",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "clickhouse",
+          "criterion_id": "query_latency",
+          "score": 4.2,
+          "rationale": "ClickHouse 獨立 OLAP 在 複雜報表查詢延遲 評估",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "clickhouse",
+          "criterion_id": "future_scale",
+          "score": 8.8,
+          "rationale": "ClickHouse 獨立 OLAP 在 規模擴展至千萬級潛力 評估",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "clickhouse",
+          "criterion_id": "infra_cost",
+          "score": 8.8,
+          "rationale": "ClickHouse 獨立 OLAP 在 硬體與伺服器費用 評估",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "clickhouse",
+          "criterion_id": "failure_recovery",
+          "score": 8.8,
+          "rationale": "ClickHouse 獨立 OLAP 在 故障復原與除錯容易度 評估",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "clickhouse",
+          "criterion_id": "dev_learning_curve",
+          "score": 8.8,
+          "rationale": "ClickHouse 獨立 OLAP 在 團隊學習曲線 評估",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "kafka_flink",
+          "criterion_id": "simplicity_tco",
+          "score": 4.2,
+          "rationale": "Kafka + Flink 串流架構 在 架構極簡度與總持有成本 評估",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "kafka_flink",
+          "criterion_id": "query_latency",
+          "score": 4.2,
+          "rationale": "Kafka + Flink 串流架構 在 複雜報表查詢延遲 評估",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "kafka_flink",
+          "criterion_id": "future_scale",
+          "score": 8.8,
+          "rationale": "Kafka + Flink 串流架構 在 規模擴展至千萬級潛力 評估",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "kafka_flink",
+          "criterion_id": "infra_cost",
+          "score": 8.8,
+          "rationale": "Kafka + Flink 串流架構 在 硬體與伺服器費用 評估",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "kafka_flink",
+          "criterion_id": "failure_recovery",
+          "score": 8.8,
+          "rationale": "Kafka + Flink 串流架構 在 故障復原與除錯容易度 評估",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "kafka_flink",
+          "criterion_id": "dev_learning_curve",
+          "score": 8.8,
+          "rationale": "Kafka + Flink 串流架構 在 團隊學習曲線 評估",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        }
+      ]
+    },
+    {
+      "weights": {
+        "simplicity_tco": 0.32,
+        "query_latency": 0.28,
+        "future_scale": 0.1,
+        "infra_cost": 0.1,
+        "failure_recovery": 0.1,
+        "dev_learning_curve": 0.1
+      },
+      "weight_rationale": {
+        "simplicity_tco": "綜合總持有成本考量",
+        "query_latency": "綜合總持有成本考量",
+        "future_scale": "綜合總持有成本考量",
+        "infra_cost": "綜合總持有成本考量",
+        "failure_recovery": "綜合總持有成本考量",
+        "dev_learning_curve": "綜合總持有成本考量"
+      },
+      "cells": [
+        {
+          "option_id": "cron_postgres",
+          "criterion_id": "simplicity_tco",
+          "score": 9,
+          "rationale": "cron + PostgreSQL 在 架構極簡度與總持有成本 綜合考量",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "cron_postgres",
+          "criterion_id": "query_latency",
+          "score": 9,
+          "rationale": "cron + PostgreSQL 在 複雜報表查詢延遲 綜合考量",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "cron_postgres",
+          "criterion_id": "future_scale",
+          "score": 9,
+          "rationale": "cron + PostgreSQL 在 規模擴展至千萬級潛力 綜合考量",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "cron_postgres",
+          "criterion_id": "infra_cost",
+          "score": 7,
+          "rationale": "cron + PostgreSQL 在 硬體與伺服器費用 綜合考量",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "cron_postgres",
+          "criterion_id": "failure_recovery",
+          "score": 7,
+          "rationale": "cron + PostgreSQL 在 故障復原與除錯容易度 綜合考量",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "cron_postgres",
+          "criterion_id": "dev_learning_curve",
+          "score": 7,
+          "rationale": "cron + PostgreSQL 在 團隊學習曲線 綜合考量",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "clickhouse",
+          "criterion_id": "simplicity_tco",
+          "score": 4,
+          "rationale": "ClickHouse 獨立 OLAP 在 架構極簡度與總持有成本 綜合考量",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "clickhouse",
+          "criterion_id": "query_latency",
+          "score": 4,
+          "rationale": "ClickHouse 獨立 OLAP 在 複雜報表查詢延遲 綜合考量",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "clickhouse",
+          "criterion_id": "future_scale",
+          "score": 9,
+          "rationale": "ClickHouse 獨立 OLAP 在 規模擴展至千萬級潛力 綜合考量",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "clickhouse",
+          "criterion_id": "infra_cost",
+          "score": 9,
+          "rationale": "ClickHouse 獨立 OLAP 在 硬體與伺服器費用 綜合考量",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "clickhouse",
+          "criterion_id": "failure_recovery",
+          "score": 9,
+          "rationale": "ClickHouse 獨立 OLAP 在 故障復原與除錯容易度 綜合考量",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "clickhouse",
+          "criterion_id": "dev_learning_curve",
+          "score": 9,
+          "rationale": "ClickHouse 獨立 OLAP 在 團隊學習曲線 綜合考量",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "kafka_flink",
+          "criterion_id": "simplicity_tco",
+          "score": 4,
+          "rationale": "Kafka + Flink 串流架構 在 架構極簡度與總持有成本 綜合考量",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "kafka_flink",
+          "criterion_id": "query_latency",
+          "score": 4,
+          "rationale": "Kafka + Flink 串流架構 在 複雜報表查詢延遲 綜合考量",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "kafka_flink",
+          "criterion_id": "future_scale",
+          "score": 9,
+          "rationale": "Kafka + Flink 串流架構 在 規模擴展至千萬級潛力 綜合考量",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "kafka_flink",
+          "criterion_id": "infra_cost",
+          "score": 9,
+          "rationale": "Kafka + Flink 串流架構 在 硬體與伺服器費用 綜合考量",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "kafka_flink",
+          "criterion_id": "failure_recovery",
+          "score": 9,
+          "rationale": "Kafka + Flink 串流架構 在 故障復原與除錯容易度 綜合考量",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "kafka_flink",
+          "criterion_id": "dev_learning_curve",
+          "score": 9,
+          "rationale": "Kafka + Flink 串流架構 在 團隊學習曲線 綜合考量",
+          "evidence_claim_ids": [
+            "cto.1"
+          ],
+          "confidence": "high"
+        }
+      ]
+    }
+  ],
+  "personaScores": [
+    {
+      "speaker_id": "conservative_cto",
+      "final_choice": "cron_postgres",
+      "weights": {
+        "simplicity_tco": 0.5,
+        "query_latency": 0.1,
+        "future_scale": 0.1,
+        "infra_cost": 0.1,
+        "failure_recovery": 0.1,
+        "dev_learning_curve": 0.1
+      },
+      "cells": [
+        {
+          "option_id": "cron_postgres",
+          "criterion_id": "simplicity_tco",
+          "score": 9,
+          "reason": "符合實用保守原則"
+        },
+        {
+          "option_id": "cron_postgres",
+          "criterion_id": "query_latency",
+          "score": 9,
+          "reason": "符合實用保守原則"
+        },
+        {
+          "option_id": "cron_postgres",
+          "criterion_id": "future_scale",
+          "score": 9,
+          "reason": "符合實用保守原則"
+        },
+        {
+          "option_id": "cron_postgres",
+          "criterion_id": "infra_cost",
+          "score": 9,
+          "reason": "符合實用保守原則"
+        },
+        {
+          "option_id": "cron_postgres",
+          "criterion_id": "failure_recovery",
+          "score": 9,
+          "reason": "符合實用保守原則"
+        },
+        {
+          "option_id": "cron_postgres",
+          "criterion_id": "dev_learning_curve",
+          "score": 9,
+          "reason": "符合實用保守原則"
+        },
+        {
+          "option_id": "clickhouse",
+          "criterion_id": "simplicity_tco",
+          "score": 5,
+          "reason": "符合實用保守原則"
+        },
+        {
+          "option_id": "clickhouse",
+          "criterion_id": "query_latency",
+          "score": 5,
+          "reason": "符合實用保守原則"
+        },
+        {
+          "option_id": "clickhouse",
+          "criterion_id": "future_scale",
+          "score": 5,
+          "reason": "符合實用保守原則"
+        },
+        {
+          "option_id": "clickhouse",
+          "criterion_id": "infra_cost",
+          "score": 5,
+          "reason": "符合實用保守原則"
+        },
+        {
+          "option_id": "clickhouse",
+          "criterion_id": "failure_recovery",
+          "score": 5,
+          "reason": "符合實用保守原則"
+        },
+        {
+          "option_id": "clickhouse",
+          "criterion_id": "dev_learning_curve",
+          "score": 5,
+          "reason": "符合實用保守原則"
+        },
+        {
+          "option_id": "kafka_flink",
+          "criterion_id": "simplicity_tco",
+          "score": 5,
+          "reason": "符合實用保守原則"
+        },
+        {
+          "option_id": "kafka_flink",
+          "criterion_id": "query_latency",
+          "score": 5,
+          "reason": "符合實用保守原則"
+        },
+        {
+          "option_id": "kafka_flink",
+          "criterion_id": "future_scale",
+          "score": 5,
+          "reason": "符合實用保守原則"
+        },
+        {
+          "option_id": "kafka_flink",
+          "criterion_id": "infra_cost",
+          "score": 5,
+          "reason": "符合實用保守原則"
+        },
+        {
+          "option_id": "kafka_flink",
+          "criterion_id": "failure_recovery",
+          "score": 5,
+          "reason": "符合實用保守原則"
+        },
+        {
+          "option_id": "kafka_flink",
+          "criterion_id": "dev_learning_curve",
+          "score": 5,
+          "reason": "符合實用保守原則"
+        }
+      ],
+      "one_line": "首年生存至上，嚴控試錯成本。"
+    },
+    {
+      "speaker_id": "perf_zealot",
+      "final_choice": "clickhouse",
+      "weights": {
+        "simplicity_tco": 0.1,
+        "query_latency": 0.1,
+        "future_scale": 0.1,
+        "infra_cost": 0.1,
+        "failure_recovery": 0.1,
+        "dev_learning_curve": 0.5
+      },
+      "cells": [
+        {
+          "option_id": "cron_postgres",
+          "criterion_id": "simplicity_tco",
+          "score": 6,
+          "reason": "重視極致控制與擴展力"
+        },
+        {
+          "option_id": "cron_postgres",
+          "criterion_id": "query_latency",
+          "score": 6,
+          "reason": "重視極致控制與擴展力"
+        },
+        {
+          "option_id": "cron_postgres",
+          "criterion_id": "future_scale",
+          "score": 6,
+          "reason": "重視極致控制與擴展力"
+        },
+        {
+          "option_id": "cron_postgres",
+          "criterion_id": "infra_cost",
+          "score": 6,
+          "reason": "重視極致控制與擴展力"
+        },
+        {
+          "option_id": "cron_postgres",
+          "criterion_id": "failure_recovery",
+          "score": 6,
+          "reason": "重視極致控制與擴展力"
+        },
+        {
+          "option_id": "cron_postgres",
+          "criterion_id": "dev_learning_curve",
+          "score": 6,
+          "reason": "重視極致控制與擴展力"
+        },
+        {
+          "option_id": "clickhouse",
+          "criterion_id": "simplicity_tco",
+          "score": 9.5,
+          "reason": "重視極致控制與擴展力"
+        },
+        {
+          "option_id": "clickhouse",
+          "criterion_id": "query_latency",
+          "score": 9.5,
+          "reason": "重視極致控制與擴展力"
+        },
+        {
+          "option_id": "clickhouse",
+          "criterion_id": "future_scale",
+          "score": 9.5,
+          "reason": "重視極致控制與擴展力"
+        },
+        {
+          "option_id": "clickhouse",
+          "criterion_id": "infra_cost",
+          "score": 9.5,
+          "reason": "重視極致控制與擴展力"
+        },
+        {
+          "option_id": "clickhouse",
+          "criterion_id": "failure_recovery",
+          "score": 9.5,
+          "reason": "重視極致控制與擴展力"
+        },
+        {
+          "option_id": "clickhouse",
+          "criterion_id": "dev_learning_curve",
+          "score": 9.5,
+          "reason": "重視極致控制與擴展力"
+        },
+        {
+          "option_id": "kafka_flink",
+          "criterion_id": "simplicity_tco",
+          "score": 6,
+          "reason": "重視極致控制與擴展力"
+        },
+        {
+          "option_id": "kafka_flink",
+          "criterion_id": "query_latency",
+          "score": 6,
+          "reason": "重視極致控制與擴展力"
+        },
+        {
+          "option_id": "kafka_flink",
+          "criterion_id": "future_scale",
+          "score": 6,
+          "reason": "重視極致控制與擴展力"
+        },
+        {
+          "option_id": "kafka_flink",
+          "criterion_id": "infra_cost",
+          "score": 6,
+          "reason": "重視極致控制與擴展力"
+        },
+        {
+          "option_id": "kafka_flink",
+          "criterion_id": "failure_recovery",
+          "score": 6,
+          "reason": "重視極致控制與擴展力"
+        },
+        {
+          "option_id": "kafka_flink",
+          "criterion_id": "dev_learning_curve",
+          "score": 6,
+          "reason": "重視極致控制與擴展力"
+        }
+      ],
+      "one_line": "底層架構的技術債會加倍奉還。"
+    }
+  ],
+  "seed": 42,
+  "extras": {
+    "verdict": {
+      "recommended_option_id": "cron_postgres",
+      "confidence_label": "高",
+      "one_liner": "在當前情境事實約束下，強烈推薦 cron_postgres 作為最優解。",
+      "recommendation_text": "經過完整交叉質詢與敏感度分析，cron_postgres 在交付速度、維運簡單度與團隊心智負擔上取得決定性領先優勢。",
+      "conditions_to_flip": [
+        "若業務規模或核心約束在未來幾個月內發生 10 倍以上突變，方需考慮改選 clickhouse"
+      ]
+    },
+    "red_team": "【反方技術紅隊警示】若選擇 cron_postgres，團隊切不可因為初期的開發順遂而放鬆架構紀律。一旦未來出現特定極限計算或合規硬性限制，當初未選 clickhouse 將迫使團隊啟動局部的微服務抽取或重構。",
+    "key_tradeoffs": [
+      {
+        "title": "即時交付速度 vs 極致架構擴展性",
+        "gain": "快速上線驗證",
+        "cost": "承擔長期局部重構可能性"
+      }
+    ],
+    "blind_spots": [
+      {
+        "title": "團隊擴張時的認知負擔溢價",
+        "description": "新成員進駐後的系統邊界理解成本",
+        "severity": "medium",
+        "why_it_matters": "影響團隊擴展速度"
+      }
+    ],
+    "next_experiments": [
+      {
+        "title": "核心資料流原型壓測 Spike",
+        "description": "針對預估尖峰量級實施 2 天原型驗證",
+        "effort": "2 天",
+        "decides": "確認是否真有架構瓶頸風險"
+      }
+    ],
+    "highlights": [
+      {
+        "title": "最具殺傷力的商業提問",
+        "quote": "活到下一個季度",
+        "speaker_id": "conservative_cto",
+        "why": "精準直擊新創技術選型的本質"
+      }
+    ],
+    "mvp": {
+      "speaker_id": "conservative_cto",
+      "comment": "始終緊扣業務生存與現金流硬約束"
+    }
+  }
+}

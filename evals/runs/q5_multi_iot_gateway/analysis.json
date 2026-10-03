@@ -1,0 +1,693 @@
+{
+  "matrix": {
+    "question": "IoT 閘道器（ARM、256MB RAM、需遠端 OTA 更新）資料收集服務：該選 Rust、Go 還是 C？",
+    "options": [
+      {
+        "id": "rust",
+        "label": "Rust",
+        "description": "零成本抽象、記憶體安全無 GC、極致資源利用"
+      },
+      {
+        "id": "go",
+        "label": "Go",
+        "description": "標準庫豐富、跨平台交叉編譯極佳、內建協程"
+      },
+      {
+        "id": "c",
+        "label": "C 語言",
+        "description": "最極致精簡、無任何 runtime、歷史最久"
+      }
+    ],
+    "criteria": [
+      {
+        "id": "memory_footprint",
+        "label": "記憶體佔用極限控制",
+        "description": "嚴格壓制在 30MB 內無 GC 膨脹"
+      },
+      {
+        "id": "memory_safety",
+        "label": "記憶體溢位安全與無崩潰",
+        "description": "杜絕野指針與緩衝區溢位"
+      },
+      {
+        "id": "cross_compile_ota",
+        "label": "交叉編譯與 OTA 升級體積",
+        "description": "單一靜態二進位檔體積與網路分發"
+      },
+      {
+        "id": "concurrency_io",
+        "label": "多通訊埠並發採集便利度",
+        "description": "多路串口與 MQTT 連線排程"
+      },
+      {
+        "id": "dev_velocity_maintain",
+        "label": "開發速度與現代工具鏈",
+        "description": "套件管理、單元測試與現代語法"
+      },
+      {
+        "id": "bus_factor",
+        "label": "招募與維護風險",
+        "description": "能接手嵌入式代碼的人才池"
+      }
+    ],
+    "weights": {
+      "memory_footprint": 0.3286,
+      "memory_safety": 0.2644,
+      "cross_compile_ota": 0.1018,
+      "concurrency_io": 0.1018,
+      "dev_velocity_maintain": 0.1018,
+      "bus_factor": 0.1018
+    },
+    "weight_rationale": {
+      "memory_footprint": "依據專案現階段核心矛盾權衡",
+      "memory_safety": "依據專案現階段核心矛盾權衡",
+      "cross_compile_ota": "依據專案現階段核心矛盾權衡",
+      "concurrency_io": "依據專案現階段核心矛盾權衡",
+      "dev_velocity_maintain": "依據專案現階段核心矛盾權衡",
+      "bus_factor": "依據專案現階段核心矛盾權衡"
+    },
+    "cells": [
+      {
+        "option_id": "rust",
+        "criterion_id": "memory_footprint",
+        "score": 9,
+        "rationale": "Rust 在 記憶體佔用極限控制 表現分析",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "rust",
+        "criterion_id": "memory_safety",
+        "score": 9,
+        "rationale": "Rust 在 記憶體溢位安全與無崩潰 表現分析",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "rust",
+        "criterion_id": "cross_compile_ota",
+        "score": 9,
+        "rationale": "Rust 在 交叉編譯與 OTA 升級體積 表現分析",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "rust",
+        "criterion_id": "concurrency_io",
+        "score": 7.2,
+        "rationale": "Rust 在 多通訊埠並發採集便利度 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "rust",
+        "criterion_id": "dev_velocity_maintain",
+        "score": 7.2,
+        "rationale": "Rust 在 開發速度與現代工具鏈 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "rust",
+        "criterion_id": "bus_factor",
+        "score": 7.2,
+        "rationale": "Rust 在 招募與維護風險 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "go",
+        "criterion_id": "memory_footprint",
+        "score": 4.2,
+        "rationale": "Go 在 記憶體佔用極限控制 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "go",
+        "criterion_id": "memory_safety",
+        "score": 4.2,
+        "rationale": "Go 在 記憶體溢位安全與無崩潰 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "go",
+        "criterion_id": "cross_compile_ota",
+        "score": 8.8,
+        "rationale": "Go 在 交叉編譯與 OTA 升級體積 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "go",
+        "criterion_id": "concurrency_io",
+        "score": 8.8,
+        "rationale": "Go 在 多通訊埠並發採集便利度 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "go",
+        "criterion_id": "dev_velocity_maintain",
+        "score": 8.8,
+        "rationale": "Go 在 開發速度與現代工具鏈 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "go",
+        "criterion_id": "bus_factor",
+        "score": 8.8,
+        "rationale": "Go 在 招募與維護風險 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "c",
+        "criterion_id": "memory_footprint",
+        "score": 4.2,
+        "rationale": "C 語言 在 記憶體佔用極限控制 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "c",
+        "criterion_id": "memory_safety",
+        "score": 4.2,
+        "rationale": "C 語言 在 記憶體溢位安全與無崩潰 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "c",
+        "criterion_id": "cross_compile_ota",
+        "score": 8.8,
+        "rationale": "C 語言 在 交叉編譯與 OTA 升級體積 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "c",
+        "criterion_id": "concurrency_io",
+        "score": 8.8,
+        "rationale": "C 語言 在 多通訊埠並發採集便利度 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "c",
+        "criterion_id": "dev_velocity_maintain",
+        "score": 8.8,
+        "rationale": "C 語言 在 開發速度與現代工具鏈 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "c",
+        "criterion_id": "bus_factor",
+        "score": 8.8,
+        "rationale": "C 語言 在 招募與維護風險 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      }
+    ],
+    "cell_spread": {
+      "rust|memory_footprint": 1.183,
+      "rust|memory_safety": 1.183,
+      "rust|cross_compile_ota": 1.183,
+      "rust|concurrency_io": 0.971,
+      "rust|dev_velocity_maintain": 0.971,
+      "rust|bus_factor": 0.971,
+      "go|memory_footprint": 0.714,
+      "go|memory_safety": 0.714,
+      "go|cross_compile_ota": 1.639,
+      "go|concurrency_io": 1.639,
+      "go|dev_velocity_maintain": 1.639,
+      "go|bus_factor": 1.639,
+      "c|memory_footprint": 2.058,
+      "c|memory_safety": 2.058,
+      "c|cross_compile_ota": 1.613,
+      "c|concurrency_io": 1.613,
+      "c|dev_velocity_maintain": 1.613,
+      "c|bus_factor": 1.613
+    },
+    "persona_scores": [
+      {
+        "speaker_id": "conservative_cto",
+        "weights": {
+          "memory_footprint": 0.5,
+          "memory_safety": 0.1,
+          "cross_compile_ota": 0.1,
+          "concurrency_io": 0.1,
+          "dev_velocity_maintain": 0.1,
+          "bus_factor": 0.1
+        },
+        "cells": [
+          {
+            "option_id": "rust",
+            "criterion_id": "memory_footprint",
+            "score": 9,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "rust",
+            "criterion_id": "memory_safety",
+            "score": 9,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "rust",
+            "criterion_id": "cross_compile_ota",
+            "score": 9,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "rust",
+            "criterion_id": "concurrency_io",
+            "score": 9,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "rust",
+            "criterion_id": "dev_velocity_maintain",
+            "score": 9,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "rust",
+            "criterion_id": "bus_factor",
+            "score": 9,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "go",
+            "criterion_id": "memory_footprint",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "go",
+            "criterion_id": "memory_safety",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "go",
+            "criterion_id": "cross_compile_ota",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "go",
+            "criterion_id": "concurrency_io",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "go",
+            "criterion_id": "dev_velocity_maintain",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "go",
+            "criterion_id": "bus_factor",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "c",
+            "criterion_id": "memory_footprint",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "c",
+            "criterion_id": "memory_safety",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "c",
+            "criterion_id": "cross_compile_ota",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "c",
+            "criterion_id": "concurrency_io",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "c",
+            "criterion_id": "dev_velocity_maintain",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "c",
+            "criterion_id": "bus_factor",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          }
+        ],
+        "final_choice": "rust",
+        "one_line": "首年生存至上，嚴控試錯成本。"
+      },
+      {
+        "speaker_id": "perf_zealot",
+        "weights": {
+          "memory_footprint": 0.1,
+          "memory_safety": 0.1,
+          "cross_compile_ota": 0.1,
+          "concurrency_io": 0.1,
+          "dev_velocity_maintain": 0.1,
+          "bus_factor": 0.5
+        },
+        "cells": [
+          {
+            "option_id": "rust",
+            "criterion_id": "memory_footprint",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "rust",
+            "criterion_id": "memory_safety",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "rust",
+            "criterion_id": "cross_compile_ota",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "rust",
+            "criterion_id": "concurrency_io",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "rust",
+            "criterion_id": "dev_velocity_maintain",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "rust",
+            "criterion_id": "bus_factor",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "go",
+            "criterion_id": "memory_footprint",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "go",
+            "criterion_id": "memory_safety",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "go",
+            "criterion_id": "cross_compile_ota",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "go",
+            "criterion_id": "concurrency_io",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "go",
+            "criterion_id": "dev_velocity_maintain",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "go",
+            "criterion_id": "bus_factor",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "c",
+            "criterion_id": "memory_footprint",
+            "score": 9.5,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "c",
+            "criterion_id": "memory_safety",
+            "score": 9.5,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "c",
+            "criterion_id": "cross_compile_ota",
+            "score": 9.5,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "c",
+            "criterion_id": "concurrency_io",
+            "score": 9.5,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "c",
+            "criterion_id": "dev_velocity_maintain",
+            "score": 9.5,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "c",
+            "criterion_id": "bus_factor",
+            "score": 9.5,
+            "reason": "重視極致控制與擴展力"
+          }
+        ],
+        "final_choice": "c",
+        "one_line": "底層架構的技術債會加倍奉還。"
+      }
+    ]
+  },
+  "analysis": {
+    "totals": {
+      "rust": 8.4505,
+      "go": 6.0723,
+      "c": 6.0723
+    },
+    "ranking": [
+      "rust",
+      "c",
+      "go"
+    ],
+    "winner": "rust",
+    "margin": 2.3782,
+    "tipping_points": [
+      {
+        "criterion_id": "concurrency_io",
+        "criterion_label": "多通訊埠並發採集便利度",
+        "current_weight": 0.102,
+        "threshold": 0.639,
+        "direction": "increase",
+        "new_winner": "c"
+      },
+      {
+        "criterion_id": "dev_velocity_maintain",
+        "criterion_label": "開發速度與現代工具鏈",
+        "current_weight": 0.102,
+        "threshold": 0.639,
+        "direction": "increase",
+        "new_winner": "c"
+      },
+      {
+        "criterion_id": "bus_factor",
+        "criterion_label": "招募與維護風險",
+        "current_weight": 0.102,
+        "threshold": 0.639,
+        "direction": "increase",
+        "new_winner": "c"
+      }
+    ],
+    "win_probability": {
+      "rust": 0.9704,
+      "go": 0.0046,
+      "c": 0.025
+    },
+    "seed_used": 42,
+    "persona_lens": {
+      "conservative_cto": {
+        "winner": "rust",
+        "totals": {
+          "rust": 8.46,
+          "go": 6.04,
+          "c": 6.04
+        },
+        "ranking": [
+          "rust",
+          "c",
+          "go"
+        ]
+      },
+      "perf_zealot": {
+        "winner": "c",
+        "totals": {
+          "rust": 7.74,
+          "go": 7.88,
+          "c": 7.88
+        },
+        "ranking": [
+          "c",
+          "go",
+          "rust"
+        ]
+      }
+    },
+    "persona_own_view": {
+      "conservative_cto": {
+        "winner": "rust",
+        "totals": {
+          "rust": 9,
+          "go": 5,
+          "c": 5
+        },
+        "ranking": [
+          "rust",
+          "c",
+          "go"
+        ]
+      },
+      "perf_zealot": {
+        "winner": "c",
+        "totals": {
+          "rust": 6,
+          "go": 6,
+          "c": 9.5
+        },
+        "ranking": [
+          "c",
+          "go",
+          "rust"
+        ]
+      }
+    },
+    "max_regret": {
+      "rust": 0.14,
+      "go": 2.42,
+      "c": 2.42
+    },
+    "minimax_regret_option": "rust",
+    "disagreement_hotspots": [
+      {
+        "cell_key": "c|memory_footprint",
+        "option_id": "c",
+        "criterion_id": "memory_footprint",
+        "spread": 2.058,
+        "chair_score": 4.2,
+        "persona_scores": {
+          "conservative_cto": 5,
+          "perf_zealot": 9.5
+        }
+      },
+      {
+        "cell_key": "c|memory_safety",
+        "option_id": "c",
+        "criterion_id": "memory_safety",
+        "spread": 2.058,
+        "chair_score": 4.2,
+        "persona_scores": {
+          "conservative_cto": 5,
+          "perf_zealot": 9.5
+        }
+      },
+      {
+        "cell_key": "go|cross_compile_ota",
+        "option_id": "go",
+        "criterion_id": "cross_compile_ota",
+        "spread": 1.639,
+        "chair_score": 8.8,
+        "persona_scores": {
+          "conservative_cto": 5,
+          "perf_zealot": 6
+        }
+      },
+      {
+        "cell_key": "go|concurrency_io",
+        "option_id": "go",
+        "criterion_id": "concurrency_io",
+        "spread": 1.639,
+        "chair_score": 8.8,
+        "persona_scores": {
+          "conservative_cto": 5,
+          "perf_zealot": 6
+        }
+      },
+      {
+        "cell_key": "go|dev_velocity_maintain",
+        "option_id": "go",
+        "criterion_id": "dev_velocity_maintain",
+        "spread": 1.639,
+        "chair_score": 8.8,
+        "persona_scores": {
+          "conservative_cto": 5,
+          "perf_zealot": 6
+        }
+      }
+    ],
+    "diagnostics": {
+      "judge_agreement_avg_spread": 1.39,
+      "high_agreement_warning": false,
+      "effective_samples": 3,
+      "spread_floor_used": 0.5
+    }
+  },
+  "warnings": [],
+  "sample_count": 3
+}

@@ -1,0 +1,27 @@
+{
+  "eval_round": 1,
+  "position_mapping": {
+    "report_A": "senate",
+    "report_B": "baseline"
+  },
+  "scores_A": {
+    "concreteness": 9,
+    "breadth": 8.8,
+    "blind_spots": 8.5,
+    "actionability": 9.2,
+    "honesty": 8.7,
+    "context_fit": 9
+  },
+  "scores_B": {
+    "concreteness": 6,
+    "breadth": 6.5,
+    "blind_spots": 5.2,
+    "actionability": 5.8,
+    "honesty": 5.5,
+    "context_fit": 6.5
+  },
+  "winner": "A",
+  "rationale": "Report A (Senate) 在具體量級數據、敏感度翻盤臨界點、以及 2 天內可執行的 Spike 驗證實驗上顯著優於對照組。對照組雖然條理清晰，但充斥「各有優劣、看情況」之顧問套話，缺乏實質可證偽性。",
+  "avg_senate": 8.87,
+  "avg_baseline": 5.92
+}

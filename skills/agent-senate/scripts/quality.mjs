@@ -62,7 +62,7 @@ export function evaluateDebateQuality(state) {
   const rebuttalTurns = debaterTurns.filter((t) => t.kind === 'rebuttal');
   let quotesCount = 0;
   for (const t of rebuttalTurns) {
-    if (/(?:>|\n)\s*【.+?#?[a-zA-Z0-9_.-]+】/.test(t.full_text || t.text)) {
+    if (/(?:^|>|\n)\s*【.+?#?[a-zA-Z0-9_.-]+】/.test(t.full_text || t.text)) {
       quotesCount++;
     }
   }

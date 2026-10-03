@@ -124,15 +124,21 @@ node "<本資料夾>/scripts/analyze.mjs" "<輸出資料夾>/input.json" --out "
 它會寫出 `analysis.json` 與可互動的 `matrix.html`，並印出贏家、總分、勝率、翻盤點、警告。**一字不改地使用它的數字。**
 若 `node` 不存在或腳本失敗：把錯誤告訴使用者並停止判決——不要自己心算總分假裝完成。
 
-### Phase 9 — 判決
-你撰寫判決，規則：
-- 推薦方案 = `analysis.winner`，不得更改。
-- 信心：贏家勝率 ≥75% 為「高」，50–75% 為「中」，<50% 為「低」。
-- 若贏家的勝率**不是**最高、或領先幅度 `margin` < 0.1，明說「過於接近」，把「下一步驗證實驗」放在最前面。
-- 若 `minimax_regret_option` 與贏家不同，必須討論。
-- 判決文字（≤300 字）：推薦與理由 → 主要代價 → 「若…則改選…」→ 3–5 條翻盤條件（優先使用 `tipping_points`）。數字照抄。
-- 挑 3 個高光時刻。quote 必須是逐字稿裡**連續的一段原文**（不可拼接兩處、不可省略中間的括號或補充而不標示 `…`），和 MVP。MVP 候選依計分排序：命中攻擊×3 + 讓步×1 − 被點名謬誤×2 − 查核旗標×2。
-- 把 `verdict`、`key_tradeoffs`、`blind_spots`、`challenged_assumptions`、`unresolved_disputes`、`next_experiments`、`risks`、`highlights`、`mvp` 補進 `input.json` 的 `extras`，重跑一次 Phase 8 的指令，讓 `matrix.html` 包含判決。
+### Phase 9 — 判決與紅隊反向辯護
+1. 你撰寫判決，規則：
+   - 推薦方案 = `analysis.winner`，不得更改。
+   - 信心：贏家勝率 ≥75% 為「高」，50–75% 為「中」，<50% 為「低」。
+   - 若贏家的勝率**不是**最高、或領先幅度 `margin` < 0.1，明說「過於接近」，把「下一步驗證實驗」放在最前面。
+   - 若 `minimax_regret_option` 與贏家不同，必須討論。
+   - 判決文字（≤300 字）：推薦與理由 → 主要代價 → 「若…則改選…」→ 3–5 條翻盤條件（優先使用 `tipping_points`）。數字照抄。
+   - 挑 3 個高光時刻。quote 必須是逐字稿裡**連續的一段原文**（不可拼接兩處、不可省略中間的括號或補充而不標示 `…`），和 MVP。MVP 候選依計分排序：命中攻擊×3 + 讓步×1 − 被點名謬誤×2 − 查核旗標×2。
+2. **派反方總結員（Red Team，模板 G）**：
+   使用 `subagent` 派出一位獨立的「反方技術紅隊」，傳入落敗之次優方案與逐字稿，撰寫約 300 字反向警示（說明選贏家未來的潛在代價與翻盤極端情境），將結果存入 `extras.red_team`，防範決策勝者偏差。
+3. 把 `verdict`、`red_team`、`key_tradeoffs`、`blind_spots`、`challenged_assumptions`、`unresolved_disputes`、`next_experiments`、`risks`、`highlights`、`mvp` 補進 `input.json` 的 `extras`，重跑一次：
+   ```bash
+   node "<本資料夾>/scripts/analyze.mjs" "<輸出資料夾>/input.json" --out "<輸出資料夾>" --state "<輸出資料夾>/state.json"
+   ```
+   腳本會自動將 `state.json` 的發言重播、論點圖與逐字稿全文注入 `matrix.html`。
 
 ### Phase 10 — 稽核
 1. **先執行確定性程式稽核**：

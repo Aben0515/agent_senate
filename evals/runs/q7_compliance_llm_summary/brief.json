@@ -1,0 +1,59 @@
+{
+  "restated_question": "客服對話摘要功能（每日 5 萬次呼叫、含敏感客戶個資）：該自架開源 LLM 還是使用雲端商業 API？",
+  "decision_type": "compliance",
+  "options": [
+    {
+      "id": "cloud_api_with_anonymization",
+      "label": "雲端商業 API + 本地去識別化前置代理",
+      "description": "在內部網關使用 Presidio/正則脫敏後調用頂級商業 API"
+    },
+    {
+      "id": "self_hosted_open_llm",
+      "label": "自架開源私有化 LLM (vLLM)",
+      "description": "在內網部署開源模型 (如 Llama-3/Qwen) 確保數據不出境"
+    }
+  ],
+  "criteria": [
+    {
+      "id": "regulatory_compliance",
+      "label": "個資法法規合規與審計安全性",
+      "description": "數據落地合規性、消除數據出境違法風險"
+    },
+    {
+      "id": "summary_quality",
+      "label": "長文本對話摘要品質與精準度",
+      "description": "掌握上下文細節、意圖識別、無幻覺"
+    },
+    {
+      "id": "tco_infrastructure",
+      "label": "基礎設施三年總持有成本 (TCO)",
+      "description": "GPU 伺服器硬體折舊、電費 vs API Token 費用"
+    },
+    {
+      "id": "ops_simplicity",
+      "label": "維運簡單度與 SLA 保證",
+      "description": "不需要專職 MLOps 團隊顧 GPU 機房"
+    },
+    {
+      "id": "scalability_concurrency",
+      "label": "尖峰流量彈性伸縮",
+      "description": "大促尖峰不排隊"
+    },
+    {
+      "id": "vendor_lockin",
+      "label": "供應商鎖定防範",
+      "description": "自由切換模型底座"
+    }
+  ],
+  "context_facts": [
+    "客服系統每日處理 5 萬通客服對話，內含電話、地址與信用卡後四碼",
+    "符合金融法規要求，若使用雲端 API 需做去識別化；若自架開源模型則需自購 GPU 伺服器並負擔高昂電費與維運"
+  ],
+  "assumptions": [
+    {
+      "text": "業務優先活下來並驗證 PMF",
+      "why_needed": "界定資源優先級",
+      "impact_if_wrong": "重大時程延誤"
+    }
+  ]
+}

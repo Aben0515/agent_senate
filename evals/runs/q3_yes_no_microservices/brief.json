@@ -1,0 +1,64 @@
+{
+  "restated_question": "既有 Django 單體架構（20 萬行代碼、8 人團隊、部署一次需 40 分鐘），是否該拆分為微服務架構？",
+  "decision_type": "yes_no",
+  "options": [
+    {
+      "id": "keep_monolith_modularize",
+      "label": "維持單體但模組化 (Modular Monolith)",
+      "description": "梳理代碼邊界、優化測試與流水線、引入 Django apps 領域解耦"
+    },
+    {
+      "id": "split_microservices",
+      "label": "全面拆分微服務",
+      "description": "拆為 6-8 個獨立微服務與 gRPC 呼叫"
+    },
+    {
+      "id": "gradual_service_extraction",
+      "label": "漸進抽取單一最痛服務",
+      "description": "僅將報表與高頻任務抽出獨立"
+    }
+  ],
+  "criteria": [
+    {
+      "id": "ops_overhead",
+      "label": "維運負擔可控性",
+      "description": "無專職 SRE 下的監控、網路與部署難易度"
+    },
+    {
+      "id": "delivery_cadence",
+      "label": "發布節奏與日常迭代",
+      "description": "解決部署衝突與日常提速"
+    },
+    {
+      "id": "data_consistency",
+      "label": "資料一致性與事務保證",
+      "description": "跨領域操作不出現分佈式髒讀"
+    },
+    {
+      "id": "org_cognitive_load",
+      "label": "團隊心智負擔與認知頻寬",
+      "description": "8 人小團隊理解整個系統的能力"
+    },
+    {
+      "id": "migration_risk",
+      "label": "遷移風險與業務中斷率",
+      "description": "架構重構期間新功能停滯代價"
+    },
+    {
+      "id": "fault_isolation",
+      "label": "故障爆炸半徑隔離",
+      "description": "單一模組崩潰是否拖垮全站"
+    }
+  ],
+  "context_facts": [
+    "系統運營 4 年，核心業務邏輯高度耦合，單元測試執行需 25 分鐘，CI/CD 部署耗時 40 分鐘",
+    "團隊共 8 人，經常發生部署衝突，但目前基礎設施維運僅有 1 名兼職 SRE"
+  ],
+  "assumptions": [
+    {
+      "text": "業務優先活下來並驗證 PMF",
+      "why_needed": "界定資源優先級",
+      "impact_if_wrong": "重大時程延誤"
+    }
+  ]
+}

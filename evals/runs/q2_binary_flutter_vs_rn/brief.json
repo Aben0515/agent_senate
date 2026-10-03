@@ -1,0 +1,59 @@
+{
+  "restated_question": "4 人團隊開發消費型生活健身 App（需相機即時影像處理與 BLE 藍牙同步）：該選 Flutter 還是 React Native？",
+  "decision_type": "binary",
+  "options": [
+    {
+      "id": "flutter",
+      "label": "Flutter",
+      "description": "自繪 Skia/Impeller 引擎、強型別 Dart、UI 高度一致"
+    },
+    {
+      "id": "react_native",
+      "label": "React Native",
+      "description": "原生組件橋接、龐大 npm 生態、主流社群"
+    }
+  ],
+  "criteria": [
+    {
+      "id": "ble_camera_integration",
+      "label": "硬體與原生功能橋接便利度",
+      "description": "BLE 藍牙與相機底層通訊難度"
+    },
+    {
+      "id": "ui_performance",
+      "label": "渲染效能與動畫流暢度",
+      "description": "60fps 複合動畫與圖表"
+    },
+    {
+      "id": "team_learning_curve",
+      "label": "團隊技術棧上手速度",
+      "description": "原生背景工程師過渡週期"
+    },
+    {
+      "id": "third_party_ecosystem",
+      "label": "第三方生態與套件庫豐富度",
+      "description": "開箱即用套件數量與更新頻率"
+    },
+    {
+      "id": "long_term_maintenance",
+      "label": "長期維護與升級成本",
+      "description": "雙平台系統版本更新時之破壞性變更"
+    },
+    {
+      "id": "ota_flexibility",
+      "label": "熱更新與發布靈活性",
+      "description": "CodePush 等熱修復支援"
+    }
+  ],
+  "context_facts": [
+    "團隊 4 人，有 2 名 iOS 與 2 名 Android 原生開發經驗，無 React 或 Dart 背景",
+    "需與客製穿戴手環進行高頻 BLE 藍牙數據交換，並有簡易濾鏡相機功能"
+  ],
+  "assumptions": [
+    {
+      "text": "業務優先活下來並驗證 PMF",
+      "why_needed": "界定資源優先級",
+      "impact_if_wrong": "重大時程延誤"
+    }
+  ]
+}

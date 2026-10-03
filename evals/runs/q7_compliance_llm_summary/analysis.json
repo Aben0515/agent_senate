@@ -1,0 +1,538 @@
+{
+  "matrix": {
+    "question": "客服對話摘要功能（每日 5 萬次呼叫、含敏感客戶個資）：該自架開源 LLM 還是使用雲端商業 API？",
+    "options": [
+      {
+        "id": "cloud_api_with_anonymization",
+        "label": "雲端商業 API + 本地去識別化前置代理",
+        "description": "在內部網關使用 Presidio/正則脫敏後調用頂級商業 API"
+      },
+      {
+        "id": "self_hosted_open_llm",
+        "label": "自架開源私有化 LLM (vLLM)",
+        "description": "在內網部署開源模型 (如 Llama-3/Qwen) 確保數據不出境"
+      }
+    ],
+    "criteria": [
+      {
+        "id": "regulatory_compliance",
+        "label": "個資法法規合規與審計安全性",
+        "description": "數據落地合規性、消除數據出境違法風險"
+      },
+      {
+        "id": "summary_quality",
+        "label": "長文本對話摘要品質與精準度",
+        "description": "掌握上下文細節、意圖識別、無幻覺"
+      },
+      {
+        "id": "tco_infrastructure",
+        "label": "基礎設施三年總持有成本 (TCO)",
+        "description": "GPU 伺服器硬體折舊、電費 vs API Token 費用"
+      },
+      {
+        "id": "ops_simplicity",
+        "label": "維運簡單度與 SLA 保證",
+        "description": "不需要專職 MLOps 團隊顧 GPU 機房"
+      },
+      {
+        "id": "scalability_concurrency",
+        "label": "尖峰流量彈性伸縮",
+        "description": "大促尖峰不排隊"
+      },
+      {
+        "id": "vendor_lockin",
+        "label": "供應商鎖定防範",
+        "description": "自由切換模型底座"
+      }
+    ],
+    "weights": {
+      "regulatory_compliance": 0.3286,
+      "summary_quality": 0.2644,
+      "tco_infrastructure": 0.1018,
+      "ops_simplicity": 0.1018,
+      "scalability_concurrency": 0.1018,
+      "vendor_lockin": 0.1018
+    },
+    "weight_rationale": {
+      "regulatory_compliance": "依據專案現階段核心矛盾權衡",
+      "summary_quality": "依據專案現階段核心矛盾權衡",
+      "tco_infrastructure": "依據專案現階段核心矛盾權衡",
+      "ops_simplicity": "依據專案現階段核心矛盾權衡",
+      "scalability_concurrency": "依據專案現階段核心矛盾權衡",
+      "vendor_lockin": "依據專案現階段核心矛盾權衡"
+    },
+    "cells": [
+      {
+        "option_id": "cloud_api_with_anonymization",
+        "criterion_id": "regulatory_compliance",
+        "score": 9,
+        "rationale": "雲端商業 API + 本地去識別化前置代理 在 個資法法規合規與審計安全性 表現分析",
+        "evidence_claim_ids": [
+          "sec.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "cloud_api_with_anonymization",
+        "criterion_id": "summary_quality",
+        "score": 9,
+        "rationale": "雲端商業 API + 本地去識別化前置代理 在 長文本對話摘要品質與精準度 表現分析",
+        "evidence_claim_ids": [
+          "sec.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "cloud_api_with_anonymization",
+        "criterion_id": "tco_infrastructure",
+        "score": 9,
+        "rationale": "雲端商業 API + 本地去識別化前置代理 在 基礎設施三年總持有成本 (TCO) 表現分析",
+        "evidence_claim_ids": [
+          "sec.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "cloud_api_with_anonymization",
+        "criterion_id": "ops_simplicity",
+        "score": 7.2,
+        "rationale": "雲端商業 API + 本地去識別化前置代理 在 維運簡單度與 SLA 保證 評估",
+        "evidence_claim_ids": [
+          "sec.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "cloud_api_with_anonymization",
+        "criterion_id": "scalability_concurrency",
+        "score": 7.2,
+        "rationale": "雲端商業 API + 本地去識別化前置代理 在 尖峰流量彈性伸縮 評估",
+        "evidence_claim_ids": [
+          "sec.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "cloud_api_with_anonymization",
+        "criterion_id": "vendor_lockin",
+        "score": 7.2,
+        "rationale": "雲端商業 API + 本地去識別化前置代理 在 供應商鎖定防範 評估",
+        "evidence_claim_ids": [
+          "sec.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "self_hosted_open_llm",
+        "criterion_id": "regulatory_compliance",
+        "score": 4.2,
+        "rationale": "自架開源私有化 LLM (vLLM) 在 個資法法規合規與審計安全性 評估",
+        "evidence_claim_ids": [
+          "sec.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "self_hosted_open_llm",
+        "criterion_id": "summary_quality",
+        "score": 4.2,
+        "rationale": "自架開源私有化 LLM (vLLM) 在 長文本對話摘要品質與精準度 評估",
+        "evidence_claim_ids": [
+          "sec.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "self_hosted_open_llm",
+        "criterion_id": "tco_infrastructure",
+        "score": 8.8,
+        "rationale": "自架開源私有化 LLM (vLLM) 在 基礎設施三年總持有成本 (TCO) 評估",
+        "evidence_claim_ids": [
+          "sec.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "self_hosted_open_llm",
+        "criterion_id": "ops_simplicity",
+        "score": 8.8,
+        "rationale": "自架開源私有化 LLM (vLLM) 在 維運簡單度與 SLA 保證 評估",
+        "evidence_claim_ids": [
+          "sec.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "self_hosted_open_llm",
+        "criterion_id": "scalability_concurrency",
+        "score": 8.8,
+        "rationale": "自架開源私有化 LLM (vLLM) 在 尖峰流量彈性伸縮 評估",
+        "evidence_claim_ids": [
+          "sec.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "self_hosted_open_llm",
+        "criterion_id": "vendor_lockin",
+        "score": 8.8,
+        "rationale": "自架開源私有化 LLM (vLLM) 在 供應商鎖定防範 評估",
+        "evidence_claim_ids": [
+          "sec.1"
+        ],
+        "confidence": "high"
+      }
+    ],
+    "cell_spread": {
+      "cloud_api_with_anonymization|regulatory_compliance": 1.183,
+      "cloud_api_with_anonymization|summary_quality": 1.183,
+      "cloud_api_with_anonymization|tco_infrastructure": 1.183,
+      "cloud_api_with_anonymization|ops_simplicity": 0.971,
+      "cloud_api_with_anonymization|scalability_concurrency": 0.971,
+      "cloud_api_with_anonymization|vendor_lockin": 0.971,
+      "self_hosted_open_llm|regulatory_compliance": 2.058,
+      "self_hosted_open_llm|summary_quality": 2.058,
+      "self_hosted_open_llm|tco_infrastructure": 1.613,
+      "self_hosted_open_llm|ops_simplicity": 1.613,
+      "self_hosted_open_llm|scalability_concurrency": 1.613,
+      "self_hosted_open_llm|vendor_lockin": 1.613
+    },
+    "persona_scores": [
+      {
+        "speaker_id": "security_paranoid",
+        "weights": {
+          "regulatory_compliance": 0.5,
+          "summary_quality": 0.1,
+          "tco_infrastructure": 0.1,
+          "ops_simplicity": 0.1,
+          "scalability_concurrency": 0.1,
+          "vendor_lockin": 0.1
+        },
+        "cells": [
+          {
+            "option_id": "cloud_api_with_anonymization",
+            "criterion_id": "regulatory_compliance",
+            "score": 9,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "cloud_api_with_anonymization",
+            "criterion_id": "summary_quality",
+            "score": 9,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "cloud_api_with_anonymization",
+            "criterion_id": "tco_infrastructure",
+            "score": 9,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "cloud_api_with_anonymization",
+            "criterion_id": "ops_simplicity",
+            "score": 9,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "cloud_api_with_anonymization",
+            "criterion_id": "scalability_concurrency",
+            "score": 9,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "cloud_api_with_anonymization",
+            "criterion_id": "vendor_lockin",
+            "score": 9,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "self_hosted_open_llm",
+            "criterion_id": "regulatory_compliance",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "self_hosted_open_llm",
+            "criterion_id": "summary_quality",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "self_hosted_open_llm",
+            "criterion_id": "tco_infrastructure",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "self_hosted_open_llm",
+            "criterion_id": "ops_simplicity",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "self_hosted_open_llm",
+            "criterion_id": "scalability_concurrency",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "self_hosted_open_llm",
+            "criterion_id": "vendor_lockin",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          }
+        ],
+        "final_choice": "cloud_api_with_anonymization",
+        "one_line": "首年生存至上，嚴控試錯成本。"
+      },
+      {
+        "speaker_id": "conservative_cto",
+        "weights": {
+          "regulatory_compliance": 0.1,
+          "summary_quality": 0.1,
+          "tco_infrastructure": 0.1,
+          "ops_simplicity": 0.1,
+          "scalability_concurrency": 0.1,
+          "vendor_lockin": 0.5
+        },
+        "cells": [
+          {
+            "option_id": "cloud_api_with_anonymization",
+            "criterion_id": "regulatory_compliance",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "cloud_api_with_anonymization",
+            "criterion_id": "summary_quality",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "cloud_api_with_anonymization",
+            "criterion_id": "tco_infrastructure",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "cloud_api_with_anonymization",
+            "criterion_id": "ops_simplicity",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "cloud_api_with_anonymization",
+            "criterion_id": "scalability_concurrency",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "cloud_api_with_anonymization",
+            "criterion_id": "vendor_lockin",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "self_hosted_open_llm",
+            "criterion_id": "regulatory_compliance",
+            "score": 9.5,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "self_hosted_open_llm",
+            "criterion_id": "summary_quality",
+            "score": 9.5,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "self_hosted_open_llm",
+            "criterion_id": "tco_infrastructure",
+            "score": 9.5,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "self_hosted_open_llm",
+            "criterion_id": "ops_simplicity",
+            "score": 9.5,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "self_hosted_open_llm",
+            "criterion_id": "scalability_concurrency",
+            "score": 9.5,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "self_hosted_open_llm",
+            "criterion_id": "vendor_lockin",
+            "score": 9.5,
+            "reason": "重視極致控制與擴展力"
+          }
+        ],
+        "final_choice": "self_hosted_open_llm",
+        "one_line": "底層架構的技術債會加倍奉還。"
+      }
+    ]
+  },
+  "analysis": {
+    "totals": {
+      "cloud_api_with_anonymization": 8.4505,
+      "self_hosted_open_llm": 6.0723
+    },
+    "ranking": [
+      "cloud_api_with_anonymization",
+      "self_hosted_open_llm"
+    ],
+    "winner": "cloud_api_with_anonymization",
+    "margin": 2.3782,
+    "tipping_points": [
+      {
+        "criterion_id": "ops_simplicity",
+        "criterion_label": "維運簡單度與 SLA 保證",
+        "current_weight": 0.102,
+        "threshold": 0.639,
+        "direction": "increase",
+        "new_winner": "self_hosted_open_llm"
+      },
+      {
+        "criterion_id": "scalability_concurrency",
+        "criterion_label": "尖峰流量彈性伸縮",
+        "current_weight": 0.102,
+        "threshold": 0.639,
+        "direction": "increase",
+        "new_winner": "self_hosted_open_llm"
+      },
+      {
+        "criterion_id": "vendor_lockin",
+        "criterion_label": "供應商鎖定防範",
+        "current_weight": 0.102,
+        "threshold": 0.639,
+        "direction": "increase",
+        "new_winner": "self_hosted_open_llm"
+      }
+    ],
+    "win_probability": {
+      "cloud_api_with_anonymization": 0.9742,
+      "self_hosted_open_llm": 0.0258
+    },
+    "seed_used": 42,
+    "persona_lens": {
+      "security_paranoid": {
+        "winner": "cloud_api_with_anonymization",
+        "totals": {
+          "cloud_api_with_anonymization": 8.46,
+          "self_hosted_open_llm": 6.04
+        },
+        "ranking": [
+          "cloud_api_with_anonymization",
+          "self_hosted_open_llm"
+        ]
+      },
+      "conservative_cto": {
+        "winner": "self_hosted_open_llm",
+        "totals": {
+          "cloud_api_with_anonymization": 7.74,
+          "self_hosted_open_llm": 7.88
+        },
+        "ranking": [
+          "self_hosted_open_llm",
+          "cloud_api_with_anonymization"
+        ]
+      }
+    },
+    "persona_own_view": {
+      "security_paranoid": {
+        "winner": "cloud_api_with_anonymization",
+        "totals": {
+          "cloud_api_with_anonymization": 9,
+          "self_hosted_open_llm": 5
+        },
+        "ranking": [
+          "cloud_api_with_anonymization",
+          "self_hosted_open_llm"
+        ]
+      },
+      "conservative_cto": {
+        "winner": "self_hosted_open_llm",
+        "totals": {
+          "cloud_api_with_anonymization": 6,
+          "self_hosted_open_llm": 9.5
+        },
+        "ranking": [
+          "self_hosted_open_llm",
+          "cloud_api_with_anonymization"
+        ]
+      }
+    },
+    "max_regret": {
+      "cloud_api_with_anonymization": 0.14,
+      "self_hosted_open_llm": 2.42
+    },
+    "minimax_regret_option": "cloud_api_with_anonymization",
+    "disagreement_hotspots": [
+      {
+        "cell_key": "self_hosted_open_llm|regulatory_compliance",
+        "option_id": "self_hosted_open_llm",
+        "criterion_id": "regulatory_compliance",
+        "spread": 2.058,
+        "chair_score": 4.2,
+        "persona_scores": {
+          "security_paranoid": 5,
+          "conservative_cto": 9.5
+        }
+      },
+      {
+        "cell_key": "self_hosted_open_llm|summary_quality",
+        "option_id": "self_hosted_open_llm",
+        "criterion_id": "summary_quality",
+        "spread": 2.058,
+        "chair_score": 4.2,
+        "persona_scores": {
+          "security_paranoid": 5,
+          "conservative_cto": 9.5
+        }
+      },
+      {
+        "cell_key": "self_hosted_open_llm|tco_infrastructure",
+        "option_id": "self_hosted_open_llm",
+        "criterion_id": "tco_infrastructure",
+        "spread": 1.613,
+        "chair_score": 8.8,
+        "persona_scores": {
+          "security_paranoid": 5,
+          "conservative_cto": 9.5
+        }
+      },
+      {
+        "cell_key": "self_hosted_open_llm|ops_simplicity",
+        "option_id": "self_hosted_open_llm",
+        "criterion_id": "ops_simplicity",
+        "spread": 1.613,
+        "chair_score": 8.8,
+        "persona_scores": {
+          "security_paranoid": 5,
+          "conservative_cto": 9.5
+        }
+      },
+      {
+        "cell_key": "self_hosted_open_llm|scalability_concurrency",
+        "option_id": "self_hosted_open_llm",
+        "criterion_id": "scalability_concurrency",
+        "spread": 1.613,
+        "chair_score": 8.8,
+        "persona_scores": {
+          "security_paranoid": 5,
+          "conservative_cto": 9.5
+        }
+      }
+    ],
+    "diagnostics": {
+      "judge_agreement_avg_spread": 1.419,
+      "high_agreement_warning": false,
+      "effective_samples": 3,
+      "spread_floor_used": 0.5
+    }
+  },
+  "warnings": [],
+  "sample_count": 3
+}

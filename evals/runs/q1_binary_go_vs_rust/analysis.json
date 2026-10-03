@@ -1,0 +1,538 @@
+{
+  "matrix": {
+    "question": "3 人新創團隊做 B2B SaaS 後端，預計一年內拓展至 500 家企業客戶，團隊熟 Python：該選 Go 還是 Rust？",
+    "options": [
+      {
+        "id": "go",
+        "label": "Go 語言",
+        "description": "高開發速度、廣泛招募池、生態完備"
+      },
+      {
+        "id": "rust",
+        "label": "Rust 語言",
+        "description": "極致性能、無 GC 停頓、編譯期記憶體安全"
+      }
+    ],
+    "criteria": [
+      {
+        "id": "delivery_velocity",
+        "label": "交付速度",
+        "description": "首版上線與每週功能迭代所需時間"
+      },
+      {
+        "id": "learning_curve",
+        "label": "學習與上手曲線",
+        "description": "Python 背景工程師轉型所需時間"
+      },
+      {
+        "id": "hiring_and_bus_factor",
+        "label": "招募池與替換風險",
+        "description": "市場人才供應量與離職容錯"
+      },
+      {
+        "id": "ops_observability",
+        "label": "維運排錯與可觀測性",
+        "description": "pprof、Sentry 與 APM 整合度"
+      },
+      {
+        "id": "resource_efficiency",
+        "label": "資源效率與硬體成本",
+        "description": "高並發下的記憶體佔用與 CPU 利用率"
+      },
+      {
+        "id": "b2b_ecosystem",
+        "label": "B2B 生態成熟度",
+        "description": "SSO/SAML、ORM、審計日誌開箱即用度"
+      }
+    ],
+    "weights": {
+      "delivery_velocity": 0.3286,
+      "learning_curve": 0.2644,
+      "hiring_and_bus_factor": 0.1018,
+      "ops_observability": 0.1018,
+      "resource_efficiency": 0.1018,
+      "b2b_ecosystem": 0.1018
+    },
+    "weight_rationale": {
+      "delivery_velocity": "依據專案現階段核心矛盾權衡",
+      "learning_curve": "依據專案現階段核心矛盾權衡",
+      "hiring_and_bus_factor": "依據專案現階段核心矛盾權衡",
+      "ops_observability": "依據專案現階段核心矛盾權衡",
+      "resource_efficiency": "依據專案現階段核心矛盾權衡",
+      "b2b_ecosystem": "依據專案現階段核心矛盾權衡"
+    },
+    "cells": [
+      {
+        "option_id": "go",
+        "criterion_id": "delivery_velocity",
+        "score": 9,
+        "rationale": "Go 語言 在 交付速度 表現分析",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "go",
+        "criterion_id": "learning_curve",
+        "score": 9,
+        "rationale": "Go 語言 在 學習與上手曲線 表現分析",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "go",
+        "criterion_id": "hiring_and_bus_factor",
+        "score": 9,
+        "rationale": "Go 語言 在 招募池與替換風險 表現分析",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "go",
+        "criterion_id": "ops_observability",
+        "score": 7.2,
+        "rationale": "Go 語言 在 維運排錯與可觀測性 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "go",
+        "criterion_id": "resource_efficiency",
+        "score": 7.2,
+        "rationale": "Go 語言 在 資源效率與硬體成本 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "go",
+        "criterion_id": "b2b_ecosystem",
+        "score": 7.2,
+        "rationale": "Go 語言 在 B2B 生態成熟度 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "rust",
+        "criterion_id": "delivery_velocity",
+        "score": 4.2,
+        "rationale": "Rust 語言 在 交付速度 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "rust",
+        "criterion_id": "learning_curve",
+        "score": 4.2,
+        "rationale": "Rust 語言 在 學習與上手曲線 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "rust",
+        "criterion_id": "hiring_and_bus_factor",
+        "score": 8.8,
+        "rationale": "Rust 語言 在 招募池與替換風險 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "rust",
+        "criterion_id": "ops_observability",
+        "score": 8.8,
+        "rationale": "Rust 語言 在 維運排錯與可觀測性 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "rust",
+        "criterion_id": "resource_efficiency",
+        "score": 8.8,
+        "rationale": "Rust 語言 在 資源效率與硬體成本 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "rust",
+        "criterion_id": "b2b_ecosystem",
+        "score": 8.8,
+        "rationale": "Rust 語言 在 B2B 生態成熟度 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      }
+    ],
+    "cell_spread": {
+      "go|delivery_velocity": 1.183,
+      "go|learning_curve": 1.183,
+      "go|hiring_and_bus_factor": 1.183,
+      "go|ops_observability": 0.971,
+      "go|resource_efficiency": 0.971,
+      "go|b2b_ecosystem": 0.971,
+      "rust|delivery_velocity": 2.058,
+      "rust|learning_curve": 2.058,
+      "rust|hiring_and_bus_factor": 1.613,
+      "rust|ops_observability": 1.613,
+      "rust|resource_efficiency": 1.613,
+      "rust|b2b_ecosystem": 1.613
+    },
+    "persona_scores": [
+      {
+        "speaker_id": "conservative_cto",
+        "weights": {
+          "delivery_velocity": 0.5,
+          "learning_curve": 0.1,
+          "hiring_and_bus_factor": 0.1,
+          "ops_observability": 0.1,
+          "resource_efficiency": 0.1,
+          "b2b_ecosystem": 0.1
+        },
+        "cells": [
+          {
+            "option_id": "go",
+            "criterion_id": "delivery_velocity",
+            "score": 9,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "go",
+            "criterion_id": "learning_curve",
+            "score": 9,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "go",
+            "criterion_id": "hiring_and_bus_factor",
+            "score": 9,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "go",
+            "criterion_id": "ops_observability",
+            "score": 9,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "go",
+            "criterion_id": "resource_efficiency",
+            "score": 9,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "go",
+            "criterion_id": "b2b_ecosystem",
+            "score": 9,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "rust",
+            "criterion_id": "delivery_velocity",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "rust",
+            "criterion_id": "learning_curve",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "rust",
+            "criterion_id": "hiring_and_bus_factor",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "rust",
+            "criterion_id": "ops_observability",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "rust",
+            "criterion_id": "resource_efficiency",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "rust",
+            "criterion_id": "b2b_ecosystem",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          }
+        ],
+        "final_choice": "go",
+        "one_line": "首年生存至上，嚴控試錯成本。"
+      },
+      {
+        "speaker_id": "perf_zealot",
+        "weights": {
+          "delivery_velocity": 0.1,
+          "learning_curve": 0.1,
+          "hiring_and_bus_factor": 0.1,
+          "ops_observability": 0.1,
+          "resource_efficiency": 0.1,
+          "b2b_ecosystem": 0.5
+        },
+        "cells": [
+          {
+            "option_id": "go",
+            "criterion_id": "delivery_velocity",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "go",
+            "criterion_id": "learning_curve",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "go",
+            "criterion_id": "hiring_and_bus_factor",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "go",
+            "criterion_id": "ops_observability",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "go",
+            "criterion_id": "resource_efficiency",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "go",
+            "criterion_id": "b2b_ecosystem",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "rust",
+            "criterion_id": "delivery_velocity",
+            "score": 9.5,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "rust",
+            "criterion_id": "learning_curve",
+            "score": 9.5,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "rust",
+            "criterion_id": "hiring_and_bus_factor",
+            "score": 9.5,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "rust",
+            "criterion_id": "ops_observability",
+            "score": 9.5,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "rust",
+            "criterion_id": "resource_efficiency",
+            "score": 9.5,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "rust",
+            "criterion_id": "b2b_ecosystem",
+            "score": 9.5,
+            "reason": "重視極致控制與擴展力"
+          }
+        ],
+        "final_choice": "rust",
+        "one_line": "底層架構的技術債會加倍奉還。"
+      }
+    ]
+  },
+  "analysis": {
+    "totals": {
+      "go": 8.4505,
+      "rust": 6.0723
+    },
+    "ranking": [
+      "go",
+      "rust"
+    ],
+    "winner": "go",
+    "margin": 2.3782,
+    "tipping_points": [
+      {
+        "criterion_id": "ops_observability",
+        "criterion_label": "維運排錯與可觀測性",
+        "current_weight": 0.102,
+        "threshold": 0.639,
+        "direction": "increase",
+        "new_winner": "rust"
+      },
+      {
+        "criterion_id": "resource_efficiency",
+        "criterion_label": "資源效率與硬體成本",
+        "current_weight": 0.102,
+        "threshold": 0.639,
+        "direction": "increase",
+        "new_winner": "rust"
+      },
+      {
+        "criterion_id": "b2b_ecosystem",
+        "criterion_label": "B2B 生態成熟度",
+        "current_weight": 0.102,
+        "threshold": 0.639,
+        "direction": "increase",
+        "new_winner": "rust"
+      }
+    ],
+    "win_probability": {
+      "go": 0.9742,
+      "rust": 0.0258
+    },
+    "seed_used": 42,
+    "persona_lens": {
+      "conservative_cto": {
+        "winner": "go",
+        "totals": {
+          "go": 8.46,
+          "rust": 6.04
+        },
+        "ranking": [
+          "go",
+          "rust"
+        ]
+      },
+      "perf_zealot": {
+        "winner": "rust",
+        "totals": {
+          "go": 7.74,
+          "rust": 7.88
+        },
+        "ranking": [
+          "rust",
+          "go"
+        ]
+      }
+    },
+    "persona_own_view": {
+      "conservative_cto": {
+        "winner": "go",
+        "totals": {
+          "go": 9,
+          "rust": 5
+        },
+        "ranking": [
+          "go",
+          "rust"
+        ]
+      },
+      "perf_zealot": {
+        "winner": "rust",
+        "totals": {
+          "go": 6,
+          "rust": 9.5
+        },
+        "ranking": [
+          "rust",
+          "go"
+        ]
+      }
+    },
+    "max_regret": {
+      "go": 0.14,
+      "rust": 2.42
+    },
+    "minimax_regret_option": "go",
+    "disagreement_hotspots": [
+      {
+        "cell_key": "rust|delivery_velocity",
+        "option_id": "rust",
+        "criterion_id": "delivery_velocity",
+        "spread": 2.058,
+        "chair_score": 4.2,
+        "persona_scores": {
+          "conservative_cto": 5,
+          "perf_zealot": 9.5
+        }
+      },
+      {
+        "cell_key": "rust|learning_curve",
+        "option_id": "rust",
+        "criterion_id": "learning_curve",
+        "spread": 2.058,
+        "chair_score": 4.2,
+        "persona_scores": {
+          "conservative_cto": 5,
+          "perf_zealot": 9.5
+        }
+      },
+      {
+        "cell_key": "rust|hiring_and_bus_factor",
+        "option_id": "rust",
+        "criterion_id": "hiring_and_bus_factor",
+        "spread": 1.613,
+        "chair_score": 8.8,
+        "persona_scores": {
+          "conservative_cto": 5,
+          "perf_zealot": 9.5
+        }
+      },
+      {
+        "cell_key": "rust|ops_observability",
+        "option_id": "rust",
+        "criterion_id": "ops_observability",
+        "spread": 1.613,
+        "chair_score": 8.8,
+        "persona_scores": {
+          "conservative_cto": 5,
+          "perf_zealot": 9.5
+        }
+      },
+      {
+        "cell_key": "rust|resource_efficiency",
+        "option_id": "rust",
+        "criterion_id": "resource_efficiency",
+        "spread": 1.613,
+        "chair_score": 8.8,
+        "persona_scores": {
+          "conservative_cto": 5,
+          "perf_zealot": 9.5
+        }
+      }
+    ],
+    "diagnostics": {
+      "judge_agreement_avg_spread": 1.419,
+      "high_agreement_warning": false,
+      "effective_samples": 3,
+      "spread_floor_used": 0.5
+    }
+  },
+  "warnings": [],
+  "sample_count": 3
+}

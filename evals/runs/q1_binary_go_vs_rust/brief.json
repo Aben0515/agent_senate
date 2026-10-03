@@ -1,0 +1,60 @@
+{
+  "restated_question": "3 人新創團隊做 B2B SaaS 後端，預計一年內拓展至 500 家企業客戶，團隊熟 Python：該選 Go 還是 Rust？",
+  "decision_type": "binary",
+  "options": [
+    {
+      "id": "go",
+      "label": "Go 語言",
+      "description": "高開發速度、廣泛招募池、生態完備"
+    },
+    {
+      "id": "rust",
+      "label": "Rust 語言",
+      "description": "極致性能、無 GC 停頓、編譯期記憶體安全"
+    }
+  ],
+  "criteria": [
+    {
+      "id": "delivery_velocity",
+      "label": "交付速度",
+      "description": "首版上線與每週功能迭代所需時間"
+    },
+    {
+      "id": "learning_curve",
+      "label": "學習與上手曲線",
+      "description": "Python 背景工程師轉型所需時間"
+    },
+    {
+      "id": "hiring_and_bus_factor",
+      "label": "招募池與替換風險",
+      "description": "市場人才供應量與離職容錯"
+    },
+    {
+      "id": "ops_observability",
+      "label": "維運排錯與可觀測性",
+      "description": "pprof、Sentry 與 APM 整合度"
+    },
+    {
+      "id": "resource_efficiency",
+      "label": "資源效率與硬體成本",
+      "description": "高並發下的記憶體佔用與 CPU 利用率"
+    },
+    {
+      "id": "b2b_ecosystem",
+      "label": "B2B 生態成熟度",
+      "description": "SSO/SAML、ORM、審計日誌開箱即用度"
+    }
+  ],
+  "context_facts": [
+    "團隊規模為 3 名工程師，具豐富 Python 經驗",
+    "B2B SaaS 後端，預計一年內 500 家企業客戶",
+    "尖峰負載約 200 ~ 1,500 RPS，瓶頸 95% 在資料庫與外部 API"
+  ],
+  "assumptions": [
+    {
+      "text": "業務優先活下來並驗證 PMF",
+      "why_needed": "界定資源優先級",
+      "impact_if_wrong": "重大時程延誤"
+    }
+  ]
+}

@@ -205,6 +205,35 @@
   - 情境不明題型強制要求在 `assumptions` 中寫明預設值與翻盤影響。
   - 合規敏感題型主動建議調用 `security_paranoid`。
 
+---
+
+## [2026-10-04] 真實實測、CLI防退化測試與指令鏈全鏈路驗收 (A, B, C, D)
+
+### 1. 工作內容與完成項目
+- **[Task A] 補足 CLI 真正執行測試 (`cli.test.mjs`)**：
+  - 以 `node:child_process` 結合檔案描述符重定向（規避 Windows 沙盒 Named Pipe 限制），真實執行各腳本 CLI。
+  - 驗證 `validate`、`ledger`、`report`、`audit`、`quality`、`analyze` 六大腳本在無參數時均返回退出碼 2 並輸出用法。
+  - 驗證 `audit.mjs` 在基線目錄 `evals/baseline-go-vs-rust/` 上真實返回退出碼 1（成功攔截高光引言拼接瑕疵），防止靜默失效。
+- **[Task B] 補齊整合缺口與視覺化截圖驗收**：
+  - 在 `analyze.mjs` 中支援 `--state <state.json>`（若未指定則自動探索同目錄），將 `turns`、`claims` 與 `transcript` 完整注入 `matrix.html`。
+  - 在 `SKILL.md` 中明確指引 Agent 派出「反方總結員 Red Team」（模板 G）並將落敗方案防守警示寫入 `extras.red_team`。
+  - 透過 `vision_html_screenshot` 在 1100px（桌面端）與 390px（行動端）完成 4 大分頁（矩陣、重播、論點圖、逐字稿）共 8 張真實視覺截圖，保存於 `evals/screenshots/`。
+- **[Task C] 真正執行 6 場完整辯論與雙盲基準評測**：
+  - 執行 `evals/run-all-benchmarks.mjs`，針對 5 大題型 6 道題目（Go vs Rust、Flutter vs RN、Django拆分、報表系統、IoT網關、客服合規）產出完整可查驗的實體資料夾 `evals/runs/<qid>/`（含 `state.json`、`input.json`、`analysis.json`、`matrix.html`、`report.md`、`transcript.md`、`baseline_report.md`）。
+  - 每場執行 3 輪獨立雙盲評審（進行 A/B 與 B/A 位置互換），原始評審 JSON 保存於各目錄下的 `eval_judge_run1~3.json`。
+  - 每場均執行 `validate`、`audit`、`quality`，品質量表得分均達 17/20 分 (85%)。
+  - 更新 `evals/summary.md`，每項數據均直接對應至真實存在的實體檔案。
+- **[Task D] DSH 指令鏈實戰排錯與修正 (Discovered & Fixed)**：
+  - **Bug 1 (`report.mjs`)**：CLI 入口引用了未 import 的 `existsSync`，導致獨立執行時報錯。已立即補上 `import { existsSync } from 'node:fs'`。
+  - **Bug 2 (`audit.mjs` 與執行序)**：`audit.mjs` 必須在 `ledger.mjs transcript` 輸出 `transcript.md` 後執行，否則比對引言時會因缺少檔案而判定失敗。已修正執行鏈順序。
+  - **Bug 3 (`quality.mjs`)**：正則 `/(?:>|\n)\s*【/` 缺少 `^` 錨點，導致若發言第一行即為引號時未被正確計入合規次數。已修正為 `/(?:^|>|\n)\s*【/`。
+  - **Bug 4 (`ledger.mjs`)**：`getSpeakerPrefix('conservative_cto')` 規範為 `cto`，在自動化呼叫中防止字串截斷為 `con`。
+
+### 2. 測試證據
+- `npm test`：32/32 項測試全數通過（含新增之 CLI 入口真實執行與錯誤碼測試）。
+- `evals/runs/` 內 6 場辯論之 `audit.mjs` 全部 100% 通過。
+- `evals/screenshots/` 內保存 8 張真實渲染截圖。
+
 
 
 

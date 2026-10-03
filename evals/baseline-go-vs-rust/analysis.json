@@ -621,7 +621,13 @@
           "kiss_hacker": 3
         }
       }
-    ]
+    ],
+    "diagnostics": {
+      "judge_agreement_avg_spread": 0.244,
+      "high_agreement_warning": true,
+      "effective_samples": 3,
+      "spread_floor_used": 0.5
+    }
   },
   "warnings": [],
   "sample_count": 3

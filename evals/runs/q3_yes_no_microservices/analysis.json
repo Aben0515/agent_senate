@@ -1,0 +1,693 @@
+{
+  "matrix": {
+    "question": "既有 Django 單體架構（20 萬行代碼、8 人團隊、部署一次需 40 分鐘），是否該拆分為微服務架構？",
+    "options": [
+      {
+        "id": "keep_monolith_modularize",
+        "label": "維持單體但模組化 (Modular Monolith)",
+        "description": "梳理代碼邊界、優化測試與流水線、引入 Django apps 領域解耦"
+      },
+      {
+        "id": "split_microservices",
+        "label": "全面拆分微服務",
+        "description": "拆為 6-8 個獨立微服務與 gRPC 呼叫"
+      },
+      {
+        "id": "gradual_service_extraction",
+        "label": "漸進抽取單一最痛服務",
+        "description": "僅將報表與高頻任務抽出獨立"
+      }
+    ],
+    "criteria": [
+      {
+        "id": "ops_overhead",
+        "label": "維運負擔可控性",
+        "description": "無專職 SRE 下的監控、網路與部署難易度"
+      },
+      {
+        "id": "delivery_cadence",
+        "label": "發布節奏與日常迭代",
+        "description": "解決部署衝突與日常提速"
+      },
+      {
+        "id": "data_consistency",
+        "label": "資料一致性與事務保證",
+        "description": "跨領域操作不出現分佈式髒讀"
+      },
+      {
+        "id": "org_cognitive_load",
+        "label": "團隊心智負擔與認知頻寬",
+        "description": "8 人小團隊理解整個系統的能力"
+      },
+      {
+        "id": "migration_risk",
+        "label": "遷移風險與業務中斷率",
+        "description": "架構重構期間新功能停滯代價"
+      },
+      {
+        "id": "fault_isolation",
+        "label": "故障爆炸半徑隔離",
+        "description": "單一模組崩潰是否拖垮全站"
+      }
+    ],
+    "weights": {
+      "ops_overhead": 0.3286,
+      "delivery_cadence": 0.2644,
+      "data_consistency": 0.1018,
+      "org_cognitive_load": 0.1018,
+      "migration_risk": 0.1018,
+      "fault_isolation": 0.1018
+    },
+    "weight_rationale": {
+      "ops_overhead": "依據專案現階段核心矛盾權衡",
+      "delivery_cadence": "依據專案現階段核心矛盾權衡",
+      "data_consistency": "依據專案現階段核心矛盾權衡",
+      "org_cognitive_load": "依據專案現階段核心矛盾權衡",
+      "migration_risk": "依據專案現階段核心矛盾權衡",
+      "fault_isolation": "依據專案現階段核心矛盾權衡"
+    },
+    "cells": [
+      {
+        "option_id": "keep_monolith_modularize",
+        "criterion_id": "ops_overhead",
+        "score": 9,
+        "rationale": "維持單體但模組化 (Modular Monolith) 在 維運負擔可控性 表現分析",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "keep_monolith_modularize",
+        "criterion_id": "delivery_cadence",
+        "score": 9,
+        "rationale": "維持單體但模組化 (Modular Monolith) 在 發布節奏與日常迭代 表現分析",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "keep_monolith_modularize",
+        "criterion_id": "data_consistency",
+        "score": 9,
+        "rationale": "維持單體但模組化 (Modular Monolith) 在 資料一致性與事務保證 表現分析",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "keep_monolith_modularize",
+        "criterion_id": "org_cognitive_load",
+        "score": 7.2,
+        "rationale": "維持單體但模組化 (Modular Monolith) 在 團隊心智負擔與認知頻寬 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "keep_monolith_modularize",
+        "criterion_id": "migration_risk",
+        "score": 7.2,
+        "rationale": "維持單體但模組化 (Modular Monolith) 在 遷移風險與業務中斷率 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "keep_monolith_modularize",
+        "criterion_id": "fault_isolation",
+        "score": 7.2,
+        "rationale": "維持單體但模組化 (Modular Monolith) 在 故障爆炸半徑隔離 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "split_microservices",
+        "criterion_id": "ops_overhead",
+        "score": 4.2,
+        "rationale": "全面拆分微服務 在 維運負擔可控性 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "split_microservices",
+        "criterion_id": "delivery_cadence",
+        "score": 4.2,
+        "rationale": "全面拆分微服務 在 發布節奏與日常迭代 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "split_microservices",
+        "criterion_id": "data_consistency",
+        "score": 8.8,
+        "rationale": "全面拆分微服務 在 資料一致性與事務保證 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "split_microservices",
+        "criterion_id": "org_cognitive_load",
+        "score": 8.8,
+        "rationale": "全面拆分微服務 在 團隊心智負擔與認知頻寬 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "split_microservices",
+        "criterion_id": "migration_risk",
+        "score": 8.8,
+        "rationale": "全面拆分微服務 在 遷移風險與業務中斷率 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "split_microservices",
+        "criterion_id": "fault_isolation",
+        "score": 8.8,
+        "rationale": "全面拆分微服務 在 故障爆炸半徑隔離 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "gradual_service_extraction",
+        "criterion_id": "ops_overhead",
+        "score": 4.2,
+        "rationale": "漸進抽取單一最痛服務 在 維運負擔可控性 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "gradual_service_extraction",
+        "criterion_id": "delivery_cadence",
+        "score": 4.2,
+        "rationale": "漸進抽取單一最痛服務 在 發布節奏與日常迭代 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "gradual_service_extraction",
+        "criterion_id": "data_consistency",
+        "score": 8.8,
+        "rationale": "漸進抽取單一最痛服務 在 資料一致性與事務保證 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "gradual_service_extraction",
+        "criterion_id": "org_cognitive_load",
+        "score": 8.8,
+        "rationale": "漸進抽取單一最痛服務 在 團隊心智負擔與認知頻寬 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "gradual_service_extraction",
+        "criterion_id": "migration_risk",
+        "score": 8.8,
+        "rationale": "漸進抽取單一最痛服務 在 遷移風險與業務中斷率 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "gradual_service_extraction",
+        "criterion_id": "fault_isolation",
+        "score": 8.8,
+        "rationale": "漸進抽取單一最痛服務 在 故障爆炸半徑隔離 評估",
+        "evidence_claim_ids": [
+          "cto.1"
+        ],
+        "confidence": "high"
+      }
+    ],
+    "cell_spread": {
+      "keep_monolith_modularize|ops_overhead": 1.183,
+      "keep_monolith_modularize|delivery_cadence": 1.183,
+      "keep_monolith_modularize|data_consistency": 1.183,
+      "keep_monolith_modularize|org_cognitive_load": 0.971,
+      "keep_monolith_modularize|migration_risk": 0.971,
+      "keep_monolith_modularize|fault_isolation": 0.971,
+      "split_microservices|ops_overhead": 0.714,
+      "split_microservices|delivery_cadence": 0.714,
+      "split_microservices|data_consistency": 1.639,
+      "split_microservices|org_cognitive_load": 1.639,
+      "split_microservices|migration_risk": 1.639,
+      "split_microservices|fault_isolation": 1.639,
+      "gradual_service_extraction|ops_overhead": 2.058,
+      "gradual_service_extraction|delivery_cadence": 2.058,
+      "gradual_service_extraction|data_consistency": 1.613,
+      "gradual_service_extraction|org_cognitive_load": 1.613,
+      "gradual_service_extraction|migration_risk": 1.613,
+      "gradual_service_extraction|fault_isolation": 1.613
+    },
+    "persona_scores": [
+      {
+        "speaker_id": "conservative_cto",
+        "weights": {
+          "ops_overhead": 0.5,
+          "delivery_cadence": 0.1,
+          "data_consistency": 0.1,
+          "org_cognitive_load": 0.1,
+          "migration_risk": 0.1,
+          "fault_isolation": 0.1
+        },
+        "cells": [
+          {
+            "option_id": "keep_monolith_modularize",
+            "criterion_id": "ops_overhead",
+            "score": 9,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "keep_monolith_modularize",
+            "criterion_id": "delivery_cadence",
+            "score": 9,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "keep_monolith_modularize",
+            "criterion_id": "data_consistency",
+            "score": 9,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "keep_monolith_modularize",
+            "criterion_id": "org_cognitive_load",
+            "score": 9,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "keep_monolith_modularize",
+            "criterion_id": "migration_risk",
+            "score": 9,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "keep_monolith_modularize",
+            "criterion_id": "fault_isolation",
+            "score": 9,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "split_microservices",
+            "criterion_id": "ops_overhead",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "split_microservices",
+            "criterion_id": "delivery_cadence",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "split_microservices",
+            "criterion_id": "data_consistency",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "split_microservices",
+            "criterion_id": "org_cognitive_load",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "split_microservices",
+            "criterion_id": "migration_risk",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "split_microservices",
+            "criterion_id": "fault_isolation",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "gradual_service_extraction",
+            "criterion_id": "ops_overhead",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "gradual_service_extraction",
+            "criterion_id": "delivery_cadence",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "gradual_service_extraction",
+            "criterion_id": "data_consistency",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "gradual_service_extraction",
+            "criterion_id": "org_cognitive_load",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "gradual_service_extraction",
+            "criterion_id": "migration_risk",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          },
+          {
+            "option_id": "gradual_service_extraction",
+            "criterion_id": "fault_isolation",
+            "score": 5,
+            "reason": "符合實用保守原則"
+          }
+        ],
+        "final_choice": "keep_monolith_modularize",
+        "one_line": "首年生存至上，嚴控試錯成本。"
+      },
+      {
+        "speaker_id": "perf_zealot",
+        "weights": {
+          "ops_overhead": 0.1,
+          "delivery_cadence": 0.1,
+          "data_consistency": 0.1,
+          "org_cognitive_load": 0.1,
+          "migration_risk": 0.1,
+          "fault_isolation": 0.5
+        },
+        "cells": [
+          {
+            "option_id": "keep_monolith_modularize",
+            "criterion_id": "ops_overhead",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "keep_monolith_modularize",
+            "criterion_id": "delivery_cadence",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "keep_monolith_modularize",
+            "criterion_id": "data_consistency",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "keep_monolith_modularize",
+            "criterion_id": "org_cognitive_load",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "keep_monolith_modularize",
+            "criterion_id": "migration_risk",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "keep_monolith_modularize",
+            "criterion_id": "fault_isolation",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "split_microservices",
+            "criterion_id": "ops_overhead",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "split_microservices",
+            "criterion_id": "delivery_cadence",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "split_microservices",
+            "criterion_id": "data_consistency",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "split_microservices",
+            "criterion_id": "org_cognitive_load",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "split_microservices",
+            "criterion_id": "migration_risk",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "split_microservices",
+            "criterion_id": "fault_isolation",
+            "score": 6,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "gradual_service_extraction",
+            "criterion_id": "ops_overhead",
+            "score": 9.5,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "gradual_service_extraction",
+            "criterion_id": "delivery_cadence",
+            "score": 9.5,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "gradual_service_extraction",
+            "criterion_id": "data_consistency",
+            "score": 9.5,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "gradual_service_extraction",
+            "criterion_id": "org_cognitive_load",
+            "score": 9.5,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "gradual_service_extraction",
+            "criterion_id": "migration_risk",
+            "score": 9.5,
+            "reason": "重視極致控制與擴展力"
+          },
+          {
+            "option_id": "gradual_service_extraction",
+            "criterion_id": "fault_isolation",
+            "score": 9.5,
+            "reason": "重視極致控制與擴展力"
+          }
+        ],
+        "final_choice": "gradual_service_extraction",
+        "one_line": "底層架構的技術債會加倍奉還。"
+      }
+    ]
+  },
+  "analysis": {
+    "totals": {
+      "keep_monolith_modularize": 8.4505,
+      "split_microservices": 6.0723,
+      "gradual_service_extraction": 6.0723
+    },
+    "ranking": [
+      "keep_monolith_modularize",
+      "gradual_service_extraction",
+      "split_microservices"
+    ],
+    "winner": "keep_monolith_modularize",
+    "margin": 2.3782,
+    "tipping_points": [
+      {
+        "criterion_id": "org_cognitive_load",
+        "criterion_label": "團隊心智負擔與認知頻寬",
+        "current_weight": 0.102,
+        "threshold": 0.639,
+        "direction": "increase",
+        "new_winner": "gradual_service_extraction"
+      },
+      {
+        "criterion_id": "migration_risk",
+        "criterion_label": "遷移風險與業務中斷率",
+        "current_weight": 0.102,
+        "threshold": 0.639,
+        "direction": "increase",
+        "new_winner": "gradual_service_extraction"
+      },
+      {
+        "criterion_id": "fault_isolation",
+        "criterion_label": "故障爆炸半徑隔離",
+        "current_weight": 0.102,
+        "threshold": 0.639,
+        "direction": "increase",
+        "new_winner": "gradual_service_extraction"
+      }
+    ],
+    "win_probability": {
+      "keep_monolith_modularize": 0.9704,
+      "split_microservices": 0.0046,
+      "gradual_service_extraction": 0.025
+    },
+    "seed_used": 42,
+    "persona_lens": {
+      "conservative_cto": {
+        "winner": "keep_monolith_modularize",
+        "totals": {
+          "keep_monolith_modularize": 8.46,
+          "split_microservices": 6.04,
+          "gradual_service_extraction": 6.04
+        },
+        "ranking": [
+          "keep_monolith_modularize",
+          "gradual_service_extraction",
+          "split_microservices"
+        ]
+      },
+      "perf_zealot": {
+        "winner": "gradual_service_extraction",
+        "totals": {
+          "keep_monolith_modularize": 7.74,
+          "split_microservices": 7.88,
+          "gradual_service_extraction": 7.88
+        },
+        "ranking": [
+          "gradual_service_extraction",
+          "split_microservices",
+          "keep_monolith_modularize"
+        ]
+      }
+    },
+    "persona_own_view": {
+      "conservative_cto": {
+        "winner": "keep_monolith_modularize",
+        "totals": {
+          "keep_monolith_modularize": 9,
+          "split_microservices": 5,
+          "gradual_service_extraction": 5
+        },
+        "ranking": [
+          "keep_monolith_modularize",
+          "gradual_service_extraction",
+          "split_microservices"
+        ]
+      },
+      "perf_zealot": {
+        "winner": "gradual_service_extraction",
+        "totals": {
+          "keep_monolith_modularize": 6,
+          "split_microservices": 6,
+          "gradual_service_extraction": 9.5
+        },
+        "ranking": [
+          "gradual_service_extraction",
+          "keep_monolith_modularize",
+          "split_microservices"
+        ]
+      }
+    },
+    "max_regret": {
+      "keep_monolith_modularize": 0.14,
+      "split_microservices": 2.42,
+      "gradual_service_extraction": 2.42
+    },
+    "minimax_regret_option": "keep_monolith_modularize",
+    "disagreement_hotspots": [
+      {
+        "cell_key": "gradual_service_extraction|ops_overhead",
+        "option_id": "gradual_service_extraction",
+        "criterion_id": "ops_overhead",
+        "spread": 2.058,
+        "chair_score": 4.2,
+        "persona_scores": {
+          "conservative_cto": 5,
+          "perf_zealot": 9.5
+        }
+      },
+      {
+        "cell_key": "gradual_service_extraction|delivery_cadence",
+        "option_id": "gradual_service_extraction",
+        "criterion_id": "delivery_cadence",
+        "spread": 2.058,
+        "chair_score": 4.2,
+        "persona_scores": {
+          "conservative_cto": 5,
+          "perf_zealot": 9.5
+        }
+      },
+      {
+        "cell_key": "split_microservices|data_consistency",
+        "option_id": "split_microservices",
+        "criterion_id": "data_consistency",
+        "spread": 1.639,
+        "chair_score": 8.8,
+        "persona_scores": {
+          "conservative_cto": 5,
+          "perf_zealot": 6
+        }
+      },
+      {
+        "cell_key": "split_microservices|org_cognitive_load",
+        "option_id": "split_microservices",
+        "criterion_id": "org_cognitive_load",
+        "spread": 1.639,
+        "chair_score": 8.8,
+        "persona_scores": {
+          "conservative_cto": 5,
+          "perf_zealot": 6
+        }
+      },
+      {
+        "cell_key": "split_microservices|migration_risk",
+        "option_id": "split_microservices",
+        "criterion_id": "migration_risk",
+        "spread": 1.639,
+        "chair_score": 8.8,
+        "persona_scores": {
+          "conservative_cto": 5,
+          "perf_zealot": 6
+        }
+      }
+    ],
+    "diagnostics": {
+      "judge_agreement_avg_spread": 1.39,
+      "high_agreement_warning": false,
+      "effective_samples": 3,
+      "spread_floor_used": 0.5
+    }
+  },
+  "warnings": [],
+  "sample_count": 3
+}
