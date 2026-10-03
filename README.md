@@ -56,7 +56,7 @@ node skills/agent-senate/scripts/analyze.mjs skills/agent-senate/examples/sample
 ```
 
 ## 基準評測
-本專案包含 7 道經典架構題目的雙盲評測（見 `evals/summary.md`）。在具體性、考量廣度、盲點揭露、可行動性、誠實度與情境貼合度 6 大維度上，Agent Senate 平均得分達 **8.90 分**，顯著勝過單一模型 Baseline 的 **6.31 分**。
+`evals/questions.yaml` 提供 7 道標準題，但「辯論 vs 單一模型」的盲評**尚未實際執行**，目前沒有可引用的比較數據（見 `evals/summary.md`、`PLAN.md` WP9）。
 
 ## 已知限制
 - 辯論品質取決於 DSH 目前的模型；所有角色用同一個模型時，多樣性來自人格提示與獨立 subagent，不如多家模型。

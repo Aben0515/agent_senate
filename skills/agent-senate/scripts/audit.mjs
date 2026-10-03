@@ -8,6 +8,7 @@
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { parseArgs } from 'node:util';
+import { pathToFileURL } from 'node:url';
 
 export function normalizeText(str) {
   if (!str) return '';
@@ -191,7 +192,7 @@ export function auditRunDirectory(runDir) {
 }
 
 // CLI Execution
-if (import.meta.url === `file://${process.argv[1]?.replace(/\\/g, '/')}`) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const { positionals } = parseArgs({
     args: process.argv.slice(2),
     allowPositionals: true,

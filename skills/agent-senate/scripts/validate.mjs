@@ -8,6 +8,7 @@
 
 import { readFileSync, writeFileSync } from 'node:fs';
 import { parseArgs } from 'node:util';
+import { pathToFileURL } from 'node:url';
 
 export function extractJsonFromText(rawText) {
   if (!rawText || typeof rawText !== 'string') {
@@ -314,7 +315,7 @@ export function validateTurnMarkdown(rawMarkdown, speakerId = null, ledger = nul
 }
 
 // CLI Execution
-if (import.meta.url === `file://${process.argv[1]?.replace(/\\/g, '/')}`) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const { values, positionals } = parseArgs({
     args: process.argv.slice(2),
     options: {

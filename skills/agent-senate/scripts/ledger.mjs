@@ -7,6 +7,7 @@
 
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { parseArgs } from 'node:util';
+import { pathToFileURL } from 'node:url';
 import { extractJsonFromText } from './validate.mjs';
 
 export const SPEAKER_PREFIXES = {
@@ -339,7 +340,7 @@ export function generateTranscriptMarkdown(state) {
 }
 
 // CLI Execution
-if (import.meta.url === `file://${process.argv[1]?.replace(/\\/g, '/')}`) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const { values, positionals } = parseArgs({
     args: process.argv.slice(2),
     options: {

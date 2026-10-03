@@ -7,6 +7,7 @@
 
 import { readFileSync, existsSync } from 'node:fs';
 import { parseArgs } from 'node:util';
+import { pathToFileURL } from 'node:url';
 
 const POLITENESS_PATTERNS = [
   /您說得有道理/i,
@@ -142,7 +143,7 @@ export function evaluateDebateQuality(state) {
 }
 
 // CLI Execution
-if (import.meta.url === `file://${process.argv[1]?.replace(/\\/g, '/')}`) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const { positionals } = parseArgs({
     args: process.argv.slice(2),
     allowPositionals: true,
