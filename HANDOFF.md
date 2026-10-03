@@ -27,7 +27,7 @@ agent-senate-dsh/
 ├─ cordis.patch.yml        告訴 DSH：把 skills/ 資料夾註冊成技能來源（照抄 @tt-a1i/archify-dsh 的格式）
 ├─ lib/index.js            必要的入口檔；匯出 resolveSenateSkillRoot（解析套件路徑）
 ├─ LICENSE, README.md, CHANGELOG.md, DEV_LOG.md, PLAN.md, HANDOFF.md(本檔), .gitignore
-├─ evals/                  評測題目 (questions.yaml)、基線資料與雙盲評測總結 (summary.md)
+├─ evals/                  評測題目 (questions.yaml)、基線資料與評測狀態說明 (summary.md，目前尚未有真實評測)
 └─ skills/agent-senate/
    ├─ SKILL.md             ★ 整個辯論流程的「程式」。DSH agent 讀它就知道怎麼主持（見 §4）
    ├─ references/
