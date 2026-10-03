@@ -68,4 +68,25 @@
 - `node skills/agent-senate/scripts/ledger.test.mjs`：測試通過。
 - 驗證成功排除基線中的自創編號與遺漏主席發言問題。
 
+---
+
+## [2026-10-04] WP3: 確定性報告組裝 report.mjs
+
+### 1. 工作內容
+- 建立 `skills/agent-senate/scripts/report.mjs`，消除人工手抄報告產生的數據幻覺與表格錯位。
+- 核心功能：
+  - 由程式生成標準 Markdown 權衡矩陣表格，自動填入中立權重、各方案得分與中位數理由。
+  - 將 Monte Carlo 勝率、翻盤臨界點轉化為自然通順的條件語句。
+  - **清晰分離兩張人格視角表**：
+    1. `Persona Lens`：使用該辯手之權重乘上主席客觀中位數評分。
+    2. `Persona Own View`：使用該辯手之權重乘上該辯手自身之主觀打分。
+  - 自動帶入由 `ledger.mjs` 計算出之辯手表現計分板。
+- 撰寫 `skills/agent-senate/scripts/report.test.mjs`，驗證特殊字元跳脫、欄位容錯降級與人格視角清晰度。
+- 更新 `SKILL.md` Phase 11，強制透過 `report.mjs` 組裝報告。
+
+### 2. 測試證據
+- `node skills/agent-senate/scripts/report.test.mjs`：2/2 通過。
+- 基線資料組裝實測：`evals/baseline-go-vs-rust/analysis.json` 成功組裝出完整乾淨報告。
+
+
 

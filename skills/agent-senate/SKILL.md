@@ -138,7 +138,10 @@ node "<本資料夾>/scripts/analyze.mjs" "<輸出資料夾>/input.json" --out "
   ```bash
   node "<本資料夾>/scripts/ledger.mjs" transcript "<輸出資料夾>/state.json" --out "<輸出資料夾>/transcript.md"
   ```
-- `report.md`：一句話結論 → 問題框定與假設 → 權衡矩陣表（準則/權重/各方案分數/加權總分）→ 穩健度（勝率、翻盤點、各人格視角、最大後悔）→ 關鍵權衡 → 盲點 → 未解爭議 → 下一步驗證實驗 → 風險 → 辯論精華（各辯手最終立場、讓步紀錄、謬誤、查核旗標、高光、MVP）→ 稽核紀錄。
+- `report.md`：由組裝腳本自動結合數學結果、記帳狀態與 extras 產出，確保數字一字不差、表格精確、雙重視角分離：
+  ```bash
+  node "<本資料夾>/scripts/report.mjs" "<輸出資料夾>/analysis.json" "<輸出資料夾>/state.json" "<輸出資料夾>/input.json" --out "<輸出資料夾>/report.md"
+  ```
 - `matrix.html`（程式產生）、`analysis.json`、`input.json`。
 
 最後向使用者摘要：推薦方案與勝率、最關鍵的兩個權衡、最大的翻盤條件、最重要的盲點、**第一個該做的驗證實驗**，並給出報告與 `matrix.html` 的路徑。
