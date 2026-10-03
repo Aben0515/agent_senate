@@ -90,7 +90,12 @@ description: 虛擬內閣 — 多 Agent 圓桌辯論室。使用者提出重大�
 使用 `subagent` 工具（`run_in_background=true`）在同一則訊息中平行派發：
 - 每位辯手各一個評分 subagent（模板 D）。
 - **3 個**彼此獨立的中立評審（模板 E）。不要讓它們知道彼此存在。
-回來後，**逐格檢查**：每個「方案 × 準則」恰好一格、準則 id 都在鎖定清單內、分數在 1–10。有缺格或亂 id 的，把錯誤貼回去叫**同一個 subagent 重做**（最多 2 次）；仍壞就丟掉該份（評審至少要有 2 份可用）。
+全部回來後，使用確定性腳本逐份驗證：
+```bash
+node "<本資料夾>/scripts/validate.mjs" judge "<輸出資料夾>/brief.json" "<評審輸出.json>"
+node "<本資料夾>/scripts/validate.mjs" persona "<輸出資料夾>/brief.json" "<辯手輸出.json>" --speaker <speaker_id>
+```
+若驗證失敗（`ok: false`），將 `errors` 的具體錯誤原文貼回給**同一個 subagent 要求重新輸出修復後的 JSON**（最多 2 次）。修復後仍失敗則丟棄該份樣本（評審至少要有 2 份可用）。驗證通過的乾淨 JSON 直接寫入 `input.json`。
 
 ### Phase 8 — 程式計算
 把結果寫成 `input.json`（格式見下），執行：

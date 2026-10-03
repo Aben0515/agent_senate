@@ -25,3 +25,24 @@
 - `evals/baseline-go-vs-rust/`（完整基線檔案）
 - `skills/agent-senate/references/subagent-interface.md`
 - `DEV_LOG.md`
+
+---
+
+## [2026-10-04] WP1: 評分驗證腳本 validate.mjs
+
+### 1. 工作內容
+- 建立 `skills/agent-senate/scripts/validate.mjs`，提供 `judge`、`persona`、`turn` 三項確定性子命令。
+- 支援容錯 JSON 抽取：處理 markdown code fences、前後贅詞、尾隨逗號（trailing commas）與平衡大括號。
+- 檢查項涵蓋：
+  - 每個「方案 × 準則」恰好一格（防缺格、防重複格）。
+  - 所有 option_id 與 criterion_id 均屬鎖定簡報範圍。
+  - 分數嚴格限制在 1.0 ~ 10.0。
+  - 權重涵蓋全部準則且非負。
+  - 若提供 `--ledger`，檢查證據論點是否引用了已被讓步 (`conceded`) 或查核不實 (`disputed_fact`) 的無效論點。
+- 撰寫 `skills/agent-senate/scripts/validate.test.mjs`，包含 9 組單元測試，全部通過。
+- 更新 `SKILL.md` Phase 7 流程，強制改用 `validate.mjs` 自動檢驗評分並提供自我修復反饋。
+
+### 2. 測試證據
+- `node skills/agent-senate/scripts/validate.test.mjs`：9/9 passed in 10ms。
+- 基線 `input.json` 實測：3 份評審樣本與 3 份辯手樣本全數通過（errors = 0）。
+
