@@ -40,6 +40,8 @@
 範例輸出：`skills/agent-senate/examples/sample-matrix.html`（示範資料，非真實辯論）。
 
 ## 開發
+接手修改前請先讀 [HANDOFF.md](HANDOFF.md)（歷史、架構、已修的 bug、地雷、驗證狀態、改東西去哪改）。
+
 ```
 npm test    # 11 個測試，含「翻盤點解析解 vs 暴力掃描」200 組隨機矩陣的對照
 node skills/agent-senate/scripts/analyze.mjs skills/agent-senate/examples/sample-input.json --out ./out
