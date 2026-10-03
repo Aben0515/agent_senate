@@ -1,0 +1,82 @@
+questions:
+  - id: "q1_binary_go_vs_rust"
+    type: "binary"
+    title: "3 人新創 B2B SaaS 後端：Go 還是 Rust？"
+    question: "3 人新創團隊做 B2B SaaS 後端，預計一年內拓展至 500 家企業客戶，團隊熟 Python：該選 Go 還是 Rust？"
+    context: |
+      團隊 3 人全功能工程師，熟悉 Python，缺乏低階系統級語言生產經驗。
+      初期伺服器預算有限，目前無專職 DevOps 人員。
+    expected_options: ["go", "rust"]
+    expected_traits:
+      - "Go 交付速度與招募池優勢明顯"
+      - "Rust 在記憶體安全與微秒延遲上領先"
+
+  - id: "q2_binary_flutter_vs_rn"
+    type: "binary"
+    title: "消費型 App 4 人團隊：Flutter 還是 React Native？"
+    question: "4 人團隊開發消費型生活健身 App（需相機即時影像處理與 BLE 藍牙同步）：該選 Flutter 還是 React Native？"
+    context: |
+      團隊 4 人，有 2 名 iOS 與 2 名 Android 原生開發經驗，無 React 或 Dart 背景。
+      需要與客製硬體手環進行高頻 BLE 藍牙數據交換，並有簡易濾鏡相機功能。
+    expected_options: ["flutter", "react_native"]
+    expected_traits:
+      - "BLE 插件生態與原生橋接成本是核心分歧"
+      - "UI 渲染效能 vs Web 前端生態重用"
+
+  - id: "q3_yes_no_microservices"
+    type: "yes_no"
+    title: "Django 單體要不要拆分微服務？"
+    question: "既有 Django 單體架構（20 萬行代碼、8 人團隊、部署一次需 40 分鐘），是否該拆分為微服務架構？"
+    context: |
+      系統運營 4 年，核心業務邏輯高度耦合，單元測試執行需 25 分鐘，CI/CD 部署耗時 40 分鐘。
+      團隊共 8 人，經常發生部署衝突，但目前基礎設施維運僅有 1 名兼職 SRE。
+    expected_options: ["keep_monolith_modularize", "split_microservices", "gradual_service_extraction"]
+    expected_traits:
+      - "必須包含維持單體但模組化 (Modular Monolith) 作為中間漸進選項"
+      - "8 人團隊維運微服務的額外治理成本與分佈式交易複雜度是關鍵交鋒"
+
+  - id: "q4_multi_reporting_backend"
+    type: "multi_option"
+    title: "內部報表系統技術選型（3 選項）"
+    question: "內部營運報表系統（每日 200 萬筆事件、報表延遲容忍 1 小時）：該選 Kafka + Flink、cron + PostgreSQL、還是 ClickHouse？"
+    context: |
+      數據源為各業務模組產生的審計與操作事件，總量約 200 萬筆，每秒尖峰約 100-300 事件。
+      管理層僅需每小時看一次聚合報表，不需要秒級串流分析。
+    expected_options: ["kafka_flink", "cron_postgres", "clickhouse"]
+    expected_traits:
+      - "3 個選項並存，矩陣欄位動態擴展至 3 欄"
+      - "極簡極客主打 cron+Postgres，性能狂推 ClickHouse，架構派推 Kafka"
+
+  - id: "q5_multi_iot_gateway"
+    type: "multi_option"
+    title: "IoT 邊緣閘道器資料收集服務（3 選項）"
+    question: "IoT 閘道器（ARM、256MB RAM、需遠端 OTA 更新）資料收集服務：該選 Rust、Go 還是 C？"
+    context: |
+      硬體為嵌入式 Linux (ARM32/64)，記憶體嚴格限制在 256MB，需同時跑系統與收集服務。
+      需穩定處理 RS-485/Modbus 感測器通訊與 MQTT 上報，現場維修極其昂貴，不可出現 panic 當機。
+    expected_options: ["rust", "go", "c"]
+    expected_traits:
+      - "記憶體限制與無 GC 停頓極端嚴苛"
+      - "C 語言記憶體漏洞風險 vs Rust 安全與編譯難度 vs Go 執行期大小"
+
+  - id: "q6_underspecified_ai_service"
+    type: "underspecified"
+    title: "我們該不該引入 AI 做客服？"
+    question: "我們是一家中型電商公司，該不該引入大語言模型 AI 取代目前的人工在線客服？"
+    context: ""
+    expected_options: ["adopt_hybrid_copilot", "full_ai_replacement", "keep_human_first"]
+    expected_traits:
+      - "情境極少，考驗 Phase 0 主席是否列出關鍵預設假設（客服成本、幻覺容忍度、訂單客單價）"
+      - "應框定漸進式人機協作 (Copilot) 作為理性方案"
+
+  - id: "q7_compliance_llm_summary"
+    type: "compliance"
+    title: "客服對話摘要功能隱私與個資選型"
+    question: "客服對話摘要功能（每日 5 萬次呼叫、含敏感客戶個資）：該自架開源 LLM 還是使用雲端商業 API？"
+    context: |
+      客服系統每日處理 5 萬通客服對話，內含電話、地址與信用卡後四碼。
+      符合金融法規要求，若使用雲端 API 需做去識別化；若自架開源模型則需自購 GPU 伺服器並負擔高昂電費與維運。
+    expected_options: ["self_hosted_open_llm", "cloud_api_with_anonymization"]
+    expected_traits:
+      - "觸發資安官 (security_paranoid) 角色深度介入"
+      - "資料落地法規風險 vs 基礎設施 TCO"

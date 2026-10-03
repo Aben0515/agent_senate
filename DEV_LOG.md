@@ -141,6 +141,24 @@
 - `npm test`：30/30 passed in 1.2s。
 - 高品質測試案例評分達 17/20 分（passed = true）；客套廢話案例評分僅 8/20 分（passed = false）。
 
+---
+
+## [2026-10-04] WP7: 題型覆蓋與題庫建立
+
+### 1. 工作內容
+- **建立標準題庫** `evals/questions.yaml`，涵蓋 5 大經典題型共 7 道技術決策題：
+  1. `binary`：二選一（3 人新創 Go vs Rust；消費型 App Flutter vs React Native）。
+  2. `yes_no`：要不要做（Django 20萬行單體要不要拆微服務）。
+  3. `multi_option`：多選項（內部報表 Kafka+Flink vs cron+Postgres vs ClickHouse；IoT 閘道器 Rust vs Go vs C）。
+  4. `underspecified`：情境不明/缺乏背景（中型電商該不該引入 AI 客服）。
+  5. `compliance`：涉敏感個資/合規審計（客服摘要自架開源 LLM vs 雲端 API 去識別化）。
+- **強化 SKILL.md 框定指導原則**：
+  - 「要不要做」題型強制要求提供漸進式折衷選項（如維持單體但模組化）。
+  - 多選項題型支援 3–5 個方案動態欄位適配。
+  - 情境不明題型強制要求在 `assumptions` 中寫明預設值與翻盤影響。
+  - 合規敏感題型主動建議調用 `security_paranoid`。
+
+
 
 
 
