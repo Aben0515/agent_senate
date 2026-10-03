@@ -39,13 +39,24 @@
 
 範例輸出：`skills/agent-senate/examples/sample-matrix.html`（示範資料，非真實辯論）。
 
-## 開發
-接手修改前請先讀 [HANDOFF.md](HANDOFF.md)（歷史、架構、已修的 bug、地雷、驗證狀態、改東西去哪改）。
+## 開發與測試腳本
+接手修改前請先讀 [HANDOFF.md](HANDOFF.md)（歷史、架構、已修的 bug、地雷、驗證狀態、改東西去哪改）與 [PLAN.md](PLAN.md)。
 
-```
-npm test    # 11 個測試，含「翻盤點解析解 vs 暴力掃描」200 組隨機矩陣的對照
+本專案採「LLM 負責判斷寫作，確定性腳本負責記帳查核」架構：
+- `analyze.mjs`：矩陣加權總分、解析翻盤點求解、評審 Bootstrap 抽樣、Monte Carlo 模擬、產生 `matrix.html`。
+- `validate.mjs`：自動校驗評審與辯手打分 JSON（防缺格、防重複格、防越界、防無效引用）。
+- `ledger.mjs`：`state.json` 記帳本，指派論點編號、維護讓步與引用狀態圖、產生 `transcript.md`。
+- `report.mjs`：確定性組裝 `report.md`，數據與表格 100% 由程式計算帶入，分離雙重辯手視角。
+- `audit.mjs`：確定性雙層程式稽核，比對引言連續子字串、檢查讓步論點引用與數值一致性。
+- `quality.mjs`：量化品質量表（10 項指標，滿分 20 分），自動檢查客套廢話與提問尖銳度。
+
+```bash
+npm test    # 執行全部 30 項單元與整合測試
 node skills/agent-senate/scripts/analyze.mjs skills/agent-senate/examples/sample-input.json --out ./out
 ```
+
+## 基準評測
+本專案包含 7 道經典架構題目的雙盲評測（見 `evals/summary.md`）。在具體性、考量廣度、盲點揭露、可行動性、誠實度與情境貼合度 6 大維度上，Agent Senate 平均得分達 **8.90 分**，顯著勝過單一模型 Baseline 的 **6.31 分**。
 
 ## 已知限制
 - 辯論品質取決於 DSH 目前的模型；所有角色用同一個模型時，多樣性來自人格提示與獨立 subagent，不如多家模型。

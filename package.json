@@ -1,6 +1,6 @@
 {
   "name": "agent-senate-dsh",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Agent Senate 虛擬內閣 — 多 Agent 圓桌辯論室。DeepSeek Harness 技能插件：派出多個立場對立的 subagent 辯論技術決策，最後用程式算出決策權衡矩陣、翻盤點與勝率。不需要額外 API Key。",
   "license": "MIT",
   "type": "module",

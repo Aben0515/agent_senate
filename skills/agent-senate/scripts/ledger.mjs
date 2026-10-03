@@ -234,7 +234,7 @@ export function renderClaimsIndex(state) {
 
 export function computeScoreboard(state) {
   const board = {};
-  const speakers = new Set(state.turns.filter((t) => t.type === 'debater').map((t) => t.speaker));
+  const speakers = new Set((state.turns || []).filter((t) => t.type === 'debater').map((t) => t.speaker));
 
   for (const sp of speakers) {
     board[sp] = {
@@ -249,7 +249,7 @@ export function computeScoreboard(state) {
   }
 
   // Count claims & status
-  for (const c of Object.values(state.claims)) {
+  for (const c of Object.values(state.claims || {})) {
     const sp = c.speaker;
     if (!board[sp]) continue;
     board[sp].claims_count++;
@@ -262,15 +262,15 @@ export function computeScoreboard(state) {
     }
 
     // Attacks landed: attacks directed at a target that later became conceded or disputed_fact
-    for (const targetId of c.attacks_claim_ids) {
-      const target = state.claims[targetId];
+    for (const targetId of c.attacks_claim_ids || []) {
+      const target = state.claims ? state.claims[targetId] : null;
       if (target && ['conceded', 'disputed_fact'].includes(target.status)) {
         board[sp].attacks_landed++;
       }
     }
   }
 
-  for (const fa of state.fallacies) {
+  for (const fa of state.fallacies || []) {
     if (board[fa.speaker_id]) {
       board[fa.speaker_id].fallacies_flagged++;
     }

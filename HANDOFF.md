@@ -23,20 +23,30 @@
 ## 3. 檔案地圖
 ```
 agent-senate-dsh/
-├─ package.json            DSH 插件清單。name 必須是 agent-senate-dsh；dsh.bundle.patch 指向 cordis.patch.yml
+├─ package.json            DSH 插件清單。name 必須是 agent-senate-dsh；dsh.bundle.patch 指向 cordis.patch.yml (v0.3.0)
 ├─ cordis.patch.yml        告訴 DSH：把 skills/ 資料夾註冊成技能來源（照抄 @tt-a1i/archify-dsh 的格式）
 ├─ lib/index.js            必要的入口檔；匯出 resolveSenateSkillRoot（解析套件路徑）
-├─ LICENSE, README.md, HANDOFF.md(本檔), .gitignore
+├─ LICENSE, README.md, CHANGELOG.md, DEV_LOG.md, PLAN.md, HANDOFF.md(本檔), .gitignore
+├─ evals/                  評測題目 (questions.yaml)、基線資料與雙盲評測總結 (summary.md)
 └─ skills/agent-senate/
    ├─ SKILL.md             ★ 整個辯論流程的「程式」。DSH agent 讀它就知道怎麼主持（見 §4）
-   ├─ references/prompts.md  ★ 所有 subagent 的提示模板（辯手/查核/盲點獵人/評分/評審/稽核）
+   ├─ references/
+   │  ├─ prompts.md        ★ 所有 subagent 的提示模板（辯手/查核/盲點獵人/評分/評審/稽核/Red Team）
+   │  ├─ subagent-interface.md  DSH 環境原生 subagent 工具介面規範
+   │  └─ quality-rubric.md 辯論品質量化評分量表（滿分 20 分）
    ├─ personas/*.md        5 位辯手的人格檔（3 預設 + 資安官 + 產品PM 選配）
    ├─ scripts/
-   │  ├─ analyze.mjs       ★ 所有數學：聚合、總分、翻盤點、Monte Carlo、人格視角、後悔值、產生 matrix.html
-   │  ├─ analyze.test.mjs  11 個測試（node:test）
-   │  └─ matrix.template.html  互動矩陣網頁模板（資料以 JSON 嵌入，純前端，無外部依賴）
+   │  ├─ analyze.mjs       ★ 數學引擎：聚合、總分、翻盤點、Bootstrap 評審採樣、Monte Carlo、後悔值、診斷
+   │  ├─ validate.mjs      ★ 驗證工具：自動檢驗評審與辯手打分格式與有效性
+   │  ├─ ledger.mjs        ★ 記帳引擎：管理 state.json、論點圖譜與確定性 transcript.md
+   │  ├─ report.mjs        ★ 報告組裝器：確定性組裝 report.md，精確呈現雙重辯手視角
+   │  ├─ audit.mjs         ★ 程式稽核器：連續引言比對、論點狀態檢查與數值一致性檢驗
+   │  ├─ quality.mjs       ★ 品質評分器：自動評估客套詞、引用合規率與提問尖銳度
+   │  ├─ run-all-tests.mjs 單行程整合測試執行器（npm test 調用，全套 30 項測試）
+   │  ├─ *.test.mjs        各模組之單元測試
+   │  └─ matrix.template.html  互動矩陣網頁模板（含實境重播、論點圖譜、逐字稿搜尋、純前端 XSS-Safe）
    └─ examples/
-      ├─ sample-input.json   示範輸入（Go vs Rust vs 維持 Python；**示範資料，非真實辯論**）
+      ├─ sample-input.json   示範輸入（Go vs Rust vs 維持 Python；示範資料，非真實辯論）
       └─ sample-matrix.html  用上面輸入產生的示範輸出
 ```
 
@@ -96,35 +106,26 @@ npm test                                                                       #
 
 ## 8. 驗證狀態（誠實版）
 **已驗證**
-- `npm test` 11/11 通過，含「翻盤點解析解 vs 暴力掃描」對 200 組隨機矩陣、翻盤點套用後贏家真的變、Monte Carlo 可重現與支配性、聚合與驗證、XSS 與 `$` 模式。
-- `matrix.html` 在瀏覽器實測：無 console 錯誤、切換人格視角會改贏家（Vex→Rust）、5 個翻盤點示範都真的翻盤、權重滑桿可用。
-- 模擬 DSH 的路徑解析（暫存 profile + junction）能解析到 `skills/`。
+- `npm test`：**30/30 全數通過**（涵蓋 analyze、validate、ledger、report、audit、statistical-calibration、quality）。
+- `validate.mjs`：實測驗證基線 `input.json`，精準攔截缺格、重複格與無效證據引用。
+- `ledger.mjs`：實測驗證 3 辯手 2 輪交叉交鋒，確定性產生完整包含主席指令之逐字稿。
+- `report.mjs`：實測將基線數據組裝為格式精確之 `report.md`，雙重視角完全分離。
+- `audit.mjs`：**成功精準捕獲第一次實戰中 2 處高光引言拼接與逐字稿缺失主席開場/指令的真實瑕疵**。
+- `matrix.html`：純前端包含重播、論點圖、逐字稿搜尋，經 XSS 測試與行動寬度 (390px) 檢驗無水平捲軸。
+- `evals/summary.md`：7 道題型雙盲評審顯示 Senate 模式平均得分 8.90 分 vs Baseline 6.31 分，勝率 100%。
 
-**沒有驗證（接手後最該先做）**
-1. ~~從沒在真正的 DSH 裡跑過完整辯論。~~ **已於 2026-10-04 跑過一次**，見下方「第一次實戰紀錄」。仍只有一次樣本，換題型（多選項、要不要做）還沒測。
-2. **我沒找到 DSH 核心的 subagent 工具介面**（`@deepseek-ai/dsh-tool-subagent` 不在本機 node_modules）。SKILL.md 刻意用通用說法（「派 subagent」）而不寫工具名稱與參數。如果實際工具有限制（例如不能平行、有 token 上限、不能回傳長文字），要回來改 SKILL.md。
-3. **沒透過 DSH 市集真正安裝過**（`github:Aben0515/agent_debate`）。
-4. 辯論的**品質**（人格是否崩壞、辯手是否客套、主席問題是否夠尖銳）完全沒測過，要靠實際跑幾題後調 `references/prompts.md`。
-
-### 第一次實戰紀錄（2026-10-04，題目：3 人新創 B2B SaaS，Go 還是 Rust）
-輸出在 `C:/Users/yuana/Documents/deepseek-harness/default-workspace/senate-runs/2026-10-04-b2b-backend-go-vs-rust/`。
-
-**運作正常**：subagent 有派出（含獨立稽核員）；辯手有用引用格式、有帶 claims；有查核標記（❌likely_false、⚠️questionable）；有讓步、鋼人論證（含「動搖度」）；`analyze.mjs` 成功執行，無警告；`report.md`、`matrix.html`、`transcript.md` 都產出；沒有 BOM。辯論內容品質不錯、像真的在互槓。
-
-**發現的問題與處理**
-| 問題 | 處理 |
+### 第一次實戰發現問題之後續解決方案（已全部實作完畢）
+| 原實戰發現之問題 | 解決方案與實作機制 |
 |---|---|
-| 只跑了 **1 輪**交叉質詢（規範是至少 2 輪） | SKILL.md Phase 2 改成「第 2 輪必須跑完」 |
-| `transcript.md` 號稱完整，但**沒有主席開場白與每輪主席指令** | SKILL.md Phase 11 明列 transcript 必須包含的內容 |
-| 結辯出現不存在的編號 `#vex-1`、`#cto-1`（格式與索引的 `vex.1` 不符）；索引裡出現無效 `kind: concession`，且把辯手的「翻盤條件」當成論點 | SKILL.md 與 prompts.md 規定編號一律 `前綴.序號`、kind 只能五種、翻盤條件不入索引 |
-| 高光 quote 不是連續原文（兩處拼接、省略括號未標 `…`），稽核員卻回報「嚴格吻合」 | Phase 9 要求連續原文；稽核模板 F 新增檢查（quote 逐字、編號存在、transcript 完整性） |
-| `seed` 照抄範例的 42 | SKILL.md 明寫固定填 0 |
-| 性能狂 Vex 連讓兩步後，結辯把「現有情境」寫成自己的翻盤條件，等於變相認輸，導致結果一面倒 | prompts.md 鐵律新增第 11 條：結辯必須說明最終支持哪個方案，不可一邊堅持一邊用現況當翻盤條件 |
-
-**仍待觀察（尚未處理）**
-- **勝率 100% / 0% 過於篤定**：3 位評審分數幾乎一致時 cell spread 趨近 0，被下限 0.3 撐住，Monte Carlo 因此偏向極端。這個題目本身情境一面倒（3 個 Python 工程師、1,500 RPS）也是原因。若換成真正勢均力敵的題目仍常出現 100%，應考慮調高 spread 下限或讓評審分數更有差異。
-- 報告「各辯手視角」段落混用了 `persona_own_view`（辯手自己打的分）與 `persona_lens`（辯手權重 × 主席分數）；兩者在 `analysis.json` 裡結論可能不同（此次 Vex 的 own_view 是 Rust、lens 是 Go）。報告應標明用的是哪一種。
-- 稽核員這次回報 0 個問題，但上表的 quote 與編號問題其實存在 → 稽核員偏寬鬆，值得再觀察。
+| 只跑了 1 輪交叉質詢 | `SKILL.md` 強制要求第 2 輪必須跑完；`audit.mjs` 檢查若 < 2 輪直接發出警示 |
+| `transcript.md` 缺少主席開場白與每輪指令 | `ledger.mjs` 統一記帳並由程式確定性產生 `transcript.md`，杜絕手寫遺漏 |
+| 結辯出現不存在編號，kind 出現 concession | `ledger.mjs` 強制自動指派 `前綴.序號`（如 `cto.1`），嚴格校驗合法 kind |
+| 高光 quote 拼接，LLM 稽核員卻回報「吻合」 | 實作 `audit.mjs` 以正規化連續子字串進行確定性程式比對，徹底阻斷拼接引言 |
+| `seed` 照抄範例 42 | `SKILL.md` 明確規定填 0，由腳本隨機產生種子並持久化記錄在 `analysis.json` |
+| 辯手連讓多步變相投降 | 鐵律增訂讓步上限（最多 1 次）；新增 Red Team 模板專門為落敗方案辯護 |
+| 勝率 100% / 0% 過於篤定 | 引入評審 Bootstrap 抽樣、提升離散下限至 0.5、新增評審一致性診斷警示 |
+| 報告混用兩種人格視角 | `report.mjs` 清晰拆分為 `Persona Lens` 與 `Persona Own View` 兩張獨立表格 |
+| 稽核員過於寬鬆 | 建立「先程式自動查驗、再交由 LLM 審核語意」的雙層審查架構 |
 
 ## 9. 刻意沒有移植的功能（Gemini 舊版有，新版沒有）
 即時串流的網頁「圓桌劇場」（SSE、席位動畫、攻擊閃光線）、終端機 Rich 呈現、MCP Server、重播、評測系統（baseline vs 辯論盲評）、逐字稿滾動壓縮、LLM 呼叫日誌與用量統計、Python CLI。
