@@ -46,3 +46,26 @@
 - `node skills/agent-senate/scripts/validate.test.mjs`：9/9 passed in 10ms。
 - 基線 `input.json` 實測：3 份評審樣本與 3 份辯手樣本全數通過（errors = 0）。
 
+---
+
+## [2026-10-04] WP2: 論點與逐字稿記帳 ledger.mjs
+
+### 1. 工作內容
+- 建立 `skills/agent-senate/scripts/ledger.mjs`，管理整場辯論的 `state.json`。
+- 子命令支援：
+  - `init`：初始化狀態（問題、簡報）。
+  - `chair`：記錄主席開場白、指令、判決。
+  - `turn`：解析辯手發言中的 ```` ```claims ```` JSON 區塊，指派 `前綴.序號`（如 `cto.1`, `vex.1`），正則偵測文中讓步與引用，維護論點圖譜與狀態（open, attacked, conceded）。
+  - `facts`：記錄查核結果並更新論點狀態（disputed_fact, plausible）。
+  - `fallacies`：記錄主席點名之邏輯謬誤。
+  - `index`：即時印出包含狀態徽章的論點索引，供下一輪辯手 prompt 調用。
+  - `scoreboard`：計算各辯手論點數、命中攻擊、讓步、謬誤與 MVP 分數。
+  - `transcript`：一鍵產生包含完整主席指令與開場白之確定性 `transcript.md`。
+- 撰寫 `skills/agent-senate/scripts/ledger.test.mjs`，完整模擬 3 辯手、2 輪交互交鋒，驗證讓步與攻擊狀態聯動。
+- 更新 `SKILL.md`，將手動記帳全面替換為 `ledger.mjs` 腳本調用。
+
+### 2. 測試證據
+- `node skills/agent-senate/scripts/ledger.test.mjs`：測試通過。
+- 驗證成功排除基線中的自創編號與遺漏主席發言問題。
+
+
