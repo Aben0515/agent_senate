@@ -88,5 +88,24 @@
 - `node skills/agent-senate/scripts/report.test.mjs`：2/2 通過。
 - 基線資料組裝實測：`evals/baseline-go-vs-rust/analysis.json` 成功組裝出完整乾淨報告。
 
+---
+
+## [2026-10-04] WP4: 程式稽核 audit.mjs 與雙層審核機制
+
+### 1. 工作內容
+- 建立 `skills/agent-senate/scripts/audit.mjs`，實作確定性程式碼稽核：
+  1. **高光引言連續性檢驗**：全形/半形/空白正規化後，嚴格比對是否為逐字稿的連續子字串，杜絕引言拼接或虛構。
+  2. **證據論點有效性**：驗證評審引用之 Claim ID 是否存在，且未被讓步 (`conceded`) 或標記為 `disputed_fact`。
+  3. **贏家與數值一致性**：檢驗 `recommended_option_id === analysis.winner`，信心標籤是否匹配勝率區間，`margin < 0.1` 是否明註「過於接近」。
+  4. **逐字稿完整性**：檢查是否包含主席開場白、每輪指令，且交叉質詢輪數 ≥ 2。
+- 撰寫 `skills/agent-senate/scripts/audit.test.mjs`，包含 4 組測試。
+- **實戰基線檢驗**：對第一次實戰 `evals/baseline-go-vs-rust/` 執行稽核，**成功精準捕獲 2 處高光引言拼接與逐字稿缺少主席開場/指令的真實瑕疵**（先前純 LLM 稽核員回報 0 問題）。
+- 更新 `SKILL.md` Phase 10 與 `references/prompts.md` 模板 F，建立「先程式自動查驗、再交由 LLM 審核語意」的雙層審查架構。
+
+### 2. 測試證據
+- `node skills/agent-senate/scripts/audit.test.mjs`：4/4 通過。
+- 基線實測準確回報引言拼接與主席指令缺失。
+
+
 
 

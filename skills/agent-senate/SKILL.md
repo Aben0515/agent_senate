@@ -130,7 +130,14 @@ node "<本資料夾>/scripts/analyze.mjs" "<輸出資料夾>/input.json" --out "
 - 把 `verdict`、`key_tradeoffs`、`blind_spots`、`challenged_assumptions`、`unresolved_disputes`、`next_experiments`、`risks`、`highlights`、`mvp` 補進 `input.json` 的 `extras`，重跑一次 Phase 8 的指令，讓 `matrix.html` 包含判決。
 
 ### Phase 10 — 稽核
-派稽核員（模板 F）。有 high / medium 問題就針對該欄位修正並重跑 Phase 8，**最多 2 輪**。在報告寫下稽核結果與修了什麼。
+1. **先執行確定性程式稽核**：
+   ```bash
+   node "<本資料夾>/scripts/audit.mjs" "<輸出資料夾>"
+   ```
+   腳本會自動檢查：高光引言是否為逐字稿連續子字串、引用論點是否存在且未讓步、數字是否與 `analysis.json` 完全吻合、交叉質詢輪數是否 ≥ 2。
+   若有 high / medium 問題，針對該欄位進行修正，並重新執行 Phase 8 與 Phase 11。
+2. **派 LLM 稽核員（模板 F）**：
+   在提示詞中附上程式稽核結果，請稽核員專注審查語意層面（理由是否真正成立、未解爭議是否已被讓步、是否有憑空捏造的外部事實）。有問題則修正並重跑，**最多 2 輪**。在報告寫下稽核結果與修了什麼。
 
 ### Phase 11 — 輸出
 寫入輸出資料夾：
