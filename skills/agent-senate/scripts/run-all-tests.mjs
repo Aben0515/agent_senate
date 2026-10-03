@@ -9,3 +9,4 @@ import './ledger.test.mjs';
 import './report.test.mjs';
 import './audit.test.mjs';
 import './statistical-calibration.test.mjs';
+import './quality.test.mjs';

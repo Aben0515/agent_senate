@@ -125,6 +125,23 @@
 - `npm test`：28/28 passed in 1.2s。
 - 評審分歧時，勝率自極端 100% 正常分散至 60% ~ 40% 區間。
 
+---
+
+## [2026-10-04] WP6: 辯論品質工程與品質量表 quality.mjs
+
+### 1. 工作內容
+- **制定量化品質量表**：建立 `skills/agent-senate/references/quality-rubric.md`，涵蓋選邊明確度、數字依據、引用格式、讓步節制、結辯翻盤條件、主席尖銳度、人格一致性、零客套廢話、論點新穎性與真實性 10 項指標（總分 20 分）。
+- **實作程式化量表計算器**：建立 `skills/agent-senate/scripts/quality.mjs`，以正則與文本分析自動計算客套詞命中、引用合規率、讓步頻率與提問尖銳度。
+- **防止一面倒投降**：
+  - 在 `references/prompts.md` 的辯論鐵律中增訂第 12 條，限制主動讓步上限為 1 次，嚴禁變相全面投降。
+  - 新增「反方總結員（Red Team）」提示詞模板 G，為落敗方案撰寫翻盤警示，防範勝者敘事偏差。
+- 撰寫 `skills/agent-senate/scripts/quality.test.mjs`，驗證高品質辯論與低品質廢話之區分能力。
+
+### 2. 測試證據
+- `npm test`：30/30 passed in 1.2s。
+- 高品質測試案例評分達 17/20 分（passed = true）；客套廢話案例評分僅 8/20 分（passed = false）。
+
+
 
 
 
