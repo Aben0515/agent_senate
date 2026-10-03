@@ -17,7 +17,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "test": "node --test skills/agent-senate/scripts/analyze.test.mjs"
+    "test": "node skills/agent-senate/scripts/run-all-tests.mjs"
   },
   "keywords": [
     "dsh-plugin",

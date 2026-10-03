@@ -213,21 +213,41 @@ function makeSamplers(rand) {
 export function runMonteCarlo(options, criteria, weights, scores, cellSpread, opts = {}) {
   const samples = opts.samples ?? 5000;
   const conc = opts.concentration ?? 20;
+  const spreadFloor = opts.spreadFloor ?? 0.5;
   const seedUsed = opts.seed ? Number(opts.seed) : 1 + Math.floor(Math.random() * 999999);
-  const { normal, dirichlet } = makeSamplers(mulberry32(seedUsed));
+  const prng = mulberry32(seedUsed);
+  const { normal, dirichlet } = makeSamplers(prng);
   const normW = normalizeWeights(weights);
   const alpha = criteria.map((c) => Math.max(0.01, (normW[c.id] ?? 0.01) * conc));
   const wins = Object.fromEntries(options.map((o) => [o.id, 0]));
+
+  const chairSamples = opts.chairSamples && opts.chairSamples.length > 1 ? opts.chairSamples : null;
 
   for (let i = 0; i < samples; i++) {
     const w = dirichlet(alpha);
     let bestId = null;
     let best = -Infinity;
+
+    // Resample judge samples with replacement (bootstrap) to model judge uncertainty
+    let currentScores = scores;
+    if (chairSamples) {
+      currentScores = {};
+      const numJudges = chairSamples.length;
+      const resampledJudges = Array.from({ length: numJudges }, () => chairSamples[Math.floor(prng() * numJudges)]);
+      for (const o of options) {
+        for (const c of criteria) {
+          const k = key(o.id, c.id);
+          const vals = resampledJudges.map((j) => j.map.get(k).score);
+          currentScores[k] = median(vals);
+        }
+      }
+    }
+
     for (const o of options) {
       let t = 0;
       criteria.forEach((c, ci) => {
-        const mu = scores[key(o.id, c.id)] ?? 5;
-        const sd = Math.max(0.3, cellSpread[key(o.id, c.id)] ?? 0.3);
+        const mu = currentScores[key(o.id, c.id)] ?? 5;
+        const sd = Math.max(spreadFloor, cellSpread[key(o.id, c.id)] ?? spreadFloor);
         t += w[ci] * Math.min(10, Math.max(1, mu + sd * normal()));
       });
       if (t > best) {
@@ -335,7 +355,7 @@ export function aggregate(input) {
     }
   }
 
-  return { weights: normW, weightRationale, cells, scores, cellSpread, personaScores, warnings, sampleCount: samples.length };
+  return { weights: normW, weightRationale, cells, scores, cellSpread, personaScores, warnings, sampleCount: samples.length, chairSamples: samples };
 }
 
 function fillWeights(w, criteria) {
@@ -356,11 +376,23 @@ export function analyze(input) {
     samples: input.monteCarloSamples ?? 5000,
     concentration: input.dirichletConcentration ?? 20,
     seed: input.seed ?? 0,
+    chairSamples: agg.chairSamples,
+    spreadFloor: 0.5,
   });
   const totals = Object.fromEntries(Object.entries(baseTotals).map(([k, v]) => [k, round(v, 4)]));
   const ranking = rankOptions(baseTotals, mc.probability);
   const winner = ranking[0];
   const margin = ranking.length > 1 ? round(baseTotals[ranking[0]] - baseTotals[ranking[1]], 4) : 0;
+
+  const allSpreads = Object.values(cellSpread);
+  const avgSpread = allSpreads.length ? round(allSpreads.reduce((a, b) => a + b, 0) / allSpreads.length, 3) : 0.0;
+  const highAgreement = avgSpread < 0.6;
+  const diagnostics = {
+    judge_agreement_avg_spread: avgSpread,
+    high_agreement_warning: highAgreement,
+    effective_samples: agg.sampleCount,
+    spread_floor_used: 0.5,
+  };
 
   const lens = (ps) => {
     const t = weightedTotals(options, criteria, ps.weights, scores);
@@ -413,6 +445,7 @@ export function analyze(input) {
     max_regret: maxRegret,
     minimax_regret_option: minimaxRegretOption,
     disagreement_hotspots: hotspots,
+    diagnostics,
   };
 
   const matrix = {

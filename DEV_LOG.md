@@ -106,6 +106,26 @@
 - `node skills/agent-senate/scripts/audit.test.mjs`：4/4 通過。
 - 基線實測準確回報引言拼接與主席指令缺失。
 
+---
+
+## [2026-10-04] WP5: 統計校準與評審 Bootstrap 採樣
+
+### 1. 工作內容
+- **Bootstrap 評審採樣**：在 `analyze.mjs` 的 `runMonteCarlo` 模擬中引入有放回抽樣（resampling with replacement）。每次迭代隨機抽選評審組合併計算中位數，真實反映「若換一批不同專家評審」時的打分不確定性。
+- **抬高 Spread 下限**：將單格標準差下限從 `0.3` 提高至 `0.5`，避免因少數評審高度趨同而導致 Monte Carlo 勝率退化為非黑即白的 100% / 0%。
+- **新增分析診斷指標 (Diagnostics)**：
+  - `judge_agreement_avg_spread`：評審打分平均離散度。
+  - `high_agreement_warning`：當平均標準差 < 0.6 時自動標註警示。
+  - `spread_floor_used`：記錄最低離散底限 (0.5)。
+- **誠實報告措辭**：在 `report.mjs` 中明確加註：「此為模型敏感度指標，非真實商業成功機率」，並在評審高度一致時提示不確定性可能被低估。
+- 撰寫 `skills/agent-senate/scripts/statistical-calibration.test.mjs`，驗證評審分歧時勝率呈合理離散分佈。
+- 建立統一的跨平台單行程測試執行器 `run-all-tests.mjs`，使 `npm test` 涵蓋全部 28 項測試。
+
+### 2. 測試證據
+- `npm test`：28/28 passed in 1.2s。
+- 評審分歧時，勝率自極端 100% 正常分散至 60% ~ 40% 區間。
+
+
 
 
 

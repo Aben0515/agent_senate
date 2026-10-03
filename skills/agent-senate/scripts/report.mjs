@@ -107,10 +107,13 @@ export function generateReportMarkdown(rawAnalysis, state, extras = {}) {
   lines.push(`- **推薦贏家**：\`${analysis.winner}\``);
   lines.push(`- **領先幅度 (Margin)**：${analysis.margin?.toFixed(2)} 分`);
   lines.push(`- **最小後悔方案 (Minimax Regret)**：\`${analysis.minimax_regret_option}\``);
-  lines.push('- **Monte Carlo 模擬勝率**：');
+  lines.push('- **Monte Carlo 模擬勝率**（在評審意見擾動與權重隨機變動下的模擬獲勝比例；註：此為模型敏感度指標，非真實商業成功機率）：');
   for (const o of options) {
     const p = Math.round((analysis.win_probability?.[o.id] || 0) * 100);
     lines.push(`  - ${o.label} (\`${o.id}\`): **${p}%**`);
+  }
+  if (analysis.diagnostics?.high_agreement_warning) {
+    lines.push(`  > ⚠️ **評審打分高度一致**（平均評審分歧標準差僅 ${analysis.diagnostics.judge_agreement_avg_spread}），模擬勝率可能低估現實世界的不確定性。`);
   }
 
   lines.push('\n### 翻盤臨界點 (Tipping Points)');
