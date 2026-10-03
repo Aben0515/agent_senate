@@ -99,10 +99,30 @@ npm test                                                                       #
 - 模擬 DSH 的路徑解析（暫存 profile + junction）能解析到 `skills/`。
 
 **沒有驗證（接手後最該先做）**
-1. **從沒在真正的 DSH 裡跑過完整辯論。** SKILL.md 的流程（平行派 subagent、依序派、評分、呼叫 node）都只是「寫好的指令」，未經實戰。第一次跑要觀察：subagent 有沒有平行派出？辯手有沒有輸出 ```` ```claims ```` 區塊？評審 JSON 有沒有缺格？
+1. ~~從沒在真正的 DSH 裡跑過完整辯論。~~ **已於 2026-10-04 跑過一次**，見下方「第一次實戰紀錄」。仍只有一次樣本，換題型（多選項、要不要做）還沒測。
 2. **我沒找到 DSH 核心的 subagent 工具介面**（`@deepseek-ai/dsh-tool-subagent` 不在本機 node_modules）。SKILL.md 刻意用通用說法（「派 subagent」）而不寫工具名稱與參數。如果實際工具有限制（例如不能平行、有 token 上限、不能回傳長文字），要回來改 SKILL.md。
 3. **沒透過 DSH 市集真正安裝過**（`github:Aben0515/agent_debate`）。
 4. 辯論的**品質**（人格是否崩壞、辯手是否客套、主席問題是否夠尖銳）完全沒測過，要靠實際跑幾題後調 `references/prompts.md`。
+
+### 第一次實戰紀錄（2026-10-04，題目：3 人新創 B2B SaaS，Go 還是 Rust）
+輸出在 `C:/Users/yuana/Documents/deepseek-harness/default-workspace/senate-runs/2026-10-04-b2b-backend-go-vs-rust/`。
+
+**運作正常**：subagent 有派出（含獨立稽核員）；辯手有用引用格式、有帶 claims；有查核標記（❌likely_false、⚠️questionable）；有讓步、鋼人論證（含「動搖度」）；`analyze.mjs` 成功執行，無警告；`report.md`、`matrix.html`、`transcript.md` 都產出；沒有 BOM。辯論內容品質不錯、像真的在互槓。
+
+**發現的問題與處理**
+| 問題 | 處理 |
+|---|---|
+| 只跑了 **1 輪**交叉質詢（規範是至少 2 輪） | SKILL.md Phase 2 改成「第 2 輪必須跑完」 |
+| `transcript.md` 號稱完整，但**沒有主席開場白與每輪主席指令** | SKILL.md Phase 11 明列 transcript 必須包含的內容 |
+| 結辯出現不存在的編號 `#vex-1`、`#cto-1`（格式與索引的 `vex.1` 不符）；索引裡出現無效 `kind: concession`，且把辯手的「翻盤條件」當成論點 | SKILL.md 與 prompts.md 規定編號一律 `前綴.序號`、kind 只能五種、翻盤條件不入索引 |
+| 高光 quote 不是連續原文（兩處拼接、省略括號未標 `…`），稽核員卻回報「嚴格吻合」 | Phase 9 要求連續原文；稽核模板 F 新增檢查（quote 逐字、編號存在、transcript 完整性） |
+| `seed` 照抄範例的 42 | SKILL.md 明寫固定填 0 |
+| 性能狂 Vex 連讓兩步後，結辯把「現有情境」寫成自己的翻盤條件，等於變相認輸，導致結果一面倒 | prompts.md 鐵律新增第 11 條：結辯必須說明最終支持哪個方案，不可一邊堅持一邊用現況當翻盤條件 |
+
+**仍待觀察（尚未處理）**
+- **勝率 100% / 0% 過於篤定**：3 位評審分數幾乎一致時 cell spread 趨近 0，被下限 0.3 撐住，Monte Carlo 因此偏向極端。這個題目本身情境一面倒（3 個 Python 工程師、1,500 RPS）也是原因。若換成真正勢均力敵的題目仍常出現 100%，應考慮調高 spread 下限或讓評審分數更有差異。
+- 報告「各辯手視角」段落混用了 `persona_own_view`（辯手自己打的分）與 `persona_lens`（辯手權重 × 主席分數）；兩者在 `analysis.json` 裡結論可能不同（此次 Vex 的 own_view 是 Rust、lens 是 Go）。報告應標明用的是哪一種。
+- 稽核員這次回報 0 個問題，但上表的 quote 與編號問題其實存在 → 稽核員偏寬鬆，值得再觀察。
 
 ## 9. 刻意沒有移植的功能（Gemini 舊版有，新版沒有）
 即時串流的網頁「圓桌劇場」（SSE、席位動畫、攻擊閃光線）、終端機 Rich 呈現、MCP Server、重播、評測系統（baseline vs 辯論盲評）、逐字稿滾動壓縮、LLM 呼叫日誌與用量統計、Python CLI。
