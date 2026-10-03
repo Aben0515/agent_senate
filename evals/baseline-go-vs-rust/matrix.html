@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>決策權衡矩陣</title>
+<style>
+  :root {
+    --bg: #f6f6f8; --card: #ffffff; --ink: #1b1b22; --muted: #6a6a78; --line: #e2e2e9;
+    --accent: #6b3fd4; --win: #138a4b; --warn: #b45309; --bad: #c0264b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #131318; --card: #1c1c24; --ink: #ececf2; --muted: #9a9aaa; --line: #2e2e3a;
+      --accent: #a98bff; --win: #3ecf8e; --warn: #f5a524; --bad: #ff6b8b; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+    font: 15px/1.6 system-ui, "Noto Sans TC", "Microsoft JhengHei", sans-serif; }
+  main { max-width: 1080px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  h2 { font-size: 16px; margin: 0 0 12px; }
+  .sub { color: var(--muted); margin: 0 0 20px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; margin-bottom: 16px; }
+  .verdict { border-left: 4px solid var(--win); }
+  .verdict .big { font-size: 26px; font-weight: 700; color: var(--win); }
+  .badge { display: inline-block; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--line); font-size: 12px; color: var(--muted); margin-left: 6px; }
+  .bars > div { display: grid; grid-template-columns: 120px 1fr 56px; gap: 10px; align-items: center; margin: 6px 0; }
+  .bar { height: 12px; border-radius: 6px; background: var(--line); overflow: hidden; }
+  .bar > i { display: block; height: 100%; background: var(--accent); }
+  .scroll { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; min-width: 560px; }
+  th, td { padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: center; }
+  th:first-child, td:first-child { text-align: left; min-width: 220px; }
+  td.cell { cursor: help; font-variant-numeric: tabular-nums; font-weight: 600; }
+  td.cell.hot::after { content: " 🔥"; font-size: 11px; }
+  tr.total td { font-weight: 700; border-top: 2px solid var(--line); }
+  td.winner, th.winner { color: var(--win); }
+  .crit-name { display: block; font-weight: 600; }
+  .crit-w { color: var(--muted); font-size: 12px; }
+  input[type=range] { width: 100%; accent-color: var(--accent); }
+  .lens button, .btn { font: inherit; padding: 4px 12px; margin: 0 6px 6px 0; border-radius: 999px;
+    border: 1px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer; }
+  .lens button[aria-pressed=true] { background: var(--accent); color: #fff; border-color: var(--accent); }
+  ul { margin: 6px 0; padding-left: 20px; }
+  li { margin: 4px 0; }
+  .sev-high { color: var(--bad); font-weight: 600; } .sev-medium { color: var(--warn); font-weight: 600; } .sev-low { color: var(--muted); }
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+  .muted { color: var(--muted); }
+  .quote { border-left: 3px solid var(--line); padding-left: 10px; color: var(--muted); }
+  @media (max-width: 560px) { .bars > div { grid-template-columns: 90px 1fr 48px; } }
+</style>
+</head>
+<body>
+<main id="app"></main>
+<script id="payload" type="application/json">{"matrix":{"question":"3 人新創做 B2B SaaS 後端，一年內預計 500 家企業客戶，團隊熟 Python，該選 Go 還是 Rust？","options":[{"id":"go","label":"Go","description":"Google 開發的靜態強型別語言，以極簡語法、內建 Goroutine 並發與快速編譯著稱，雲原生與 Web 生態成熟。"},{"id":"rust","label":"Rust","description":"Mozilla 發起的系統級語言，以所有權借用檢查實現無 GC 記憶體安全、零成本抽象與極致尾延遲控制。"}],"criteria":[{"id":"delivery_velocity","label":"交付與迭代速度","description":"前半年業務功能快速驗證、頻繁修改業務邏輯的開發效率（越高越好）"},{"id":"learning_curve","label":"學習與上手曲線","description":"Python 工程師轉型並達到可安全上生產環境水準的難易度（越高越好）"},{"id":"ops_observability","label":"維運排錯與可觀測性","description":"線上問題定位、pprof、APM 與排程崩潰隔離容錯（越高越好）"},{"id":"hiring_and_bus_factor","label":"招募池與替換風險","description":"擴編招募候選人基數、薪資溢價與人員離職替換承受力（越高越好）"},{"id":"resource_efficiency","label":"資源效率與硬體成本","description":"伺服器記憶體佔用、帳單成本與極限吞吐（越高越好）"},{"id":"b2b_ecosystem","label":"企業生態與工具鏈成熟度","description":"SSO/SAML、ORM、企業周邊 SDK 與資料模型演進彈性（越高越好）"}],"weights":{"delivery_velocity":0.3333,"learning_curve":0.25,"ops_observability":0.0767,"hiring_and_bus_factor":0.15,"resource_efficiency":0.05,"b2b_ecosystem":0.14},"weight_rationale":{"delivery_velocity":"3人新創團隊首要目標為生存與交付期限，前半年需頻繁驗證B2B業務邏輯，迭代速度為最核心指標。","learning_curve":"現有團隊背景為Python，需在極短時間內切換語言並交付安全生產代碼，學習門檻直接決定專案存亡。","ops_observability":"線上問題排查與APM重要，但早期階段排程與排錯主要依賴標準工具，重要性適中。","hiring_and_bus_factor":"3人規模承受離職衝擊極脆弱（Bus Factor極低），招募池廣度與替換成本對持續營運至關重要。","resource_efficiency":"尖峰僅1500 RPS且瓶頸在DB與外部API，伺服器資源開銷與帳單在早期對生存影響微乎其微。","b2b_ecosystem":"B2B業務極度依賴企業SSO/SAML、主流周邊SDK與彈性ORM，生態完善度大幅影響自研與整合負擔。"},"cells":[{"option_id":"go","criterion_id":"delivery_velocity","score":9,"rationale":"語法簡約且編譯極快，無複雜生命週期標註，業務邏輯修改與API交付敏捷度極高。","evidence_claim_ids":["kiss.4","cto.1"],"confidence":"high"},{"option_id":"go","criterion_id":"learning_curve","score":9,"rationale":"Python工程師概念轉換平緩，標準函式庫直覺，數週內即可產出生產級安全程式碼。","evidence_claim_ids":["kiss.1","cto.1"],"confidence":"high"},{"option_id":"go","criterion_id":"ops_observability","score":8,"rationale":"內建pprof分析成熟，Goroutine排程透明，主流APM開箱即用且排查成本低。","evidence_claim_ids":[],"confidence":"medium"},{"option_id":"go","criterion_id":"hiring_and_bus_factor","score":9,"rationale":"人才池廣大且薪資溢價適中，初階至中階開發者易補齊，降低小團隊離職替換風險。","evidence_claim_ids":["kiss.3","cto.3"],"confidence":"high"},{"option_id":"go","criterion_id":"resource_efficiency","score":7,"rationale":"記憶體開銷雖高於Rust，但單機足以支撐1500 RPS，完全滿足現有負載需求。","evidence_claim_ids":["kiss.2","cto.2"],"confidence":"high"},{"option_id":"go","criterion_id":"b2b_ecosystem","score":9,"rationale":"企業級SAML/SSO、各類第三方SaaS SDK與ORM工具鏈發展成熟完備。","evidence_claim_ids":[],"confidence":"high"},{"option_id":"rust","criterion_id":"delivery_velocity","score":4,"rationale":"嚴格型別與生命週期檢查導致前期編譯阻力大，慢編譯拖慢頻繁迭代與驗證。","evidence_claim_ids":["kiss.4"],"confidence":"high"},{"option_id":"rust","criterion_id":"learning_curve","score":3,"rationale":"所有權、生命週期與非同步Tokio概念陡峭，容易遭遇編譯器撞牆期拖延進度。","evidence_claim_ids":["kiss.1"],"confidence":"high"},{"option_id":"rust","criterion_id":"ops_observability","score":6,"rationale":"tracing生態健全但非同步除錯門檻高，Tokio任務飢餓排查對初學者具難度。","evidence_claim_ids":[],"confidence":"medium"},{"option_id":"rust","criterion_id":"hiring_and_bus_factor","score":4,"rationale":"合格系統工程師基數小且薪資溢價顯著，一旦關鍵成員離職將造成嚴重的Bus Factor危機。","evidence_claim_ids":["kiss.3","cto.3"],"confidence":"high"},{"option_id":"rust","criterion_id":"resource_efficiency","score":10,"rationale":"無GC機制提供極致記憶體控制與微秒級尾延遲，極限吞吐與硬體效率頂級。","evidence_claim_ids":["vex.1","cto.4"],"confidence":"high"},{"option_id":"rust","criterion_id":"b2b_ecosystem","score":5,"rationale":"核心 crates 紮實，但企業專屬周邊SDK覆蓋率較零散，常需自行包裝。","evidence_claim_ids":[],"confidence":"medium"}],"cell_spread":{"go|delivery_velocity":0,"go|learning_curve":0,"go|ops_observability":0.687,"go|hiring_and_bus_factor":0,"go|resource_efficiency":0.577,"go|b2b_ecosystem":0,"rust|delivery_velocity":0,"rust|learning_curve":0.5,"rust|ops_observability":0.687,"rust|hiring_and_bus_factor":0.471,"rust|resource_efficiency":0,"rust|b2b_ecosystem":0},"persona_scores":[{"speaker_id":"conservative_cto","weights":{"delivery_velocity":0.3,"learning_curve":0.25,"ops_observability":0.07,"hiring_and_bus_factor":0.2,"resource_efficiency":0.03,"b2b_ecosystem":0.15},"cells":[{"option_id":"go","criterion_id":"delivery_velocity","score":9,"reason":"語法極簡且編譯飛快，能確保前半年業務功能快速試錯與每週頻繁上線。"},{"option_id":"rust","criterion_id":"delivery_velocity","score":4,"reason":"型別系統嚴格與慢編譯拖慢迭代，初期頻繁更動業務邏輯痛苦且產能折損嚴重。"},{"option_id":"go","criterion_id":"learning_curve","score":9,"reason":"Python工程師1-2週內即可上手交付生產代碼，轉型陣痛極低。"},{"option_id":"rust","criterion_id":"learning_curve","score":2,"reason":"生命週期與借用檢查陡峭，初學者極易與編譯器搏鬥，學習成本極高。"},{"option_id":"go","criterion_id":"ops_observability","score":9,"reason":"內建pprof神器與成熟APM生態，線上排錯直觀且有完整的排程容錯。"},{"option_id":"rust","criterion_id":"ops_observability","score":7,"reason":"無GC帶來可預測延遲，但非同步stack trace與除錯排查門檻高。"},{"option_id":"go","criterion_id":"hiring_and_bus_factor","score":9,"reason":"人才池龐大且無過高溢價，3人團隊若遇離職替換成本極低，風險完全可控。"},{"option_id":"rust","criterion_id":"hiring_and_bus_factor","score":3,"reason":"市場人才極度稀缺且薪資溢價高，3人團隊一旦有人離職將面臨斷層危機。"},{"option_id":"go","criterion_id":"resource_efficiency","score":7,"reason":"1500 RPS瓶頸在DB與外部IO，Go效能已綽綽有餘，硬體成本差異微小。"},{"option_id":"rust","criterion_id":"resource_efficiency","score":10,"reason":"極致記憶體與CPU控制力無庸置疑，但在此B2B場景下屬過度工程。"},{"option_id":"go","criterion_id":"b2b_ecosystem","score":9,"reason":"企業級SAML/SSO、審計與主流SDK生態成熟健全，開箱即用省下大量TCO。"},{"option_id":"rust","criterion_id":"b2b_ecosystem","score":5,"reason":"企業級周邊庫與B2B協議整合不夠成熟，需耗費大量人月自行造輪子。"}],"final_choice":"go","one_line":"小團隊活下來靠交付速度與低替換成本，Go是性價比最高、風險最小的唯一解。"},{"speaker_id":"perf_zealot","weights":{"delivery_velocity":0.1,"learning_curve":0.05,"ops_observability":0.15,"hiring_and_bus_factor":0.05,"resource_efficiency":0.45,"b2b_ecosystem":0.2},"cells":[{"option_id":"go","criterion_id":"delivery_velocity","score":9,"reason":"語法簡約標準庫齊全，業務功能驗證與原型迭代速度極快。"},{"option_id":"rust","criterion_id":"delivery_velocity","score":4,"reason":"型別系統與編譯檢查嚴格，初期頻繁變更資料模型較為耗時。"},{"option_id":"go","criterion_id":"learning_curve","score":9,"reason":"Python背景工程師數日內即可上手交付，學習阻力極低。"},{"option_id":"rust","criterion_id":"learning_curve","score":2,"reason":"所有權與生命週期門檻極高，初學者需數月才能安全上線。"},{"option_id":"go","criterion_id":"ops_observability","score":7,"reason":"pprof工具成熟，但GC停頓與黑箱逃逸在高壓下較難排查。"},{"option_id":"rust","criterion_id":"ops_observability","score":8,"reason":"無GC干擾且編譯期排查並發問題，線上運行表現極其穩定可預測。"},{"option_id":"go","criterion_id":"hiring_and_bus_factor","score":9,"reason":"人才庫龐大且替代成本低，三人小團隊遭遇離職衝擊較小。"},{"option_id":"rust","criterion_id":"hiring_and_bus_factor","score":3,"reason":"市場人才極度稀缺且溢價顯著，小團隊離職替換風險極高。"},{"option_id":"go","criterion_id":"resource_efficiency","score":6,"reason":"運行時開銷與GC記憶體佔用高於Rust，極限吞吐受限。"},{"option_id":"rust","criterion_id":"resource_efficiency","score":10,"reason":"零成本抽象與無GC機制，帶來微秒級極限吞吐與最低開銷。"},{"option_id":"go","criterion_id":"b2b_ecosystem","score":9,"reason":"企業級SAML/SSO、審計與資料庫SDK高度成熟完整。"},{"option_id":"rust","criterion_id":"b2b_ecosystem","score":5,"reason":"部分企業級周邊與舊協議SDK較少，整合需額外自研適配。"}],"final_choice":"rust","one_line":"即便商業妥協難以避免，極致效能與零GC延遲仍是不可動搖的信仰！"},{"speaker_id":"kiss_hacker","weights":{"delivery_velocity":0.3,"learning_curve":0.25,"ops_observability":0.15,"hiring_and_bus_factor":0.15,"resource_efficiency":0.05,"b2b_ecosystem":0.1},"cells":[{"option_id":"go","criterion_id":"delivery_velocity","score":9,"reason":"語法極簡、編譯飛快，能最快驗證業務邏輯，大幅降低過度設計。"},{"option_id":"rust","criterion_id":"delivery_velocity","score":4,"reason":"型別系統與生命週期爭吵耗時，慢編譯拖垮早期頻繁改動需求。"},{"option_id":"go","criterion_id":"learning_curve","score":9,"reason":"Python工程師1-2週即可安全交付，認知負擔極低。"},{"option_id":"rust","criterion_id":"learning_curve","score":2,"reason":"所有權與借用機制陡峭，新手極易卡關甚至產生不可維護代碼。"},{"option_id":"go","criterion_id":"ops_observability","score":9,"reason":"pprof開箱即用、運行時診斷成熟，排查線上問題直觀省事。"},{"option_id":"rust","criterion_id":"ops_observability","score":7,"reason":"無GC無崩潰優勢明顯，但除錯與非同步運行時棧追蹤較繁瑣。"},{"option_id":"go","criterion_id":"hiring_and_bus_factor","score":9,"reason":"市場人才庫龐大，3人小團隊遭逢離職能迅速補位與交接。"},{"option_id":"rust","criterion_id":"hiring_and_bus_factor","score":3,"reason":"人才稀少且薪資高昂，3人團隊遇離職直接面臨滅頂之災。"},{"option_id":"go","criterion_id":"resource_efficiency","score":7,"reason":"記憶體佔用稍高於Rust，但1500 RPS瓶頸在DB，效能早已過剩。"},{"option_id":"rust","criterion_id":"resource_efficiency","score":10,"reason":"極致零成本抽象與微秒延遲，資源表現無可挑剔。"},{"option_id":"go","criterion_id":"b2b_ecosystem","score":9,"reason":"SAML/SSO、審計與雲原生庫豐富成熟，不需重造輪子。"},{"option_id":"rust","criterion_id":"b2b_ecosystem","score":5,"reason":"B2B企業周邊整合庫分散且不夠開箱即用，增加額外開發成本。"}],"final_choice":"go","one_line":"別為用不到的微秒性能自找麻煩，Go簡單實用才是小團隊活下來的唯一真理。"}]},"analysis":{"totals":{"go":8.8233,"rust":4.3433},"ranking":["go","rust"],"winner":"go","margin":4.48,"tipping_points":[{"criterion_id":"resource_efficiency","criterion_label":"資源效率與硬體成本","current_weight":0.05,"threshold":0.619,"direction":"increase","new_winner":"rust"}],"win_probability":{"go":1,"rust":0},"seed_used":42,"persona_lens":{"conservative_cto":{"winner":"go","totals":{"go":8.87,"rust":4.22},"ranking":["go","rust"]},"perf_zealot":{"winner":"go","totals":{"go":7.95,"rust":7.15},"ranking":["go","rust"]},"kiss_hacker":{"winner":"go","totals":{"go":8.75,"rust":4.45},"ranking":["go","rust"]}},"persona_own_view":{"conservative_cto":{"winner":"go","totals":{"go":8.94,"rust":3.84},"ranking":["go","rust"]},"perf_zealot":{"winner":"go","totals":{"go":7.35,"rust":7.35},"ranking":["go","rust"]},"kiss_hacker":{"winner":"go","totals":{"go":8.9,"rust":4.2},"ranking":["go","rust"]}},"max_regret":{"go":0,"rust":4.65},"minimax_regret_option":"go","disagreement_hotspots":[{"cell_key":"go|ops_observability","option_id":"go","criterion_id":"ops_observability","spread":0.687,"chair_score":8,"persona_scores":{"conservative_cto":9,"perf_zealot":7,"kiss_hacker":9}},{"cell_key":"rust|ops_observability","option_id":"rust","criterion_id":"ops_observability","spread":0.687,"chair_score":6,"persona_scores":{"conservative_cto":7,"perf_zealot":8,"kiss_hacker":7}},{"cell_key":"go|resource_efficiency","option_id":"go","criterion_id":"resource_efficiency","spread":0.577,"chair_score":7,"persona_scores":{"conservative_cto":7,"perf_zealot":6,"kiss_hacker":7}},{"cell_key":"rust|learning_curve","option_id":"rust","criterion_id":"learning_curve","spread":0.5,"chair_score":3,"persona_scores":{"conservative_cto":2,"perf_zealot":2,"kiss_hacker":2}},{"cell_key":"rust|hiring_and_bus_factor","option_id":"rust","criterion_id":"hiring_and_bus_factor","spread":0.471,"chair_score":4,"persona_scores":{"conservative_cto":3,"perf_zealot":3,"kiss_hacker":3}}]},"warnings":[],"sample_count":3,"extras":{"personas":[{"id":"conservative_cto","short_name":"陳CTO","emoji":"🛡️"},{"id":"perf_zealot","short_name":"Vex","emoji":"⚡"},{"id":"kiss_hacker","short_name":"剃刀","emoji":"🪓"}],"verdict":{"winner":"go","confidence":"high","text":"強烈推薦 Go。在 3 人新創且全熟 Python、目標一年拿下 500 家 B2B 企業客戶的存亡情境下，首要矛盾是『交付速度、商業驗證與極低替換成本』，而非『微秒級延遲』。Go 擁有平緩學習曲線（1~2 週上線）、成熟的 B2B SSO/審計生態與開箱即用的除錯工具，能在關鍵生存期為團隊保留最高認知頻寬。代價是放棄了 Rust 由編譯器帶來的極限無 GC 尾延遲控制與靜態型別防線；若未來核心演變為微秒級高頻計算或單機 5 萬 RPS 以上且資源成本權重上升至 61.9% 以上，則應改選 Rust。"},"key_tradeoffs":[{"title":"即時交付速度與學習曲線 vs 極限硬體控制力","gain":"Go 能讓 Python 團隊在 1~2 週內交付生產級代碼並敏捷重構資料模型","cost":"放棄了零 GC 停頓的微秒級尾延遲控制與極限記憶體密度","option_ids":["go","rust"]},{"title":"人才招募替換韌性 vs 編譯期絕對安全護城河","gain":"Go 具備龐大人才庫與低 Bus Factor 替換成本，對 3 人團隊抗離職風險至關重要","cost":"放棄由 Rust 編譯器杜絕空指標與資料競爭的靜態保障，需依賴規範與測試","option_ids":["go","rust"]},{"title":"開箱即用企業生態 vs 底層無抽象損耗掌控度","gain":"Go 在企業 SAML/SSO、Audit Log、主流 ORM 與雲原生 SDK 成熟完備，避免重複造輪子","cost":"缺乏 Rust 在底層計算密集型與嵌入式場景下的零成本抽象優勢","option_ids":["go","rust"]}],"blind_spots":[{"title":"可觀測性與分散式追蹤建置成本","description":"Go 內建 pprof 且 OpenTelemetry/APM 支援成熟；Rust 非同步 tracing 在跨 runtime 追蹤與 APM 整合複雜度高。","why_it_matters":"3 人團隊線上排錯若缺少成熟 APM 與 profiling 工具，工單響應與故障診斷將耗費數倍人力。","favors_option_ids":["go"],"severity":"high"},{"title":"故障模式與非同步執行時的崩潰隔離","description":"Rust Tokio 遇到阻塞式 IO 易引發線程飢餓與雪崩；Go 搶佔式排程對初學者容錯度顯著較高。","why_it_matters":"Python 工程師轉型極易誤調用阻塞操作，Go 具備更強的容錯防禦邊界。","favors_option_ids":["go"],"severity":"high"},{"title":"資料模型頻繁變更的重構摩擦力","description":"B2B SaaS 早期 Schema 每週更迭，Go 組合式結構體重構迅速，Rust 生命週期與所有權易牽一髮動全身。","why_it_matters":"探索 PMF 期間，重構阻力直接決定交付與試錯速度。","favors_option_ids":["go"],"severity":"high"}],"challenged_assumptions":[{"assumption":"團隊必須在 Go 與 Rust 二選一進行重寫，Python 已經無法勝任","challenge":"尖峰 1,500 RPS 對現代非同步 Python（FastAPI + uvloop + asyncpg）搭配適當擴展完全足夠。在尚未驗證付費意願前重寫，需警惕過早最佳化。"},{"assumption":"500 家企業客戶等於均勻的 1,500 RPS 負載","challenge":"B2B 流量高度集中在上班日特定尖峰與複雜報表運算，真實瓶頸通常在資料庫鎖與外部 API，而非 Web 框架 CPU 吞吐。"}],"unresolved_disputes":[{"title":"Go GC 與逃逸分析在高並發下是否構成 B2B SLA 致命風險","positions":{"Vex":"Go 逃逸分析與 GC 停頓在突發尖峰下會破壞企業級 SLA 尾延遲，屬隱形地雷。","陳CTO/剃刀":"1,500 RPS 瓶頸在 DB 與外部網路 IO，Go 毫秒級 GC 根本不影響業務商業結果。"},"what_would_settle_it":"在 1,500 RPS 伴隨真實 DB 延遲環境下進行壓測，檢驗 p999 尾延遲是否違反企客 SLA。"}],"next_experiments":[{"title":"典型 B2B 業務端點雙語言開發 POC","description":"由既有 Python 工程師分別用 Go (Gin/Echo) 與 Rust (Axum) 實作含 SAML 驗證、Postgres 事務與 Webhook 的端點。","effort":"2 人天","decides":"精準測量團隊上手工時、編寫阻力與初期迭代週期差距。"},{"title":"1,500 RPS 混合負載與 GC 延遲壓測","description":"模擬 500 家企業尖峰負載並掛載 50ms 延遲的 Mock DB，觀測 Go 的 GC pause 與 p99 尾延遲。","effort":"1 人天","decides":"驗證 Go GC 是否會在目標規模下構成實質性能瓶頸。"}],"risks":[{"option_id":"go","risk":"工程師缺乏靜態規範意識導致線上 nil pointer panic 或並發 map 衝突","likelihood":"中","impact":"中","mitigation":"引入嚴格的 golangci-lint、開啟 race detector 並統一 recover 中介軟體。"},{"option_id":"rust","risk":"學習曲線過陡導致業務交付嚴重延宕，錯失首年企業客戶上線窗口","likelihood":"高","impact":"高","mitigation":"初期限定使用安全子集、採用 Axum 成熟模板，避免過早引入複雜巨集與手動生命週期。"}],"highlights":[{"speaker":"剃刀","quote":"單台 4 核心 8GB 的 Go 服務能輕鬆撐起 10,000+ RPS，Rust 省下的那 5ms 與 50MB 記憶體，在資料庫 20ms 的 IO 面前毫無商業意義。"},{"speaker":"陳CTO","quote":"企客簽約看的是 SOC2、SAML/SSO、Audit Log 與 RBAC，不是你的單機微容器！"},{"speaker":"Vex","quote":"3 人團隊面對一年 500 家企業客戶，最致命的不是「P99 延遲」，而是認知頻寬破產與客製化泥淖。"}],"mvp":{"speaker_id":"conservative_cto","comment":"以精準的商業 TCO 算帳、企業 SSO/合規生態防線及直戳 3 人團隊生存痛點，奠定了本場辯論的決策基調。"}}}</script>
+<script>
+(function () {
+  "use strict";
+  var DATA = JSON.parse(document.getElementById("payload").textContent.replace(/^\/\*__DATA__\*\//, ""));
+  var M = DATA.matrix, A = DATA.analysis, X = DATA.extras || {};
+  var app = document.getElementById("app");
+
+  function h(tag, attrs) {
+    var el = document.createElement(tag);
+    if (attrs) Object.keys(attrs).forEach(function (k) {
+      if (k === "class") el.className = attrs[k];
+      else if (k === "style") el.setAttribute("style", attrs[k]);
+      else if (k.indexOf("on") === 0) el.addEventListener(k.slice(2), attrs[k]);
+      else el.setAttribute(k, attrs[k]);
+    });
+    for (var i = 2; i < arguments.length; i++) {
+      var c = arguments[i];
+      if (c == null || c === false) continue;
+      if (Array.isArray(c)) c.forEach(function (x) { if (x != null) el.appendChild(typeof x === "object" ? x : document.createTextNode(String(x))); });
+      else el.appendChild(typeof c === "object" ? c : document.createTextNode(String(c)));
+    }
+    return el;
+  }
+  var pct = function (x) { return Math.round(x * 100) + "%"; };
+  var optLabel = {}; M.options.forEach(function (o) { optLabel[o.id] = o.label || o.id; });
+  var critLabel = {}; M.criteria.forEach(function (c) { critLabel[c.id] = c.label || c.id; });
+  var personaInfo = {}; (X.personas || []).forEach(function (p) { personaInfo[p.id] = p; });
+  var pname = function (id) { var p = personaInfo[id]; return p ? (p.emoji || "") + " " + (p.short_name || p.display_name || id) : id; };
+
+  var score = {}, spread = M.cell_spread || {}, cellInfo = {};
+  M.cells.forEach(function (c) { score[c.option_id + "|" + c.criterion_id] = c.score; cellInfo[c.option_id + "|" + c.criterion_id] = c; });
+  var hotKeys = {}; (A.disagreement_hotspots || []).slice(0, 3).forEach(function (x) { hotKeys[x.cell_key] = true; });
+
+  var chairW = Object.assign({}, M.weights);
+  var W = Object.assign({}, chairW);   // live (normalized) weights
+  var activeLens = "chair";
+
+  function normalize(w) {
+    var t = 0; M.criteria.forEach(function (c) { t += Math.max(0, w[c.id] || 0); });
+    var o = {}; M.criteria.forEach(function (c) { o[c.id] = t > 0 ? Math.max(0, w[c.id] || 0) / t : 1 / M.criteria.length; });
+    return o;
+  }
+  function totals(w) {
+    var n = normalize(w), t = {};
+    M.options.forEach(function (o) {
+      var s = 0; M.criteria.forEach(function (c) { s += n[c.id] * (score[o.id + "|" + c.id] || 5); });
+      t[o.id] = s;
+    });
+    return t;
+  }
+  function winnerOf(t) {
+    return Object.keys(t).sort(function (a, b) {
+      return Math.abs(t[a] - t[b]) > 1e-9 ? t[b] - t[a] : ((A.win_probability[b] || 0) - (A.win_probability[a] || 0)) || (a < b ? -1 : 1);
+    })[0];
+  }
+
+  // ---------- header + verdict
+  var v = X.verdict || {};
+  var winner = A.winner;
+  app.appendChild(h("h1", null, "⚖️ 決策權衡矩陣"));
+  app.appendChild(h("p", { class: "sub" }, M.question));
+  app.appendChild(h("div", { class: "card verdict" },
+    h("div", { class: "muted" }, "判決"),
+    h("div", { class: "big" }, optLabel[winner] || winner,
+      v.confidence_label ? h("span", { class: "badge" }, "信心：" + v.confidence_label) : null),
+    v.one_liner ? h("p", null, v.one_liner) : null,
+    v.recommendation_text ? h("p", { class: "muted" }, v.recommendation_text) : null,
+    A.minimax_regret_option && A.minimax_regret_option !== winner
+      ? h("p", { class: "sev-medium" }, "注意：最小化最大後悔的方案是「" + (optLabel[A.minimax_regret_option] || A.minimax_regret_option) + "」，與贏家不同。")
+      : null
+  ));
+
+  // ---------- win probability
+  var bars = h("div", { class: "bars" });
+  M.options.slice().sort(function (a, b) { return (A.win_probability[b.id] || 0) - (A.win_probability[a.id] || 0); }).forEach(function (o) {
+    var p = A.win_probability[o.id] || 0;
+    bars.appendChild(h("div", null, h("span", null, o.label || o.id),
+      h("div", { class: "bar" }, h("i", { style: "width:" + (p * 100).toFixed(1) + "%" })), h("span", null, pct(p))));
+  });
+  app.appendChild(h("div", { class: "card" }, h("h2", null, "勝率（Monte Carlo，權重與分數都帶不確定性）"), bars,
+    h("div", { class: "muted" }, "隨機種子 " + A.seed_used + "；主席取樣 " + DATA.sample_count + " 次，取中位數。")));
+
+  // ---------- interactive matrix
+  var tbl = h("table");
+  var lensBox = h("div", { class: "lens" });
+  var tipBox = h("ul");
+  var resultLine = h("p", { class: "muted" });
+
+  function setWeights(w) {
+    W = normalize(w);
+    M.criteria.forEach(function (c) { sliders[c.id].value = Math.round(W[c.id] * 100); });
+    render();
+  }
+  var sliders = {};
+  M.criteria.forEach(function (c) {
+    sliders[c.id] = h("input", { type: "range", min: "0", max: "100", step: "1", "aria-label": "權重：" + (c.label || c.id),
+      oninput: function (e) { W[c.id] = Number(e.target.value) / 100; setActive("custom"); render(); } });
+  });
+
+  function setActive(name) { activeLens = name; renderLens(); }
+  function renderLens() {
+    lensBox.textContent = "";
+    var items = [["chair", "⚖️ 主席"]].concat((M.persona_scores || []).map(function (p) { return [p.speaker_id, pname(p.speaker_id)]; }));
+    items.forEach(function (it) {
+      lensBox.appendChild(h("button", { "aria-pressed": String(activeLens === it[0]), onclick: function () {
+        var w = it[0] === "chair" ? chairW : (M.persona_scores.filter(function (p) { return p.speaker_id === it[0]; })[0] || {}).weights;
+        activeLens = it[0]; setWeights(w || chairW);
+      } }, it[1]));
+    });
+    lensBox.appendChild(h("button", { class: "btn", onclick: function () { activeLens = "chair"; setWeights(chairW); } }, "重設"));
+  }
+
+  function render() {
+    var t = totals(W), win = winnerOf(t);
+    tbl.textContent = "";
+    var head = h("tr", null, h("th", null, "準則（拖曳調整權重）"));
+    M.options.forEach(function (o) { head.appendChild(h("th", { class: o.id === win ? "winner" : "" }, o.label || o.id, o.id === win ? " 👑" : "")); });
+    tbl.appendChild(head);
+    var nw = normalize(W);
+    M.criteria.forEach(function (c) {
+      var rationale = M.weight_rationale && M.weight_rationale[c.id];
+      var row = h("tr", null, h("td", { title: rationale || c.description || "" },
+        h("span", { class: "crit-name" }, c.label || c.id), h("span", { class: "crit-w" }, "權重 " + pct(nw[c.id])), sliders[c.id]));
+      M.options.forEach(function (o) {
+        var k = o.id + "|" + c.id, s = score[k], info = cellInfo[k] || {};
+        var hue = Math.round((s - 1) / 9 * 120);
+        var tip = (info.rationale || "") + (info.evidence_claim_ids && info.evidence_claim_ids.length ? "\n證據：" + info.evidence_claim_ids.join(", ") : "")
+          + "\n信心：" + (info.confidence || "-") + "\n分歧度（標準差）：" + (spread[k] != null ? spread[k] : "-");
+        row.appendChild(h("td", { class: "cell" + (hotKeys[k] ? " hot" : ""), style: "background:hsl(" + hue + " 60% 45% / .28)", title: tip }, s.toFixed(1)));
+      });
+      tbl.appendChild(row);
+    });
+    var tot = h("tr", { class: "total" }, h("td", null, "加權總分"));
+    M.options.forEach(function (o) { tot.appendChild(h("td", { class: o.id === win ? "winner" : "" }, t[o.id].toFixed(2))); });
+    tbl.appendChild(tot);
+    resultLine.textContent = "目前權重下的贏家：" + (optLabel[win] || win) + (win !== winner ? "（與主席權重的贏家「" + (optLabel[winner] || winner) + "」不同）" : "");
+  }
+
+  renderLens();
+  app.appendChild(h("div", { class: "card" }, h("h2", null, "互動矩陣"),
+    h("div", { class: "muted" }, "切換人格視角，或拖曳滑桿改權重。滑鼠停在分數上可看理由與證據；🔥 表示各方分歧最大的格子。"),
+    lensBox, h("div", { class: "scroll" }, tbl), resultLine));
+  M.criteria.forEach(function (c) { sliders[c.id].value = Math.round(W[c.id] * 100); });
+  render();
+
+  // ---------- tipping points
+  function applyTip(tp) {
+    var w = {}, k = tp.criterion_id, cur = chairW[k], other = 1 - cur;
+    // thresholds are rounded; step just past the crossing so the demo really flips the winner
+    var t = Math.min(1, Math.max(0, tp.threshold + (tp.direction === "increase" ? 0.005 : -0.005)));
+    M.criteria.forEach(function (c) { w[c.id] = c.id === k ? t : chairW[c.id] * (1 - t) / other; });
+    activeLens = "custom"; setWeights(w); renderLens();
+  }
+  if ((A.tipping_points || []).length) {
+    A.tipping_points.forEach(function (tp) {
+      tipBox.appendChild(h("li", null,
+        "若「" + (tp.criterion_label || critLabel[tp.criterion_id]) + "」權重" + (tp.direction === "increase" ? "提高" : "降低") + "到 " + pct(tp.threshold)
+        + "（目前 " + pct(tp.current_weight) + "），" + (optLabel[tp.new_winner] || tp.new_winner) + " 勝出。 ",
+        h("button", { class: "btn", onclick: function () { applyTip(tp); } }, "示範")));
+    });
+  } else tipBox.appendChild(h("li", null, "任何單一準則的權重在 0–100% 之間怎麼調，贏家都不會改變——結論相當穩健。"));
+  var persBox = h("ul");
+  Object.keys(A.persona_lens || {}).forEach(function (id) {
+    var l = A.persona_lens[id], o = (A.persona_own_view || {})[id] || {};
+    persBox.appendChild(h("li", null, pname(id) + "：用他的權重看 → " + (optLabel[l.winner] || l.winner) + "；他自己打的分數 → " + (optLabel[o.winner] || o.winner)));
+  });
+  app.appendChild(h("div", { class: "grid2" },
+    h("div", { class: "card" }, h("h2", null, "翻盤點"), tipBox),
+    h("div", { class: "card" }, h("h2", null, "各人格視角"), persBox,
+      h("div", { class: "muted" }, "最大後悔（越小越安全）：" + M.options.map(function (o) { return (o.label || o.id) + " " + (A.max_regret[o.id] != null ? A.max_regret[o.id].toFixed(2) : "-"); }).join("、")))));
+
+  // ---------- extras
+  function listCard(title, items, fn) {
+    if (!items || !items.length) return;
+    var ul = h("ul"); items.forEach(function (it) { ul.appendChild(h("li", null, fn(it))); });
+    app.appendChild(h("div", { class: "card" }, h("h2", null, title), ul));
+  }
+  listCard("關鍵權衡", X.key_tradeoffs, function (t) { return [h("strong", null, t.title), "：得到 " + (t.gain || "") + "；付出 " + (t.cost || "")]; });
+  listCard("盲點", X.blind_spots, function (b) { return [h("span", { class: "sev-" + (b.severity || "low") }, "[" + (b.severity || "") + "] "), h("strong", null, b.title), "：" + (b.description || "") + (b.why_it_matters ? "（" + b.why_it_matters + "）" : "")]; });
+  listCard("沒人挑戰的假設", X.challenged_assumptions, function (a) { return [h("strong", null, a.assumption), "：" + (a.challenge || "")]; });
+  listCard("未解爭議", X.unresolved_disputes, function (d) { return [h("strong", null, d.title), "。要解決它：" + (d.what_would_settle_it || "")]; });
+  listCard("下一步驗證實驗", X.next_experiments, function (e) { return [h("strong", null, e.title), "（" + (e.effort || "?") + "）" + (e.description || "") + (e.decides ? " → 可決定：" + e.decides : "")]; });
+  listCard("風險登記", X.risks, function (r) { return [h("strong", null, optLabel[r.option_id] || r.option_id), "：" + (r.risk || "") + "（可能性 " + (r.likelihood || "?") + " / 衝擊 " + (r.impact || "?") + "）；緩解：" + (r.mitigation || "")]; });
+  listCard("翻盤條件", v.conditions_to_flip, function (c) { return c; });
+  listCard("高光時刻", X.highlights, function (x) { return [h("strong", null, x.title + "（" + pname(x.speaker_id) + "）"), h("div", { class: "quote" }, x.quote), x.why]; });
+  if (X.mvp) app.appendChild(h("div", { class: "card" }, h("h2", null, "🏆 MVP"), h("p", null, pname(X.mvp.speaker_id) + "：" + (X.mvp.comment || ""))));
+  if (X.audit) app.appendChild(h("div", { class: "card" }, h("h2", null, "稽核"), h("p", null, X.audit)));
+  if ((DATA.warnings || []).length) listCard("資料警告", DATA.warnings, function (w) { return w; });
+})();
+</script>
+</body>
+</html>

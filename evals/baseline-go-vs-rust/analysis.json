@@ -1,0 +1,628 @@
+{
+  "matrix": {
+    "question": "3 人新創做 B2B SaaS 後端，一年內預計 500 家企業客戶，團隊熟 Python，該選 Go 還是 Rust？",
+    "options": [
+      {
+        "id": "go",
+        "label": "Go",
+        "description": "Google 開發的靜態強型別語言，以極簡語法、內建 Goroutine 並發與快速編譯著稱，雲原生與 Web 生態成熟。"
+      },
+      {
+        "id": "rust",
+        "label": "Rust",
+        "description": "Mozilla 發起的系統級語言，以所有權借用檢查實現無 GC 記憶體安全、零成本抽象與極致尾延遲控制。"
+      }
+    ],
+    "criteria": [
+      {
+        "id": "delivery_velocity",
+        "label": "交付與迭代速度",
+        "description": "前半年業務功能快速驗證、頻繁修改業務邏輯的開發效率（越高越好）"
+      },
+      {
+        "id": "learning_curve",
+        "label": "學習與上手曲線",
+        "description": "Python 工程師轉型並達到可安全上生產環境水準的難易度（越高越好）"
+      },
+      {
+        "id": "ops_observability",
+        "label": "維運排錯與可觀測性",
+        "description": "線上問題定位、pprof、APM 與排程崩潰隔離容錯（越高越好）"
+      },
+      {
+        "id": "hiring_and_bus_factor",
+        "label": "招募池與替換風險",
+        "description": "擴編招募候選人基數、薪資溢價與人員離職替換承受力（越高越好）"
+      },
+      {
+        "id": "resource_efficiency",
+        "label": "資源效率與硬體成本",
+        "description": "伺服器記憶體佔用、帳單成本與極限吞吐（越高越好）"
+      },
+      {
+        "id": "b2b_ecosystem",
+        "label": "企業生態與工具鏈成熟度",
+        "description": "SSO/SAML、ORM、企業周邊 SDK 與資料模型演進彈性（越高越好）"
+      }
+    ],
+    "weights": {
+      "delivery_velocity": 0.3333,
+      "learning_curve": 0.25,
+      "ops_observability": 0.0767,
+      "hiring_and_bus_factor": 0.15,
+      "resource_efficiency": 0.05,
+      "b2b_ecosystem": 0.14
+    },
+    "weight_rationale": {
+      "delivery_velocity": "3人新創團隊首要目標為生存與交付期限，前半年需頻繁驗證B2B業務邏輯，迭代速度為最核心指標。",
+      "learning_curve": "現有團隊背景為Python，需在極短時間內切換語言並交付安全生產代碼，學習門檻直接決定專案存亡。",
+      "ops_observability": "線上問題排查與APM重要，但早期階段排程與排錯主要依賴標準工具，重要性適中。",
+      "hiring_and_bus_factor": "3人規模承受離職衝擊極脆弱（Bus Factor極低），招募池廣度與替換成本對持續營運至關重要。",
+      "resource_efficiency": "尖峰僅1500 RPS且瓶頸在DB與外部API，伺服器資源開銷與帳單在早期對生存影響微乎其微。",
+      "b2b_ecosystem": "B2B業務極度依賴企業SSO/SAML、主流周邊SDK與彈性ORM，生態完善度大幅影響自研與整合負擔。"
+    },
+    "cells": [
+      {
+        "option_id": "go",
+        "criterion_id": "delivery_velocity",
+        "score": 9,
+        "rationale": "語法簡約且編譯極快，無複雜生命週期標註，業務邏輯修改與API交付敏捷度極高。",
+        "evidence_claim_ids": [
+          "kiss.4",
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "go",
+        "criterion_id": "learning_curve",
+        "score": 9,
+        "rationale": "Python工程師概念轉換平緩，標準函式庫直覺，數週內即可產出生產級安全程式碼。",
+        "evidence_claim_ids": [
+          "kiss.1",
+          "cto.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "go",
+        "criterion_id": "ops_observability",
+        "score": 8,
+        "rationale": "內建pprof分析成熟，Goroutine排程透明，主流APM開箱即用且排查成本低。",
+        "evidence_claim_ids": [],
+        "confidence": "medium"
+      },
+      {
+        "option_id": "go",
+        "criterion_id": "hiring_and_bus_factor",
+        "score": 9,
+        "rationale": "人才池廣大且薪資溢價適中，初階至中階開發者易補齊，降低小團隊離職替換風險。",
+        "evidence_claim_ids": [
+          "kiss.3",
+          "cto.3"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "go",
+        "criterion_id": "resource_efficiency",
+        "score": 7,
+        "rationale": "記憶體開銷雖高於Rust，但單機足以支撐1500 RPS，完全滿足現有負載需求。",
+        "evidence_claim_ids": [
+          "kiss.2",
+          "cto.2"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "go",
+        "criterion_id": "b2b_ecosystem",
+        "score": 9,
+        "rationale": "企業級SAML/SSO、各類第三方SaaS SDK與ORM工具鏈發展成熟完備。",
+        "evidence_claim_ids": [],
+        "confidence": "high"
+      },
+      {
+        "option_id": "rust",
+        "criterion_id": "delivery_velocity",
+        "score": 4,
+        "rationale": "嚴格型別與生命週期檢查導致前期編譯阻力大，慢編譯拖慢頻繁迭代與驗證。",
+        "evidence_claim_ids": [
+          "kiss.4"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "rust",
+        "criterion_id": "learning_curve",
+        "score": 3,
+        "rationale": "所有權、生命週期與非同步Tokio概念陡峭，容易遭遇編譯器撞牆期拖延進度。",
+        "evidence_claim_ids": [
+          "kiss.1"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "rust",
+        "criterion_id": "ops_observability",
+        "score": 6,
+        "rationale": "tracing生態健全但非同步除錯門檻高，Tokio任務飢餓排查對初學者具難度。",
+        "evidence_claim_ids": [],
+        "confidence": "medium"
+      },
+      {
+        "option_id": "rust",
+        "criterion_id": "hiring_and_bus_factor",
+        "score": 4,
+        "rationale": "合格系統工程師基數小且薪資溢價顯著，一旦關鍵成員離職將造成嚴重的Bus Factor危機。",
+        "evidence_claim_ids": [
+          "kiss.3",
+          "cto.3"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "rust",
+        "criterion_id": "resource_efficiency",
+        "score": 10,
+        "rationale": "無GC機制提供極致記憶體控制與微秒級尾延遲，極限吞吐與硬體效率頂級。",
+        "evidence_claim_ids": [
+          "vex.1",
+          "cto.4"
+        ],
+        "confidence": "high"
+      },
+      {
+        "option_id": "rust",
+        "criterion_id": "b2b_ecosystem",
+        "score": 5,
+        "rationale": "核心 crates 紮實，但企業專屬周邊SDK覆蓋率較零散，常需自行包裝。",
+        "evidence_claim_ids": [],
+        "confidence": "medium"
+      }
+    ],
+    "cell_spread": {
+      "go|delivery_velocity": 0,
+      "go|learning_curve": 0,
+      "go|ops_observability": 0.687,
+      "go|hiring_and_bus_factor": 0,
+      "go|resource_efficiency": 0.577,
+      "go|b2b_ecosystem": 0,
+      "rust|delivery_velocity": 0,
+      "rust|learning_curve": 0.5,
+      "rust|ops_observability": 0.687,
+      "rust|hiring_and_bus_factor": 0.471,
+      "rust|resource_efficiency": 0,
+      "rust|b2b_ecosystem": 0
+    },
+    "persona_scores": [
+      {
+        "speaker_id": "conservative_cto",
+        "weights": {
+          "delivery_velocity": 0.3,
+          "learning_curve": 0.25,
+          "ops_observability": 0.07,
+          "hiring_and_bus_factor": 0.2,
+          "resource_efficiency": 0.03,
+          "b2b_ecosystem": 0.15
+        },
+        "cells": [
+          {
+            "option_id": "go",
+            "criterion_id": "delivery_velocity",
+            "score": 9,
+            "reason": "語法極簡且編譯飛快，能確保前半年業務功能快速試錯與每週頻繁上線。"
+          },
+          {
+            "option_id": "rust",
+            "criterion_id": "delivery_velocity",
+            "score": 4,
+            "reason": "型別系統嚴格與慢編譯拖慢迭代，初期頻繁更動業務邏輯痛苦且產能折損嚴重。"
+          },
+          {
+            "option_id": "go",
+            "criterion_id": "learning_curve",
+            "score": 9,
+            "reason": "Python工程師1-2週內即可上手交付生產代碼，轉型陣痛極低。"
+          },
+          {
+            "option_id": "rust",
+            "criterion_id": "learning_curve",
+            "score": 2,
+            "reason": "生命週期與借用檢查陡峭，初學者極易與編譯器搏鬥，學習成本極高。"
+          },
+          {
+            "option_id": "go",
+            "criterion_id": "ops_observability",
+            "score": 9,
+            "reason": "內建pprof神器與成熟APM生態，線上排錯直觀且有完整的排程容錯。"
+          },
+          {
+            "option_id": "rust",
+            "criterion_id": "ops_observability",
+            "score": 7,
+            "reason": "無GC帶來可預測延遲，但非同步stack trace與除錯排查門檻高。"
+          },
+          {
+            "option_id": "go",
+            "criterion_id": "hiring_and_bus_factor",
+            "score": 9,
+            "reason": "人才池龐大且無過高溢價，3人團隊若遇離職替換成本極低，風險完全可控。"
+          },
+          {
+            "option_id": "rust",
+            "criterion_id": "hiring_and_bus_factor",
+            "score": 3,
+            "reason": "市場人才極度稀缺且薪資溢價高，3人團隊一旦有人離職將面臨斷層危機。"
+          },
+          {
+            "option_id": "go",
+            "criterion_id": "resource_efficiency",
+            "score": 7,
+            "reason": "1500 RPS瓶頸在DB與外部IO，Go效能已綽綽有餘，硬體成本差異微小。"
+          },
+          {
+            "option_id": "rust",
+            "criterion_id": "resource_efficiency",
+            "score": 10,
+            "reason": "極致記憶體與CPU控制力無庸置疑，但在此B2B場景下屬過度工程。"
+          },
+          {
+            "option_id": "go",
+            "criterion_id": "b2b_ecosystem",
+            "score": 9,
+            "reason": "企業級SAML/SSO、審計與主流SDK生態成熟健全，開箱即用省下大量TCO。"
+          },
+          {
+            "option_id": "rust",
+            "criterion_id": "b2b_ecosystem",
+            "score": 5,
+            "reason": "企業級周邊庫與B2B協議整合不夠成熟，需耗費大量人月自行造輪子。"
+          }
+        ],
+        "final_choice": "go",
+        "one_line": "小團隊活下來靠交付速度與低替換成本，Go是性價比最高、風險最小的唯一解。"
+      },
+      {
+        "speaker_id": "perf_zealot",
+        "weights": {
+          "delivery_velocity": 0.1,
+          "learning_curve": 0.05,
+          "ops_observability": 0.15,
+          "hiring_and_bus_factor": 0.05,
+          "resource_efficiency": 0.45,
+          "b2b_ecosystem": 0.2
+        },
+        "cells": [
+          {
+            "option_id": "go",
+            "criterion_id": "delivery_velocity",
+            "score": 9,
+            "reason": "語法簡約標準庫齊全，業務功能驗證與原型迭代速度極快。"
+          },
+          {
+            "option_id": "rust",
+            "criterion_id": "delivery_velocity",
+            "score": 4,
+            "reason": "型別系統與編譯檢查嚴格，初期頻繁變更資料模型較為耗時。"
+          },
+          {
+            "option_id": "go",
+            "criterion_id": "learning_curve",
+            "score": 9,
+            "reason": "Python背景工程師數日內即可上手交付，學習阻力極低。"
+          },
+          {
+            "option_id": "rust",
+            "criterion_id": "learning_curve",
+            "score": 2,
+            "reason": "所有權與生命週期門檻極高，初學者需數月才能安全上線。"
+          },
+          {
+            "option_id": "go",
+            "criterion_id": "ops_observability",
+            "score": 7,
+            "reason": "pprof工具成熟，但GC停頓與黑箱逃逸在高壓下較難排查。"
+          },
+          {
+            "option_id": "rust",
+            "criterion_id": "ops_observability",
+            "score": 8,
+            "reason": "無GC干擾且編譯期排查並發問題，線上運行表現極其穩定可預測。"
+          },
+          {
+            "option_id": "go",
+            "criterion_id": "hiring_and_bus_factor",
+            "score": 9,
+            "reason": "人才庫龐大且替代成本低，三人小團隊遭遇離職衝擊較小。"
+          },
+          {
+            "option_id": "rust",
+            "criterion_id": "hiring_and_bus_factor",
+            "score": 3,
+            "reason": "市場人才極度稀缺且溢價顯著，小團隊離職替換風險極高。"
+          },
+          {
+            "option_id": "go",
+            "criterion_id": "resource_efficiency",
+            "score": 6,
+            "reason": "運行時開銷與GC記憶體佔用高於Rust，極限吞吐受限。"
+          },
+          {
+            "option_id": "rust",
+            "criterion_id": "resource_efficiency",
+            "score": 10,
+            "reason": "零成本抽象與無GC機制，帶來微秒級極限吞吐與最低開銷。"
+          },
+          {
+            "option_id": "go",
+            "criterion_id": "b2b_ecosystem",
+            "score": 9,
+            "reason": "企業級SAML/SSO、審計與資料庫SDK高度成熟完整。"
+          },
+          {
+            "option_id": "rust",
+            "criterion_id": "b2b_ecosystem",
+            "score": 5,
+            "reason": "部分企業級周邊與舊協議SDK較少，整合需額外自研適配。"
+          }
+        ],
+        "final_choice": "rust",
+        "one_line": "即便商業妥協難以避免，極致效能與零GC延遲仍是不可動搖的信仰！"
+      },
+      {
+        "speaker_id": "kiss_hacker",
+        "weights": {
+          "delivery_velocity": 0.3,
+          "learning_curve": 0.25,
+          "ops_observability": 0.15,
+          "hiring_and_bus_factor": 0.15,
+          "resource_efficiency": 0.05,
+          "b2b_ecosystem": 0.1
+        },
+        "cells": [
+          {
+            "option_id": "go",
+            "criterion_id": "delivery_velocity",
+            "score": 9,
+            "reason": "語法極簡、編譯飛快，能最快驗證業務邏輯，大幅降低過度設計。"
+          },
+          {
+            "option_id": "rust",
+            "criterion_id": "delivery_velocity",
+            "score": 4,
+            "reason": "型別系統與生命週期爭吵耗時，慢編譯拖垮早期頻繁改動需求。"
+          },
+          {
+            "option_id": "go",
+            "criterion_id": "learning_curve",
+            "score": 9,
+            "reason": "Python工程師1-2週即可安全交付，認知負擔極低。"
+          },
+          {
+            "option_id": "rust",
+            "criterion_id": "learning_curve",
+            "score": 2,
+            "reason": "所有權與借用機制陡峭，新手極易卡關甚至產生不可維護代碼。"
+          },
+          {
+            "option_id": "go",
+            "criterion_id": "ops_observability",
+            "score": 9,
+            "reason": "pprof開箱即用、運行時診斷成熟，排查線上問題直觀省事。"
+          },
+          {
+            "option_id": "rust",
+            "criterion_id": "ops_observability",
+            "score": 7,
+            "reason": "無GC無崩潰優勢明顯，但除錯與非同步運行時棧追蹤較繁瑣。"
+          },
+          {
+            "option_id": "go",
+            "criterion_id": "hiring_and_bus_factor",
+            "score": 9,
+            "reason": "市場人才庫龐大，3人小團隊遭逢離職能迅速補位與交接。"
+          },
+          {
+            "option_id": "rust",
+            "criterion_id": "hiring_and_bus_factor",
+            "score": 3,
+            "reason": "人才稀少且薪資高昂，3人團隊遇離職直接面臨滅頂之災。"
+          },
+          {
+            "option_id": "go",
+            "criterion_id": "resource_efficiency",
+            "score": 7,
+            "reason": "記憶體佔用稍高於Rust，但1500 RPS瓶頸在DB，效能早已過剩。"
+          },
+          {
+            "option_id": "rust",
+            "criterion_id": "resource_efficiency",
+            "score": 10,
+            "reason": "極致零成本抽象與微秒延遲，資源表現無可挑剔。"
+          },
+          {
+            "option_id": "go",
+            "criterion_id": "b2b_ecosystem",
+            "score": 9,
+            "reason": "SAML/SSO、審計與雲原生庫豐富成熟，不需重造輪子。"
+          },
+          {
+            "option_id": "rust",
+            "criterion_id": "b2b_ecosystem",
+            "score": 5,
+            "reason": "B2B企業周邊整合庫分散且不夠開箱即用，增加額外開發成本。"
+          }
+        ],
+        "final_choice": "go",
+        "one_line": "別為用不到的微秒性能自找麻煩，Go簡單實用才是小團隊活下來的唯一真理。"
+      }
+    ]
+  },
+  "analysis": {
+    "totals": {
+      "go": 8.8233,
+      "rust": 4.3433
+    },
+    "ranking": [
+      "go",
+      "rust"
+    ],
+    "winner": "go",
+    "margin": 4.48,
+    "tipping_points": [
+      {
+        "criterion_id": "resource_efficiency",
+        "criterion_label": "資源效率與硬體成本",
+        "current_weight": 0.05,
+        "threshold": 0.619,
+        "direction": "increase",
+        "new_winner": "rust"
+      }
+    ],
+    "win_probability": {
+      "go": 1,
+      "rust": 0
+    },
+    "seed_used": 42,
+    "persona_lens": {
+      "conservative_cto": {
+        "winner": "go",
+        "totals": {
+          "go": 8.87,
+          "rust": 4.22
+        },
+        "ranking": [
+          "go",
+          "rust"
+        ]
+      },
+      "perf_zealot": {
+        "winner": "go",
+        "totals": {
+          "go": 7.95,
+          "rust": 7.15
+        },
+        "ranking": [
+          "go",
+          "rust"
+        ]
+      },
+      "kiss_hacker": {
+        "winner": "go",
+        "totals": {
+          "go": 8.75,
+          "rust": 4.45
+        },
+        "ranking": [
+          "go",
+          "rust"
+        ]
+      }
+    },
+    "persona_own_view": {
+      "conservative_cto": {
+        "winner": "go",
+        "totals": {
+          "go": 8.94,
+          "rust": 3.84
+        },
+        "ranking": [
+          "go",
+          "rust"
+        ]
+      },
+      "perf_zealot": {
+        "winner": "go",
+        "totals": {
+          "go": 7.35,
+          "rust": 7.35
+        },
+        "ranking": [
+          "go",
+          "rust"
+        ]
+      },
+      "kiss_hacker": {
+        "winner": "go",
+        "totals": {
+          "go": 8.9,
+          "rust": 4.2
+        },
+        "ranking": [
+          "go",
+          "rust"
+        ]
+      }
+    },
+    "max_regret": {
+      "go": 0,
+      "rust": 4.65
+    },
+    "minimax_regret_option": "go",
+    "disagreement_hotspots": [
+      {
+        "cell_key": "go|ops_observability",
+        "option_id": "go",
+        "criterion_id": "ops_observability",
+        "spread": 0.687,
+        "chair_score": 8,
+        "persona_scores": {
+          "conservative_cto": 9,
+          "perf_zealot": 7,
+          "kiss_hacker": 9
+        }
+      },
+      {
+        "cell_key": "rust|ops_observability",
+        "option_id": "rust",
+        "criterion_id": "ops_observability",
+        "spread": 0.687,
+        "chair_score": 6,
+        "persona_scores": {
+          "conservative_cto": 7,
+          "perf_zealot": 8,
+          "kiss_hacker": 7
+        }
+      },
+      {
+        "cell_key": "go|resource_efficiency",
+        "option_id": "go",
+        "criterion_id": "resource_efficiency",
+        "spread": 0.577,
+        "chair_score": 7,
+        "persona_scores": {
+          "conservative_cto": 7,
+          "perf_zealot": 6,
+          "kiss_hacker": 7
+        }
+      },
+      {
+        "cell_key": "rust|learning_curve",
+        "option_id": "rust",
+        "criterion_id": "learning_curve",
+        "spread": 0.5,
+        "chair_score": 3,
+        "persona_scores": {
+          "conservative_cto": 2,
+          "perf_zealot": 2,
+          "kiss_hacker": 2
+        }
+      },
+      {
+        "cell_key": "rust|hiring_and_bus_factor",
+        "option_id": "rust",
+        "criterion_id": "hiring_and_bus_factor",
+        "spread": 0.471,
+        "chair_score": 4,
+        "persona_scores": {
+          "conservative_cto": 3,
+          "perf_zealot": 3,
+          "kiss_hacker": 3
+        }
+      }
+    ]
+  },
+  "warnings": [],
+  "sample_count": 3
+}

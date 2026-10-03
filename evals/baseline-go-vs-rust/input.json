@@ -1,0 +1,328 @@
+{
+  "question": "3 人新創做 B2B SaaS 後端，一年內預計 500 家企業客戶，團隊熟 Python，該選 Go 還是 Rust？",
+  "options": [
+    {
+      "id": "go",
+      "label": "Go",
+      "description": "Google 開發的靜態強型別語言，以極簡語法、內建 Goroutine 並發與快速編譯著稱，雲原生與 Web 生態成熟。"
+    },
+    {
+      "id": "rust",
+      "label": "Rust",
+      "description": "Mozilla 發起的系統級語言，以所有權借用檢查實現無 GC 記憶體安全、零成本抽象與極致尾延遲控制。"
+    }
+  ],
+  "criteria": [
+    {"id": "delivery_velocity", "label": "交付與迭代速度", "description": "前半年業務功能快速驗證、頻繁修改業務邏輯的開發效率（越高越好）"},
+    {"id": "learning_curve", "label": "學習與上手曲線", "description": "Python 工程師轉型並達到可安全上生產環境水準的難易度（越高越好）"},
+    {"id": "ops_observability", "label": "維運排錯與可觀測性", "description": "線上問題定位、pprof、APM 與排程崩潰隔離容錯（越高越好）"},
+    {"id": "hiring_and_bus_factor", "label": "招募池與替換風險", "description": "擴編招募候選人基數、薪資溢價與人員離職替換承受力（越高越好）"},
+    {"id": "resource_efficiency", "label": "資源效率與硬體成本", "description": "伺服器記憶體佔用、帳單成本與極限吞吐（越高越好）"},
+    {"id": "b2b_ecosystem", "label": "企業生態與工具鏈成熟度", "description": "SSO/SAML、ORM、企業周邊 SDK 與資料模型演進彈性（越高越好）"}
+  ],
+  "chairSamples": [
+    {
+      "weights": {
+        "delivery_velocity": 0.3,
+        "learning_curve": 0.25,
+        "hiring_and_bus_factor": 0.15,
+        "b2b_ecosystem": 0.15,
+        "ops_observability": 0.1,
+        "resource_efficiency": 0.05
+      },
+      "weight_rationale": {
+        "delivery_velocity": "3人新創團隊首要目標為生存與交付期限，前半年需頻繁驗證B2B業務邏輯，迭代速度為最核心指標。",
+        "learning_curve": "現有團隊背景為Python，需在極短時間內切換語言並交付安全生產代碼，學習門檻直接決定專案存亡。",
+        "hiring_and_bus_factor": "3人規模承受離職衝擊極脆弱（Bus Factor極低），招募池廣度與替換成本對持續營運至關重要。",
+        "b2b_ecosystem": "B2B業務極度依賴企業SSO/SAML、主流周邊SDK與彈性ORM，生態完善度大幅影響自研與整合負擔。",
+        "ops_observability": "線上問題排查與APM重要，但早期階段排程與排錯主要依賴標準工具，重要性適中。",
+        "resource_efficiency": "尖峰僅1500 RPS且瓶頸在DB與外部API，伺服器資源開銷與帳單在早期對生存影響微乎其微。"
+      },
+      "cells": [
+        {"option_id":"go","criterion_id":"delivery_velocity","score":9,"rationale":"語法簡約且編譯極快，無複雜生命週期標註，業務邏輯修改與API交付敏捷度極高。","evidence_claim_ids":["kiss.4","cto.1"],"confidence":"high"},
+        {"option_id":"rust","criterion_id":"delivery_velocity","score":4,"rationale":"嚴格型別與生命週期檢查導致前期編譯阻力大，慢編譯拖慢頻繁迭代與驗證。","evidence_claim_ids":["kiss.4"],"confidence":"high"},
+        {"option_id":"go","criterion_id":"learning_curve","score":9,"rationale":"Python工程師概念轉換平緩，標準函式庫直覺，數週內即可產出生產級安全程式碼。","evidence_claim_ids":["kiss.1","cto.1"],"confidence":"high"},
+        {"option_id":"rust","criterion_id":"learning_curve","score":3,"rationale":"所有權、生命週期與非同步Tokio概念陡峭，容易遭遇編譯器撞牆期拖延進度。","evidence_claim_ids":["kiss.1"],"confidence":"high"},
+        {"option_id":"go","criterion_id":"ops_observability","score":8,"rationale":"內建pprof分析成熟，Goroutine排程透明，主流APM開箱即用且排查成本低。","evidence_claim_ids":[],"confidence":"medium"},
+        {"option_id":"rust","criterion_id":"ops_observability","score":6,"rationale":"tracing生態健全但非同步除錯門檻高，Tokio任務飢餓排查對初學者具難度。","evidence_claim_ids":[],"confidence":"medium"},
+        {"option_id":"go","criterion_id":"hiring_and_bus_factor","score":9,"rationale":"人才池廣大且薪資溢價適中，初階至中階開發者易補齊，降低小團隊離職替換風險。","evidence_claim_ids":["kiss.3","cto.3"],"confidence":"high"},
+        {"option_id":"rust","criterion_id":"hiring_and_bus_factor","score":3,"rationale":"人才市場極度供不應求且薪資溢價高，3人小團隊一旦成員離職替換衝擊致命。","evidence_claim_ids":["kiss.3","cto.3"],"confidence":"high"},
+        {"option_id":"go","criterion_id":"resource_efficiency","score":7,"rationale":"記憶體開銷雖高於Rust，但單機足以支撐1500 RPS，完全滿足現有負載需求。","evidence_claim_ids":["kiss.2","cto.2"],"confidence":"high"},
+        {"option_id":"rust","criterion_id":"resource_efficiency","score":10,"rationale":"無GC機制提供極致記憶體控制與微秒級尾延遲，極限吞吐與硬體效率頂級。","evidence_claim_ids":["vex.1","cto.4"],"confidence":"high"},
+        {"option_id":"go","criterion_id":"b2b_ecosystem","score":9,"rationale":"企業級SAML/SSO、各類第三方SaaS SDK與ORM工具鏈發展成熟完備。","evidence_claim_ids":[],"confidence":"high"},
+        {"option_id":"rust","criterion_id":"b2b_ecosystem","score":5,"rationale":"核心 crates 紮實，但企業專屬周邊SDK覆蓋率較零散，常需自行包裝。","evidence_claim_ids":[],"confidence":"medium"}
+      ]
+    },
+    {
+      "weights": {
+        "delivery_velocity": 0.35,
+        "learning_curve": 0.25,
+        "hiring_and_bus_factor": 0.15,
+        "b2b_ecosystem": 0.12,
+        "ops_observability": 0.08,
+        "resource_efficiency": 0.05
+      },
+      "weight_rationale": {
+        "delivery_velocity": "3人新創團隊處於生死存亡階段，一年內須對齊交付期限驗證商業價值，快速反覆運算與交付是最高優先權。",
+        "learning_curve": "全體為Python背景且團隊規模極小，若轉型期過長或無法安全交付上線，將直接威脅公司存續。",
+        "hiring_and_bus_factor": "極小團隊任何成員離職皆可能帶來致命斷層，人才池廣度與替換難易度至關重要。",
+        "b2b_ecosystem": "B2B企業客戶需要大量標準SAML/SSO、審計與周邊SDK整合，直接影響產品能否敲開企客大門。",
+        "ops_observability": "線上排錯與可觀測性影響穩定度，但初期流量規模下標準監控即可覆蓋多數場景。",
+        "resource_efficiency": "尖峰1500 RPS瓶頸在DB與外部API，硬體與記憶體開銷對初期SaaS總體成本影響極低。"
+      },
+      "cells": [
+        {"option_id":"go","criterion_id":"delivery_velocity","score":9,"rationale":"語法簡約且編譯迅速，能快速修改業務邏輯並交付功能，高度契合SaaS早期頻繁迭代需求。","evidence_claim_ids":["kiss.4","cto.1"],"confidence":"high"},
+        {"option_id":"rust","criterion_id":"delivery_velocity","score":4,"rationale":"嚴格的所有權與借用檢查使初期領域模型調整摩擦力大，加上編譯耗時較長，拉低功能試錯節奏。","evidence_claim_ids":["kiss.4"],"confidence":"high"},
+        {"option_id":"go","criterion_id":"learning_curve","score":9,"rationale":"Python工程師概念轉換平滑，一至兩週內即可達到可安全交付生產環境程式碼的水準。","evidence_claim_ids":["kiss.1","cto.1"],"confidence":"high"},
+        {"option_id":"rust","criterion_id":"learning_curve","score":3,"rationale":"生命週期、借用檢查與非同步執行時概念陡峭，容易引發初期開發挫折與生產交付延宕。","evidence_claim_ids":["kiss.1"],"confidence":"high"},
+        {"option_id":"go","criterion_id":"ops_observability","score":8,"rationale":"標準工具鏈pprof完備，goroutine排程具備搶佔機制，APM及線上分析排錯生態相當成熟。","evidence_claim_ids":[],"confidence":"high"},
+        {"option_id":"rust","criterion_id":"ops_observability","score":6,"rationale":"Tokio底層tracing工具完善，但非同步長任務可能導致執行緒飢餓，缺乏原生內省排錯難度高。","evidence_claim_ids":["vex.4"],"confidence":"medium"},
+        {"option_id":"go","criterion_id":"hiring_and_bus_factor","score":9,"rationale":"後端市場人才供給充沛且薪資溢價可控，3人小團隊遭遇流動時能迅速遞補接手。","evidence_claim_ids":["kiss.3","cto.3"],"confidence":"high"},
+        {"option_id":"rust","criterion_id":"hiring_and_bus_factor","score":4,"rationale":"合格系統工程師基數小且薪資溢價顯著，一旦關鍵成員離職將造成嚴重的Bus Factor危機。","evidence_claim_ids":["kiss.3","cto.3"],"confidence":"high"},
+        {"option_id":"go","criterion_id":"resource_efficiency","score":8,"rationale":"並發處理能力足以輕鬆應對1500 RPS，記憶體開銷雖非極限但在雲端成本中佔比極微。","evidence_claim_ids":["kiss.2","cto.2"],"confidence":"high"},
+        {"option_id":"rust","criterion_id":"resource_efficiency","score":10,"rationale":"無GC機制帶來極致CPU與記憶體使用效率，尾延遲極低，在極限吞吐下硬體效率處於頂峰。","evidence_claim_ids":["vex.1"],"confidence":"high"},
+        {"option_id":"go","criterion_id":"b2b_ecosystem","score":9,"rationale":"雲原生與企業中介軟體標準語言，SAML/SSO及第三方API SDK資源極為豐富完備。","evidence_claim_ids":["cto.5"],"confidence":"high"},
+        {"option_id":"rust","criterion_id":"b2b_ecosystem","score":5,"rationale":"常見Web框架與資料庫連線健全，但企業級特異化認證協定與周邊SDK往往需自建封裝。","evidence_claim_ids":["cto.5"],"confidence":"medium"}
+      ]
+    },
+    {
+      "weights": {
+        "delivery_velocity": 0.35,
+        "learning_curve": 0.25,
+        "hiring_and_bus_factor": 0.15,
+        "b2b_ecosystem": 0.15,
+        "ops_observability": 0.05,
+        "resource_efficiency": 0.05
+      },
+      "weight_rationale": {
+        "delivery_velocity": "3人新創團隊處於生存與驗證期，交付速度與業務邏輯頻繁調整直接決定公司生死，為最高權重。",
+        "learning_curve": "全員熟Python，轉型至能安全交付生產環境程式碼的難易度與時間消耗是核心瓶頸，權重極高。",
+        "hiring_and_bus_factor": "3人極小團隊的Bus Factor極低，若遇人員流動需能快速在市場招募替補，具中高重要性。",
+        "b2b_ecosystem": "B2B SaaS需對接企業SSO、審計日誌及繁複第三方SDK，工具鏈成熟度直接影響交付時程，具中高重要性。",
+        "ops_observability": "線上排錯與維運雖然重要，但在初期規模下成熟度要求適中，且兩者皆有一定基礎工具支援。",
+        "resource_efficiency": "尖峰1500 RPS瓶頸在DB與外部API，初期伺服器帳單在成本佔比極低，非生存瓶頸，權重最低。"
+      },
+      "cells": [
+        {"option_id":"go","criterion_id":"delivery_velocity","score":9,"rationale":"語法簡約且快速編譯，熱重載與業務邏輯迭代敏捷，極利於初期頻繁調整需求。","evidence_claim_ids":["kiss.4","cto.1"],"confidence":"high"},
+        {"option_id":"rust","criterion_id":"delivery_velocity","score":4,"rationale":"型別約束嚴格、編譯耗時長，初期資料模型變更頻繁時需大量重構所有權與生命週期。","evidence_claim_ids":["kiss.4"],"confidence":"high"},
+        {"option_id":"go","criterion_id":"learning_curve","score":9,"rationale":"Python工程師約1-2週即可上手並產出符合生產水準之標準化程式碼。","evidence_claim_ids":["kiss.1","cto.1"],"confidence":"high"},
+        {"option_id":"rust","criterion_id":"learning_curve","score":3,"rationale":"所有權、生命週期與Tokio非同步心智負擔極重，新手易卡在編譯器檢查。","evidence_claim_ids":["kiss.1","cto.1"],"confidence":"high"},
+        {"option_id":"go","criterion_id":"ops_observability","score":8,"rationale":"內建pprof分析利器，Goroutine排程具良好搶佔機制，主流APM開箱即用。","evidence_claim_ids":[],"confidence":"medium"},
+        {"option_id":"rust","criterion_id":"ops_observability","score":7,"rationale":"tracing生態日益完善，但Tokio任務排程飢餓排查與非同步堆疊追蹤門檻較高。","evidence_claim_ids":[],"confidence":"medium"},
+        {"option_id":"go","criterion_id":"hiring_and_bus_factor","score":9,"rationale":"人才池龐大且薪資結構穩定，3人團隊遇離職時交接與補人相對快速。","evidence_claim_ids":["kiss.3","cto.3"],"confidence":"high"},
+        {"option_id":"rust","criterion_id":"hiring_and_bus_factor","score":4,"rationale":"人才供給稀缺且薪資溢價明顯，微型團隊一旦關鍵成員離職難以迅速替換。","evidence_claim_ids":["kiss.3","cto.3"],"confidence":"high"},
+        {"option_id":"go","criterion_id":"resource_efficiency","score":7,"rationale":"在1500 RPS下單台規格即可從容應對，但GC與記憶體開銷高於Rust。","evidence_claim_ids":["kiss.2","cto.2"],"confidence":"high"},
+        {"option_id":"rust","criterion_id":"resource_efficiency","score":10,"rationale":"無GC機制且記憶體控制極致，具備微秒級尾延遲與最高硬體吞吐極限。","evidence_claim_ids":["vex.1"],"confidence":"high"},
+        {"option_id":"go","criterion_id":"b2b_ecosystem","score":9,"rationale":"企業級SAML/SSO、ORM與雲端SDK非常成熟，大幅降低企業端整合負擔。","evidence_claim_ids":[],"confidence":"medium"},
+        {"option_id":"rust","criterion_id":"b2b_ecosystem","score":5,"rationale":"B2B周邊協議與部分企業軟體SDK支援零散，常需自行包裝維護底層客戶端。","evidence_claim_ids":[],"confidence":"medium"}
+      ]
+    }
+  ],
+  "personaScores": [
+    {
+      "speaker_id": "conservative_cto",
+      "weights": {
+        "delivery_velocity": 30,
+        "learning_curve": 25,
+        "hiring_and_bus_factor": 20,
+        "b2b_ecosystem": 15,
+        "ops_observability": 7,
+        "resource_efficiency": 3
+      },
+      "cells": [
+        {"option_id":"go","criterion_id":"delivery_velocity","score":9,"reason":"語法極簡且編譯飛快，能確保前半年業務功能快速試錯與每週頻繁上線。"},
+        {"option_id":"rust","criterion_id":"delivery_velocity","score":4,"reason":"型別系統嚴格與慢編譯拖慢迭代，初期頻繁更動業務邏輯痛苦且產能折損嚴重。"},
+        {"option_id":"go","criterion_id":"learning_curve","score":9,"reason":"Python工程師1-2週內即可上手交付生產代碼，轉型陣痛極低。"},
+        {"option_id":"rust","criterion_id":"learning_curve","score":2,"reason":"生命週期與借用檢查陡峭，初學者極易與編譯器搏鬥，學習成本極高。"},
+        {"option_id":"go","criterion_id":"ops_observability","score":9,"reason":"內建pprof神器與成熟APM生態，線上排錯直觀且有完整的排程容錯。"},
+        {"option_id":"rust","criterion_id":"ops_observability","score":7,"reason":"無GC帶來可預測延遲，但非同步stack trace與除錯排查門檻高。"},
+        {"option_id":"go","criterion_id":"hiring_and_bus_factor","score":9,"reason":"人才池龐大且無過高溢價，3人團隊若遇離職替換成本極低，風險完全可控。"},
+        {"option_id":"rust","criterion_id":"hiring_and_bus_factor","score":3,"reason":"市場人才極度稀缺且薪資溢價高，3人團隊一旦有人離職將面臨斷層危機。"},
+        {"option_id":"go","criterion_id":"resource_efficiency","score":7,"reason":"1500 RPS瓶頸在DB與外部IO，Go效能已綽綽有餘，硬體成本差異微小。"},
+        {"option_id":"rust","criterion_id":"resource_efficiency","score":10,"reason":"極致記憶體與CPU控制力無庸置疑，但在此B2B場景下屬過度工程。"},
+        {"option_id":"go","criterion_id":"b2b_ecosystem","score":9,"reason":"企業級SAML/SSO、審計與主流SDK生態成熟健全，開箱即用省下大量TCO。"},
+        {"option_id":"rust","criterion_id":"b2b_ecosystem","score":5,"reason":"企業級周邊庫與B2B協議整合不夠成熟，需耗費大量人月自行造輪子。"}
+      ],
+      "final_choice": "go",
+      "one_line": "小團隊活下來靠交付速度與低替換成本，Go是性價比最高、風險最小的唯一解。"
+    },
+    {
+      "speaker_id": "perf_zealot",
+      "weights": {
+        "delivery_velocity": 0.1,
+        "learning_curve": 0.05,
+        "ops_observability": 0.15,
+        "hiring_and_bus_factor": 0.05,
+        "resource_efficiency": 0.45,
+        "b2b_ecosystem": 0.2
+      },
+      "cells": [
+        {"option_id":"go","criterion_id":"delivery_velocity","score":9,"reason":"語法簡約標準庫齊全，業務功能驗證與原型迭代速度極快。"},
+        {"option_id":"rust","criterion_id":"delivery_velocity","score":4,"reason":"型別系統與編譯檢查嚴格，初期頻繁變更資料模型較為耗時。"},
+        {"option_id":"go","criterion_id":"learning_curve","score":9,"reason":"Python背景工程師數日內即可上手交付，學習阻力極低。"},
+        {"option_id":"rust","criterion_id":"learning_curve","score":2,"reason":"所有權與生命週期門檻極高，初學者需數月才能安全上線。"},
+        {"option_id":"go","criterion_id":"ops_observability","score":7,"reason":"pprof工具成熟，但GC停頓與黑箱逃逸在高壓下較難排查。"},
+        {"option_id":"rust","criterion_id":"ops_observability","score":8,"reason":"無GC干擾且編譯期排查並發問題，線上運行表現極其穩定可預測。"},
+        {"option_id":"go","criterion_id":"hiring_and_bus_factor","score":9,"reason":"人才庫龐大且替代成本低，三人小團隊遭遇離職衝擊較小。"},
+        {"option_id":"rust","criterion_id":"hiring_and_bus_factor","score":3,"reason":"市場人才極度稀缺且溢價顯著，小團隊離職替換風險極高。"},
+        {"option_id":"go","criterion_id":"resource_efficiency","score":6,"reason":"運行時開銷與GC記憶體佔用高於Rust，極限吞吐受限。"},
+        {"option_id":"rust","criterion_id":"resource_efficiency","score":10,"reason":"零成本抽象與無GC機制，帶來微秒級極限吞吐與最低開銷。"},
+        {"option_id":"go","criterion_id":"b2b_ecosystem","score":9,"reason":"企業級SAML/SSO、審計與資料庫SDK高度成熟完整。"},
+        {"option_id":"rust","criterion_id":"b2b_ecosystem","score":5,"reason":"部分企業級周邊與舊協議SDK較少，整合需額外自研適配。"}
+      ],
+      "final_choice": "rust",
+      "one_line": "即便商業妥協難以避免，極致效能與零GC延遲仍是不可動搖的信仰！"
+    },
+    {
+      "speaker_id": "kiss_hacker",
+      "weights": {
+        "delivery_velocity": 30,
+        "learning_curve": 25,
+        "ops_observability": 15,
+        "hiring_and_bus_factor": 15,
+        "resource_efficiency": 5,
+        "b2b_ecosystem": 10
+      },
+      "cells": [
+        {"option_id":"go","criterion_id":"delivery_velocity","score":9,"reason":"語法極簡、編譯飛快，能最快驗證業務邏輯，大幅降低過度設計。"},
+        {"option_id":"rust","criterion_id":"delivery_velocity","score":4,"reason":"型別系統與生命週期爭吵耗時，慢編譯拖垮早期頻繁改動需求。"},
+        {"option_id":"go","criterion_id":"learning_curve","score":9,"reason":"Python工程師1-2週即可安全交付，認知負擔極低。"},
+        {"option_id":"rust","criterion_id":"learning_curve","score":2,"reason":"所有權與借用機制陡峭，新手極易卡關甚至產生不可維護代碼。"},
+        {"option_id":"go","criterion_id":"ops_observability","score":9,"reason":"pprof開箱即用、運行時診斷成熟，排查線上問題直觀省事。"},
+        {"option_id":"rust","criterion_id":"ops_observability","score":7,"reason":"無GC無崩潰優勢明顯，但除錯與非同步運行時棧追蹤較繁瑣。"},
+        {"option_id":"go","criterion_id":"hiring_and_bus_factor","score":9,"reason":"市場人才庫龐大，3人小團隊遭逢離職能迅速補位與交接。"},
+        {"option_id":"rust","criterion_id":"hiring_and_bus_factor","score":3,"reason":"人才稀少且薪資高昂，3人團隊遇離職直接面臨滅頂之災。"},
+        {"option_id":"go","criterion_id":"resource_efficiency","score":7,"reason":"記憶體佔用稍高於Rust，但1500 RPS瓶頸在DB，效能早已過剩。"},
+        {"option_id":"rust","criterion_id":"resource_efficiency","score":10,"reason":"極致零成本抽象與微秒延遲，資源表現無可挑剔。"},
+        {"option_id":"go","criterion_id":"b2b_ecosystem","score":9,"reason":"SAML/SSO、審計與雲原生庫豐富成熟，不需重造輪子。"},
+        {"option_id":"rust","criterion_id":"b2b_ecosystem","score":5,"reason":"B2B企業周邊整合庫分散且不夠開箱即用，增加額外開發成本。"}
+      ],
+      "final_choice": "go",
+      "one_line": "別為用不到的微秒性能自找麻煩，Go簡單實用才是小團隊活下來的唯一真理。"
+    }
+  ],
+  "seed": 42,
+  "extras": {
+    "personas": [
+      {"id": "conservative_cto", "short_name": "陳CTO", "emoji": "🛡️"},
+      {"id": "perf_zealot", "short_name": "Vex", "emoji": "⚡"},
+      {"id": "kiss_hacker", "short_name": "剃刀", "emoji": "🪓"}
+    ],
+    "verdict": {
+      "winner": "go",
+      "confidence": "high",
+      "text": "強烈推薦 Go。在 3 人新創且全熟 Python、目標一年拿下 500 家 B2B 企業客戶的存亡情境下，首要矛盾是『交付速度、商業驗證與極低替換成本』，而非『微秒級延遲』。Go 擁有平緩學習曲線（1~2 週上線）、成熟的 B2B SSO/審計生態與開箱即用的除錯工具，能在關鍵生存期為團隊保留最高認知頻寬。代價是放棄了 Rust 由編譯器帶來的極限無 GC 尾延遲控制與靜態型別防線；若未來核心演變為微秒級高頻計算或單機 5 萬 RPS 以上且資源成本權重上升至 61.9% 以上，則應改選 Rust。"
+    },
+    "key_tradeoffs": [
+      {
+        "title": "即時交付速度與學習曲線 vs 極限硬體控制力",
+        "gain": "Go 能讓 Python 團隊在 1~2 週內交付生產級代碼並敏捷重構資料模型",
+        "cost": "放棄了零 GC 停頓的微秒級尾延遲控制與極限記憶體密度",
+        "option_ids": ["go", "rust"]
+      },
+      {
+        "title": "人才招募替換韌性 vs 編譯期絕對安全護城河",
+        "gain": "Go 具備龐大人才庫與低 Bus Factor 替換成本，對 3 人團隊抗離職風險至關重要",
+        "cost": "放棄由 Rust 編譯器杜絕空指標與資料競爭的靜態保障，需依賴規範與測試",
+        "option_ids": ["go", "rust"]
+      },
+      {
+        "title": "開箱即用企業生態 vs 底層無抽象損耗掌控度",
+        "gain": "Go 在企業 SAML/SSO、Audit Log、主流 ORM 與雲原生 SDK 成熟完備，避免重複造輪子",
+        "cost": "缺乏 Rust 在底層計算密集型與嵌入式場景下的零成本抽象優勢",
+        "option_ids": ["go", "rust"]
+      }
+    ],
+    "blind_spots": [
+      {
+        "title": "可觀測性與分散式追蹤建置成本",
+        "description": "Go 內建 pprof 且 OpenTelemetry/APM 支援成熟；Rust 非同步 tracing 在跨 runtime 追蹤與 APM 整合複雜度高。",
+        "why_it_matters": "3 人團隊線上排錯若缺少成熟 APM 與 profiling 工具，工單響應與故障診斷將耗費數倍人力。",
+        "favors_option_ids": ["go"],
+        "severity": "high"
+      },
+      {
+        "title": "故障模式與非同步執行時的崩潰隔離",
+        "description": "Rust Tokio 遇到阻塞式 IO 易引發線程飢餓與雪崩；Go 搶佔式排程對初學者容錯度顯著較高。",
+        "why_it_matters": "Python 工程師轉型極易誤調用阻塞操作，Go 具備更強的容錯防禦邊界。",
+        "favors_option_ids": ["go"],
+        "severity": "high"
+      },
+      {
+        "title": "資料模型頻繁變更的重構摩擦力",
+        "description": "B2B SaaS 早期 Schema 每週更迭，Go 組合式結構體重構迅速，Rust 生命週期與所有權易牽一髮動全身。",
+        "why_it_matters": "探索 PMF 期間，重構阻力直接決定交付與試錯速度。",
+        "favors_option_ids": ["go"],
+        "severity": "high"
+      }
+    ],
+    "challenged_assumptions": [
+      {
+        "assumption": "團隊必須在 Go 與 Rust 二選一進行重寫，Python 已經無法勝任",
+        "challenge": "尖峰 1,500 RPS 對現代非同步 Python（FastAPI + uvloop + asyncpg）搭配適當擴展完全足夠。在尚未驗證付費意願前重寫，需警惕過早最佳化。"
+      },
+      {
+        "assumption": "500 家企業客戶等於均勻的 1,500 RPS 負載",
+        "challenge": "B2B 流量高度集中在上班日特定尖峰與複雜報表運算，真實瓶頸通常在資料庫鎖與外部 API，而非 Web 框架 CPU 吞吐。"
+      }
+    ],
+    "unresolved_disputes": [
+      {
+        "title": "Go GC 與逃逸分析在高並發下是否構成 B2B SLA 致命風險",
+        "positions": {
+          "Vex": "Go 逃逸分析與 GC 停頓在突發尖峰下會破壞企業級 SLA 尾延遲，屬隱形地雷。",
+          "陳CTO/剃刀": "1,500 RPS 瓶頸在 DB 與外部網路 IO，Go 毫秒級 GC 根本不影響業務商業結果。"
+        },
+        "what_would_settle_it": "在 1,500 RPS 伴隨真實 DB 延遲環境下進行壓測，檢驗 p999 尾延遲是否違反企客 SLA。"
+      }
+    ],
+    "next_experiments": [
+      {
+        "title": "典型 B2B 業務端點雙語言開發 POC",
+        "description": "由既有 Python 工程師分別用 Go (Gin/Echo) 與 Rust (Axum) 實作含 SAML 驗證、Postgres 事務與 Webhook 的端點。",
+        "effort": "2 人天",
+        "decides": "精準測量團隊上手工時、編寫阻力與初期迭代週期差距。"
+      },
+      {
+        "title": "1,500 RPS 混合負載與 GC 延遲壓測",
+        "description": "模擬 500 家企業尖峰負載並掛載 50ms 延遲的 Mock DB，觀測 Go 的 GC pause 與 p99 尾延遲。",
+        "effort": "1 人天",
+        "decides": "驗證 Go GC 是否會在目標規模下構成實質性能瓶頸。"
+      }
+    ],
+    "risks": [
+      {
+        "option_id": "go",
+        "risk": "工程師缺乏靜態規範意識導致線上 nil pointer panic 或並發 map 衝突",
+        "likelihood": "中",
+        "impact": "中",
+        "mitigation": "引入嚴格的 golangci-lint、開啟 race detector 並統一 recover 中介軟體。"
+      },
+      {
+        "option_id": "rust",
+        "risk": "學習曲線過陡導致業務交付嚴重延宕，錯失首年企業客戶上線窗口",
+        "likelihood": "高",
+        "impact": "高",
+        "mitigation": "初期限定使用安全子集、採用 Axum 成熟模板，避免過早引入複雜巨集與手動生命週期。"
+      }
+    ],
+    "highlights": [
+      {
+        "speaker": "剃刀",
+        "quote": "單台 4 核心 8GB 的 Go 服務能輕鬆撐起 10,000+ RPS，Rust 省下的那 5ms 與 50MB 記憶體，在資料庫 20ms 的 IO 面前毫無商業意義。"
+      },
+      {
+        "speaker": "陳CTO",
+        "quote": "企客簽約看的是 SOC2、SAML/SSO、Audit Log 與 RBAC，不是你的單機微容器！"
+      },
+      {
+        "speaker": "Vex",
+        "quote": "3 人團隊面對一年 500 家企業客戶，最致命的不是「P99 延遲」，而是認知頻寬破產與客製化泥淖。"
+      }
+    ],
+    "mvp": {
+      "speaker_id": "conservative_cto",
+      "comment": "以精準的商業 TCO 算帳、企業 SSO/合規生態防線及直戳 3 人團隊生存痛點，奠定了本場辯論的決策基調。"
+    }
+  }
+}
