@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>決策權衡矩陣</title>
+<style>
+  :root {
+    --bg: #f6f6f8; --card: #ffffff; --ink: #1b1b22; --muted: #6a6a78; --line: #e2e2e9;
+    --accent: #6b3fd4; --win: #138a4b; --warn: #b45309; --bad: #c0264b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #131318; --card: #1c1c24; --ink: #ececf2; --muted: #9a9aaa; --line: #2e2e3a;
+      --accent: #a98bff; --win: #3ecf8e; --warn: #f5a524; --bad: #ff6b8b; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+    font: 15px/1.6 system-ui, "Noto Sans TC", "Microsoft JhengHei", sans-serif; }
+  main { max-width: 1080px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  h2 { font-size: 16px; margin: 0 0 12px; }
+  .sub { color: var(--muted); margin: 0 0 20px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; margin-bottom: 16px; }
+  .verdict { border-left: 4px solid var(--win); }
+  .verdict .big { font-size: 26px; font-weight: 700; color: var(--win); }
+  .badge { display: inline-block; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--line); font-size: 12px; color: var(--muted); margin-left: 6px; }
+  .bars > div { display: grid; grid-template-columns: 120px 1fr 56px; gap: 10px; align-items: center; margin: 6px 0; }
+  .bar { height: 12px; border-radius: 6px; background: var(--line); overflow: hidden; }
+  .bar > i { display: block; height: 100%; background: var(--accent); }
+  .scroll { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; min-width: 560px; }
+  th, td { padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: center; }
+  th:first-child, td:first-child { text-align: left; min-width: 220px; }
+  td.cell { cursor: help; font-variant-numeric: tabular-nums; font-weight: 600; }
+  td.cell.hot::after { content: " 🔥"; font-size: 11px; }
+  tr.total td { font-weight: 700; border-top: 2px solid var(--line); }
+  td.winner, th.winner { color: var(--win); }
+  .crit-name { display: block; font-weight: 600; }
+  .crit-w { color: var(--muted); font-size: 12px; }
+  input[type=range] { width: 100%; accent-color: var(--accent); }
+  .lens button, .btn { font: inherit; padding: 4px 12px; margin: 0 6px 6px 0; border-radius: 999px;
+    border: 1px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer; }
+  .lens button[aria-pressed=true] { background: var(--accent); color: #fff; border-color: var(--accent); }
+  ul { margin: 6px 0; padding-left: 20px; }
+  li { margin: 4px 0; }
+  .sev-high { color: var(--bad); font-weight: 600; } .sev-medium { color: var(--warn); font-weight: 600; } .sev-low { color: var(--muted); }
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+  .muted { color: var(--muted); }
+  .quote { border-left: 3px solid var(--line); padding-left: 10px; color: var(--muted); }
+  @media (max-width: 560px) { .bars > div { grid-template-columns: 90px 1fr 48px; } }
+</style>
+</head>
+<body>
+<main id="app"></main>
+<script id="payload" type="application/json">{"matrix":{"question":"3 人新創做 B2B SaaS 後端，該選 Go 還是 Rust？（範例資料，非真實辯論）","options":[{"id":"go","label":"Go","description":"用 Go 重寫核心後端"},{"id":"rust","label":"Rust","description":"用 Rust 重寫核心後端"},{"id":"python","label":"維持 Python","description":"留在 Python/FastAPI，必要處再最佳化"}],"criteria":[{"id":"delivery_speed","label":"交付速度","description":"交付速度（分數越高越好）","higher_is_better_phrasing":"交付速度越高越好"},{"id":"ops_simplicity","label":"維運簡單度","description":"維運簡單度（分數越高越好）","higher_is_better_phrasing":"維運簡單度越高越好"},{"id":"hiring","label":"招募與技能匹配","description":"招募與技能匹配（分數越高越好）","higher_is_better_phrasing":"招募與技能匹配越高越好"},{"id":"performance","label":"性能與資源效率","description":"性能與資源效率（分數越高越好）","higher_is_better_phrasing":"性能與資源效率越高越好"},{"id":"safety","label":"可靠性與記憶體安全","description":"可靠性與記憶體安全（分數越高越好）","higher_is_better_phrasing":"可靠性與記憶體安全越高越好"},{"id":"ecosystem","label":"生態成熟度","description":"生態成熟度（分數越高越好）","higher_is_better_phrasing":"生態成熟度越高越好"},{"id":"evolvability","label":"演進彈性","description":"演進彈性（分數越高越好）","higher_is_better_phrasing":"演進彈性越高越好"}],"weights":{"delivery_speed":0.2499,"ops_simplicity":0.2,"hiring":0.15,"performance":0.0999,"safety":0.1,"ecosystem":0.1,"evolvability":0.0999},"weight_rationale":{"delivery_speed":"範例：依三人團隊與一年內 500 家客戶的情境設定","ops_simplicity":"範例：依三人團隊與一年內 500 家客戶的情境設定","hiring":"範例：依三人團隊與一年內 500 家客戶的情境設定","performance":"範例：依三人團隊與一年內 500 家客戶的情境設定","safety":"範例：依三人團隊與一年內 500 家客戶的情境設定","ecosystem":"範例：依三人團隊與一年內 500 家客戶的情境設定","evolvability":"範例：依三人團隊與一年內 500 家客戶的情境設定"},"cells":[{"option_id":"go","criterion_id":"delivery_speed","score":8,"rationale":"Go 在「交付速度」：範例理由（示範資料）","evidence_claim_ids":["cto.2","kiss.1"],"confidence":"high"},{"option_id":"go","criterion_id":"ops_simplicity","score":8,"rationale":"Go 在「維運簡單度」：範例理由（示範資料）","evidence_claim_ids":["cto.2","kiss.1"],"confidence":"medium"},{"option_id":"go","criterion_id":"hiring","score":7,"rationale":"Go 在「招募與技能匹配」：範例理由（示範資料）","evidence_claim_ids":["cto.2"],"confidence":"medium"},{"option_id":"go","criterion_id":"performance","score":7,"rationale":"Go 在「性能與資源效率」：範例理由（示範資料）","evidence_claim_ids":["cto.2"],"confidence":"high"},{"option_id":"go","criterion_id":"safety","score":7,"rationale":"Go 在「可靠性與記憶體安全」：範例理由（示範資料）","evidence_claim_ids":["cto.2"],"confidence":"medium"},{"option_id":"go","criterion_id":"ecosystem","score":8,"rationale":"Go 在「生態成熟度」：範例理由（示範資料）","evidence_claim_ids":["cto.2","kiss.1"],"confidence":"medium"},{"option_id":"go","criterion_id":"evolvability","score":7,"rationale":"Go 在「演進彈性」：範例理由（示範資料）","evidence_claim_ids":["cto.2","kiss.1"],"confidence":"high"},{"option_id":"rust","criterion_id":"delivery_speed","score":4,"rationale":"Rust 在「交付速度」：範例理由（示範資料）","evidence_claim_ids":["cto.2","kiss.1"],"confidence":"high"},{"option_id":"rust","criterion_id":"ops_simplicity","score":5,"rationale":"Rust 在「維運簡單度」：範例理由（示範資料）","evidence_claim_ids":["cto.2","kiss.1"],"confidence":"medium"},{"option_id":"rust","criterion_id":"hiring","score":3,"rationale":"Rust 在「招募與技能匹配」：範例理由（示範資料）","evidence_claim_ids":["cto.2"],"confidence":"medium"},{"option_id":"rust","criterion_id":"performance","score":10,"rationale":"Rust 在「性能與資源效率」：範例理由（示範資料）","evidence_claim_ids":["cto.2"],"confidence":"high"},{"option_id":"rust","criterion_id":"safety","score":10,"rationale":"Rust 在「可靠性與記憶體安全」：範例理由（示範資料）","evidence_claim_ids":["cto.2"],"confidence":"medium"},{"option_id":"rust","criterion_id":"ecosystem","score":6,"rationale":"Rust 在「生態成熟度」：範例理由（示範資料）","evidence_claim_ids":["cto.2","kiss.1"],"confidence":"medium"},{"option_id":"rust","criterion_id":"evolvability","score":7,"rationale":"Rust 在「演進彈性」：範例理由（示範資料）","evidence_claim_ids":["cto.2","kiss.1"],"confidence":"high"},{"option_id":"python","criterion_id":"delivery_speed","score":9,"rationale":"維持 Python 在「交付速度」：範例理由（示範資料）","evidence_claim_ids":["cto.2","kiss.1"],"confidence":"high"},{"option_id":"python","criterion_id":"ops_simplicity","score":6,"rationale":"維持 Python 在「維運簡單度」：範例理由（示範資料）","evidence_claim_ids":["cto.2","kiss.1"],"confidence":"medium"},{"option_id":"python","criterion_id":"hiring","score":9,"rationale":"維持 Python 在「招募與技能匹配」：範例理由（示範資料）","evidence_claim_ids":["cto.2"],"confidence":"medium"},{"option_id":"python","criterion_id":"performance","score":3,"rationale":"維持 Python 在「性能與資源效率」：範例理由（示範資料）","evidence_claim_ids":["cto.2"],"confidence":"high"},{"option_id":"python","criterion_id":"safety","score":4,"rationale":"維持 Python 在「可靠性與記憶體安全」：範例理由（示範資料）","evidence_claim_ids":["cto.2"],"confidence":"medium"},{"option_id":"python","criterion_id":"ecosystem","score":9,"rationale":"維持 Python 在「生態成熟度」：範例理由（示範資料）","evidence_claim_ids":["cto.2","kiss.1"],"confidence":"medium"},{"option_id":"python","criterion_id":"evolvability","score":4,"rationale":"維持 Python 在「演進彈性」：範例理由（示範資料）","evidence_claim_ids":["cto.2","kiss.1"],"confidence":"high"}],"cell_spread":{"go|delivery_speed":0.816,"go|ops_simplicity":0.816,"go|hiring":0.816,"go|performance":0.816,"go|safety":0.816,"go|ecosystem":0.816,"go|evolvability":0.816,"rust|delivery_speed":0.816,"rust|ops_simplicity":0.816,"rust|hiring":0.816,"rust|performance":0.471,"rust|safety":0.471,"rust|ecosystem":0.816,"rust|evolvability":0.816,"python|delivery_speed":0.816,"python|ops_simplicity":0.816,"python|hiring":0.816,"python|performance":0.816,"python|safety":0.816,"python|ecosystem":0.816,"python|evolvability":0.816},"persona_scores":[{"speaker_id":"conservative_cto","weights":{"delivery_speed":0.15,"ops_simplicity":0.3,"hiring":0.3,"performance":0.05,"safety":0.05,"ecosystem":0.1,"evolvability":0.05},"cells":[{"option_id":"go","criterion_id":"delivery_speed","score":7,"reason":"Go 在「交付速度」：人格視角（示範資料）"},{"option_id":"go","criterion_id":"ops_simplicity","score":9,"reason":"Go 在「維運簡單度」：人格視角（示範資料）"},{"option_id":"go","criterion_id":"hiring","score":7,"reason":"Go 在「招募與技能匹配」：人格視角（示範資料）"},{"option_id":"go","criterion_id":"performance","score":6,"reason":"Go 在「性能與資源效率」：人格視角（示範資料）"},{"option_id":"go","criterion_id":"safety","score":8,"reason":"Go 在「可靠性與記憶體安全」：人格視角（示範資料）"},{"option_id":"go","criterion_id":"ecosystem","score":8,"reason":"Go 在「生態成熟度」：人格視角（示範資料）"},{"option_id":"go","criterion_id":"evolvability","score":6,"reason":"Go 在「演進彈性」：人格視角（示範資料）"},{"option_id":"rust","criterion_id":"delivery_speed","score":3,"reason":"Rust 在「交付速度」：人格視角（示範資料）"},{"option_id":"rust","criterion_id":"ops_simplicity","score":6,"reason":"Rust 在「維運簡單度」：人格視角（示範資料）"},{"option_id":"rust","criterion_id":"hiring","score":3,"reason":"Rust 在「招募與技能匹配」：人格視角（示範資料）"},{"option_id":"rust","criterion_id":"performance","score":9,"reason":"Rust 在「性能與資源效率」：人格視角（示範資料）"},{"option_id":"rust","criterion_id":"safety","score":10,"reason":"Rust 在「可靠性與記憶體安全」：人格視角（示範資料）"},{"option_id":"rust","criterion_id":"ecosystem","score":6,"reason":"Rust 在「生態成熟度」：人格視角（示範資料）"},{"option_id":"rust","criterion_id":"evolvability","score":6,"reason":"Rust 在「演進彈性」：人格視角（示範資料）"},{"option_id":"python","criterion_id":"delivery_speed","score":8,"reason":"維持 Python 在「交付速度」：人格視角（示範資料）"},{"option_id":"python","criterion_id":"ops_simplicity","score":7,"reason":"維持 Python 在「維運簡單度」：人格視角（示範資料）"},{"option_id":"python","criterion_id":"hiring","score":9,"reason":"維持 Python 在「招募與技能匹配」：人格視角（示範資料）"},{"option_id":"python","criterion_id":"performance","score":2,"reason":"維持 Python 在「性能與資源效率」：人格視角（示範資料）"},{"option_id":"python","criterion_id":"safety","score":5,"reason":"維持 Python 在「可靠性與記憶體安全」：人格視角（示範資料）"},{"option_id":"python","criterion_id":"ecosystem","score":9,"reason":"維持 Python 在「生態成熟度」：人格視角（示範資料）"},{"option_id":"python","criterion_id":"evolvability","score":3,"reason":"維持 Python 在「演進彈性」：人格視角（示範資料）"}],"final_choice":"go","one_line":"先交付，再最佳化。"},{"speaker_id":"perf_zealot","weights":{"delivery_speed":0.05,"ops_simplicity":0.05,"hiring":0.05,"performance":0.5,"safety":0.25,"ecosystem":0.05,"evolvability":0.05},"cells":[{"option_id":"go","criterion_id":"delivery_speed","score":8,"reason":"Go 在「交付速度」：人格視角（示範資料）"},{"option_id":"go","criterion_id":"ops_simplicity","score":7,"reason":"Go 在「維運簡單度」：人格視角（示範資料）"},{"option_id":"go","criterion_id":"hiring","score":8,"reason":"Go 在「招募與技能匹配」：人格視角（示範資料）"},{"option_id":"go","criterion_id":"performance","score":7,"reason":"Go 在「性能與資源效率」：人格視角（示範資料）"},{"option_id":"go","criterion_id":"safety","score":6,"reason":"Go 在「可靠性與記憶體安全」：人格視角（示範資料）"},{"option_id":"go","criterion_id":"ecosystem","score":9,"reason":"Go 在「生態成熟度」：人格視角（示範資料）"},{"option_id":"go","criterion_id":"evolvability","score":7,"reason":"Go 在「演進彈性」：人格視角（示範資料）"},{"option_id":"rust","criterion_id":"delivery_speed","score":4,"reason":"Rust 在「交付速度」：人格視角（示範資料）"},{"option_id":"rust","criterion_id":"ops_simplicity","score":4,"reason":"Rust 在「維運簡單度」：人格視角（示範資料）"},{"option_id":"rust","criterion_id":"hiring","score":4,"reason":"Rust 在「招募與技能匹配」：人格視角（示範資料）"},{"option_id":"rust","criterion_id":"performance","score":10,"reason":"Rust 在「性能與資源效率」：人格視角（示範資料）"},{"option_id":"rust","criterion_id":"safety","score":9,"reason":"Rust 在「可靠性與記憶體安全」：人格視角（示範資料）"},{"option_id":"rust","criterion_id":"ecosystem","score":7,"reason":"Rust 在「生態成熟度」：人格視角（示範資料）"},{"option_id":"rust","criterion_id":"evolvability","score":7,"reason":"Rust 在「演進彈性」：人格視角（示範資料）"},{"option_id":"python","criterion_id":"delivery_speed","score":9,"reason":"維持 Python 在「交付速度」：人格視角（示範資料）"},{"option_id":"python","criterion_id":"ops_simplicity","score":5,"reason":"維持 Python 在「維運簡單度」：人格視角（示範資料）"},{"option_id":"python","criterion_id":"hiring","score":10,"reason":"維持 Python 在「招募與技能匹配」：人格視角（示範資料）"},{"option_id":"python","criterion_id":"performance","score":3,"reason":"維持 Python 在「性能與資源效率」：人格視角（示範資料）"},{"option_id":"python","criterion_id":"safety","score":3,"reason":"維持 Python 在「可靠性與記憶體安全」：人格視角（示範資料）"},{"option_id":"python","criterion_id":"ecosystem","score":10,"reason":"維持 Python 在「生態成熟度」：人格視角（示範資料）"},{"option_id":"python","criterion_id":"evolvability","score":4,"reason":"維持 Python 在「演進彈性」：人格視角（示範資料）"}],"final_choice":"rust","one_line":"雲端帳單是性能債的利息。"},{"speaker_id":"kiss_hacker","weights":{"delivery_speed":0.35,"ops_simplicity":0.3,"hiring":0.1,"performance":0.05,"safety":0.05,"ecosystem":0.1,"evolvability":0.05},"cells":[{"option_id":"go","criterion_id":"delivery_speed","score":9,"reason":"Go 在「交付速度」：人格視角（示範資料）"},{"option_id":"go","criterion_id":"ops_simplicity","score":8,"reason":"Go 在「維運簡單度」：人格視角（示範資料）"},{"option_id":"go","criterion_id":"hiring","score":6,"reason":"Go 在「招募與技能匹配」：人格視角（示範資料）"},{"option_id":"go","criterion_id":"performance","score":8,"reason":"Go 在「性能與資源效率」：人格視角（示範資料）"},{"option_id":"go","criterion_id":"safety","score":7,"reason":"Go 在「可靠性與記憶體安全」：人格視角（示範資料）"},{"option_id":"go","criterion_id":"ecosystem","score":7,"reason":"Go 在「生態成熟度」：人格視角（示範資料）"},{"option_id":"go","criterion_id":"evolvability","score":8,"reason":"Go 在「演進彈性」：人格視角（示範資料）"},{"option_id":"rust","criterion_id":"delivery_speed","score":5,"reason":"Rust 在「交付速度」：人格視角（示範資料）"},{"option_id":"rust","criterion_id":"ops_simplicity","score":5,"reason":"Rust 在「維運簡單度」：人格視角（示範資料）"},{"option_id":"rust","criterion_id":"hiring","score":2,"reason":"Rust 在「招募與技能匹配」：人格視角（示範資料）"},{"option_id":"rust","criterion_id":"performance","score":10,"reason":"Rust 在「性能與資源效率」：人格視角（示範資料）"},{"option_id":"rust","criterion_id":"safety","score":10,"reason":"Rust 在「可靠性與記憶體安全」：人格視角（示範資料）"},{"option_id":"rust","criterion_id":"ecosystem","score":5,"reason":"Rust 在「生態成熟度」：人格視角（示範資料）"},{"option_id":"rust","criterion_id":"evolvability","score":8,"reason":"Rust 在「演進彈性」：人格視角（示範資料）"},{"option_id":"python","criterion_id":"delivery_speed","score":10,"reason":"維持 Python 在「交付速度」：人格視角（示範資料）"},{"option_id":"python","criterion_id":"ops_simplicity","score":6,"reason":"維持 Python 在「維運簡單度」：人格視角（示範資料）"},{"option_id":"python","criterion_id":"hiring","score":8,"reason":"維持 Python 在「招募與技能匹配」：人格視角（示範資料）"},{"option_id":"python","criterion_id":"performance","score":4,"reason":"維持 Python 在「性能與資源效率」：人格視角（示範資料）"},{"option_id":"python","criterion_id":"safety","score":4,"reason":"維持 Python 在「可靠性與記憶體安全」：人格視角（示範資料）"},{"option_id":"python","criterion_id":"ecosystem","score":8,"reason":"維持 Python 在「生態成熟度」：人格視角（示範資料）"},{"option_id":"python","criterion_id":"evolvability","score":5,"reason":"維持 Python 在「演進彈性」：人格視角（示範資料）"}],"final_choice":"python","one_line":"最好的程式碼是沒寫的程式碼。"}]},"analysis":{"totals":{"go":7.55,"rust":5.7498,"python":6.8003},"ranking":["go","python","rust"],"winner":"go","margin":0.7497,"tipping_points":[{"criterion_id":"delivery_speed","criterion_label":"交付速度","current_weight":0.25,"threshold":0.571,"direction":"increase","new_winner":"python"},{"criterion_id":"hiring","criterion_label":"招募與技能匹配","current_weight":0.15,"threshold":0.382,"direction":"increase","new_winner":"python"},{"criterion_id":"performance","criterion_label":"性能與資源效率","current_weight":0.1,"threshold":0.437,"direction":"increase","new_winner":"rust"},{"criterion_id":"safety","criterion_label":"可靠性與記憶體安全","current_weight":0.1,"threshold":0.438,"direction":"increase","new_winner":"rust"},{"criterion_id":"ecosystem","criterion_label":"生態成熟度","current_weight":0.1,"threshold":0.486,"direction":"increase","new_winner":"python"}],"win_probability":{"go":0.86,"rust":0.0058,"python":0.1342},"seed_used":42,"persona_lens":{"conservative_cto":{"winner":"go","totals":{"go":7.55,"rust":4.95,"python":7.3},"ranking":["go","python","rust"]},"perf_zealot":{"winner":"rust","totals":{"go":7.15,"rust":8.75,"python":4.35},"ranking":["rust","go","python"]},"kiss_hacker":{"winner":"go","totals":{"go":7.75,"rust":5.15,"python":7.3},"ranking":["go","python","rust"]}},"persona_own_view":{"conservative_cto":{"winner":"go","totals":{"go":7.65,"rust":5,"python":7.4},"ranking":["go","python","rust"]},"perf_zealot":{"winner":"rust","totals":{"go":6.95,"rust":8.55,"python":4.15},"ranking":["rust","go","python"]},"kiss_hacker":{"winner":"go","totals":{"go":8,"rust":5.35,"python":7.55},"ranking":["go","python","rust"]}},"max_regret":{"go":1.6,"rust":2.6,"python":4.4},"minimax_regret_option":"go","disagreement_hotspots":[{"cell_key":"go|delivery_speed","option_id":"go","criterion_id":"delivery_speed","spread":0.816,"chair_score":8,"persona_scores":{"conservative_cto":7,"perf_zealot":8,"kiss_hacker":9}},{"cell_key":"go|ops_simplicity","option_id":"go","criterion_id":"ops_simplicity","spread":0.816,"chair_score":8,"persona_scores":{"conservative_cto":9,"perf_zealot":7,"kiss_hacker":8}},{"cell_key":"go|hiring","option_id":"go","criterion_id":"hiring","spread":0.816,"chair_score":7,"persona_scores":{"conservative_cto":7,"perf_zealot":8,"kiss_hacker":6}},{"cell_key":"go|performance","option_id":"go","criterion_id":"performance","spread":0.816,"chair_score":7,"persona_scores":{"conservative_cto":6,"perf_zealot":7,"kiss_hacker":8}},{"cell_key":"go|safety","option_id":"go","criterion_id":"safety","spread":0.816,"chair_score":7,"persona_scores":{"conservative_cto":8,"perf_zealot":6,"kiss_hacker":7}}]},"warnings":[],"sample_count":3,"extras":{"personas":[{"id":"conservative_cto","short_name":"陳CTO","emoji":"🛡️"},{"id":"perf_zealot","short_name":"Vex","emoji":"⚡"},{"id":"kiss_hacker","short_name":"剃刀","emoji":"🪓"}],"verdict":{"confidence_label":"中","one_liner":"（範例）依權重與情境得出的示範判決。","recommendation_text":"這是示範資料，用來預覽矩陣頁面；真實辯論會由主席依程式計算結果撰寫。","conditions_to_flip":["（範例）性能權重提高到臨界值以上時改選性能方案"]},"key_tradeoffs":[{"title":"交付速度 vs 長期性能","gain":"更快上市","cost":"日後可能要重寫熱點"}],"blind_spots":[{"severity":"high","title":"招募市場","description":"範例盲點。","why_it_matters":"影響半年後的擴編速度"}],"challenged_assumptions":[{"assumption":"一年內會有 500 家客戶","challenge":"範例：若成長慢一半，結論是否改變？"}],"next_experiments":[{"title":"2 天壓測 spike","effort":"2 人日","description":"用真實查詢型態壓測","decides":"性能是否真的是瓶頸"}]}}</script>
+<script>
+(function () {
+  "use strict";
+  var DATA = JSON.parse(document.getElementById("payload").textContent.replace(/^\/\*__DATA__\*\//, ""));
+  var M = DATA.matrix, A = DATA.analysis, X = DATA.extras || {};
+  var app = document.getElementById("app");
+
+  function h(tag, attrs) {
+    var el = document.createElement(tag);
+    if (attrs) Object.keys(attrs).forEach(function (k) {
+      if (k === "class") el.className = attrs[k];
+      else if (k === "style") el.setAttribute("style", attrs[k]);
+      else if (k.indexOf("on") === 0) el.addEventListener(k.slice(2), attrs[k]);
+      else el.setAttribute(k, attrs[k]);
+    });
+    for (var i = 2; i < arguments.length; i++) {
+      var c = arguments[i];
+      if (c == null || c === false) continue;
+      if (Array.isArray(c)) c.forEach(function (x) { if (x != null) el.appendChild(typeof x === "object" ? x : document.createTextNode(String(x))); });
+      else el.appendChild(typeof c === "object" ? c : document.createTextNode(String(c)));
+    }
+    return el;
+  }
+  var pct = function (x) { return Math.round(x * 100) + "%"; };
+  var optLabel = {}; M.options.forEach(function (o) { optLabel[o.id] = o.label || o.id; });
+  var critLabel = {}; M.criteria.forEach(function (c) { critLabel[c.id] = c.label || c.id; });
+  var personaInfo = {}; (X.personas || []).forEach(function (p) { personaInfo[p.id] = p; });
+  var pname = function (id) { var p = personaInfo[id]; return p ? (p.emoji || "") + " " + (p.short_name || p.display_name || id) : id; };
+
+  var score = {}, spread = M.cell_spread || {}, cellInfo = {};
+  M.cells.forEach(function (c) { score[c.option_id + "|" + c.criterion_id] = c.score; cellInfo[c.option_id + "|" + c.criterion_id] = c; });
+  var hotKeys = {}; (A.disagreement_hotspots || []).slice(0, 3).forEach(function (x) { hotKeys[x.cell_key] = true; });
+
+  var chairW = Object.assign({}, M.weights);
+  var W = Object.assign({}, chairW);   // live (normalized) weights
+  var activeLens = "chair";
+
+  function normalize(w) {
+    var t = 0; M.criteria.forEach(function (c) { t += Math.max(0, w[c.id] || 0); });
+    var o = {}; M.criteria.forEach(function (c) { o[c.id] = t > 0 ? Math.max(0, w[c.id] || 0) / t : 1 / M.criteria.length; });
+    return o;
+  }
+  function totals(w) {
+    var n = normalize(w), t = {};
+    M.options.forEach(function (o) {
+      var s = 0; M.criteria.forEach(function (c) { s += n[c.id] * (score[o.id + "|" + c.id] || 5); });
+      t[o.id] = s;
+    });
+    return t;
+  }
+  function winnerOf(t) {
+    return Object.keys(t).sort(function (a, b) {
+      return Math.abs(t[a] - t[b]) > 1e-9 ? t[b] - t[a] : ((A.win_probability[b] || 0) - (A.win_probability[a] || 0)) || (a < b ? -1 : 1);
+    })[0];
+  }
+
+  // ---------- header + verdict
+  var v = X.verdict || {};
+  var winner = A.winner;
+  app.appendChild(h("h1", null, "⚖️ 決策權衡矩陣"));
+  app.appendChild(h("p", { class: "sub" }, M.question));
+  app.appendChild(h("div", { class: "card verdict" },
+    h("div", { class: "muted" }, "判決"),
+    h("div", { class: "big" }, optLabel[winner] || winner,
+      v.confidence_label ? h("span", { class: "badge" }, "信心：" + v.confidence_label) : null),
+    v.one_liner ? h("p", null, v.one_liner) : null,
+    v.recommendation_text ? h("p", { class: "muted" }, v.recommendation_text) : null,
+    A.minimax_regret_option && A.minimax_regret_option !== winner
+      ? h("p", { class: "sev-medium" }, "注意：最小化最大後悔的方案是「" + (optLabel[A.minimax_regret_option] || A.minimax_regret_option) + "」，與贏家不同。")
+      : null
+  ));
+
+  // ---------- win probability
+  var bars = h("div", { class: "bars" });
+  M.options.slice().sort(function (a, b) { return (A.win_probability[b.id] || 0) - (A.win_probability[a.id] || 0); }).forEach(function (o) {
+    var p = A.win_probability[o.id] || 0;
+    bars.appendChild(h("div", null, h("span", null, o.label || o.id),
+      h("div", { class: "bar" }, h("i", { style: "width:" + (p * 100).toFixed(1) + "%" })), h("span", null, pct(p))));
+  });
+  app.appendChild(h("div", { class: "card" }, h("h2", null, "勝率（Monte Carlo，權重與分數都帶不確定性）"), bars,
+    h("div", { class: "muted" }, "隨機種子 " + A.seed_used + "；主席取樣 " + DATA.sample_count + " 次，取中位數。")));
+
+  // ---------- interactive matrix
+  var tbl = h("table");
+  var lensBox = h("div", { class: "lens" });
+  var tipBox = h("ul");
+  var resultLine = h("p", { class: "muted" });
+
+  function setWeights(w) {
+    W = normalize(w);
+    M.criteria.forEach(function (c) { sliders[c.id].value = Math.round(W[c.id] * 100); });
+    render();
+  }
+  var sliders = {};
+  M.criteria.forEach(function (c) {
+    sliders[c.id] = h("input", { type: "range", min: "0", max: "100", step: "1", "aria-label": "權重：" + (c.label || c.id),
+      oninput: function (e) { W[c.id] = Number(e.target.value) / 100; setActive("custom"); render(); } });
+  });
+
+  function setActive(name) { activeLens = name; renderLens(); }
+  function renderLens() {
+    lensBox.textContent = "";
+    var items = [["chair", "⚖️ 主席"]].concat((M.persona_scores || []).map(function (p) { return [p.speaker_id, pname(p.speaker_id)]; }));
+    items.forEach(function (it) {
+      lensBox.appendChild(h("button", { "aria-pressed": String(activeLens === it[0]), onclick: function () {
+        var w = it[0] === "chair" ? chairW : (M.persona_scores.filter(function (p) { return p.speaker_id === it[0]; })[0] || {}).weights;
+        activeLens = it[0]; setWeights(w || chairW);
+      } }, it[1]));
+    });
+    lensBox.appendChild(h("button", { class: "btn", onclick: function () { activeLens = "chair"; setWeights(chairW); } }, "重設"));
+  }
+
+  function render() {
+    var t = totals(W), win = winnerOf(t);
+    tbl.textContent = "";
+    var head = h("tr", null, h("th", null, "準則（拖曳調整權重）"));
+    M.options.forEach(function (o) { head.appendChild(h("th", { class: o.id === win ? "winner" : "" }, o.label || o.id, o.id === win ? " 👑" : "")); });
+    tbl.appendChild(head);
+    var nw = normalize(W);
+    M.criteria.forEach(function (c) {
+      var rationale = M.weight_rationale && M.weight_rationale[c.id];
+      var row = h("tr", null, h("td", { title: rationale || c.description || "" },
+        h("span", { class: "crit-name" }, c.label || c.id), h("span", { class: "crit-w" }, "權重 " + pct(nw[c.id])), sliders[c.id]));
+      M.options.forEach(function (o) {
+        var k = o.id + "|" + c.id, s = score[k], info = cellInfo[k] || {};
+        var hue = Math.round((s - 1) / 9 * 120);
+        var tip = (info.rationale || "") + (info.evidence_claim_ids && info.evidence_claim_ids.length ? "\n證據：" + info.evidence_claim_ids.join(", ") : "")
+          + "\n信心：" + (info.confidence || "-") + "\n分歧度（標準差）：" + (spread[k] != null ? spread[k] : "-");
+        row.appendChild(h("td", { class: "cell" + (hotKeys[k] ? " hot" : ""), style: "background:hsl(" + hue + " 60% 45% / .28)", title: tip }, s.toFixed(1)));
+      });
+      tbl.appendChild(row);
+    });
+    var tot = h("tr", { class: "total" }, h("td", null, "加權總分"));
+    M.options.forEach(function (o) { tot.appendChild(h("td", { class: o.id === win ? "winner" : "" }, t[o.id].toFixed(2))); });
+    tbl.appendChild(tot);
+    resultLine.textContent = "目前權重下的贏家：" + (optLabel[win] || win) + (win !== winner ? "（與主席權重的贏家「" + (optLabel[winner] || winner) + "」不同）" : "");
+  }
+
+  renderLens();
+  app.appendChild(h("div", { class: "card" }, h("h2", null, "互動矩陣"),
+    h("div", { class: "muted" }, "切換人格視角，或拖曳滑桿改權重。滑鼠停在分數上可看理由與證據；🔥 表示各方分歧最大的格子。"),
+    lensBox, h("div", { class: "scroll" }, tbl), resultLine));
+  M.criteria.forEach(function (c) { sliders[c.id].value = Math.round(W[c.id] * 100); });
+  render();
+
+  // ---------- tipping points
+  function applyTip(tp) {
+    var w = {}, k = tp.criterion_id, cur = chairW[k], other = 1 - cur;
+    // thresholds are rounded; step just past the crossing so the demo really flips the winner
+    var t = Math.min(1, Math.max(0, tp.threshold + (tp.direction === "increase" ? 0.005 : -0.005)));
+    M.criteria.forEach(function (c) { w[c.id] = c.id === k ? t : chairW[c.id] * (1 - t) / other; });
+    activeLens = "custom"; setWeights(w); renderLens();
+  }
+  if ((A.tipping_points || []).length) {
+    A.tipping_points.forEach(function (tp) {
+      tipBox.appendChild(h("li", null,
+        "若「" + (tp.criterion_label || critLabel[tp.criterion_id]) + "」權重" + (tp.direction === "increase" ? "提高" : "降低") + "到 " + pct(tp.threshold)
+        + "（目前 " + pct(tp.current_weight) + "），" + (optLabel[tp.new_winner] || tp.new_winner) + " 勝出。 ",
+        h("button", { class: "btn", onclick: function () { applyTip(tp); } }, "示範")));
+    });
+  } else tipBox.appendChild(h("li", null, "任何單一準則的權重在 0–100% 之間怎麼調，贏家都不會改變——結論相當穩健。"));
+  var persBox = h("ul");
+  Object.keys(A.persona_lens || {}).forEach(function (id) {
+    var l = A.persona_lens[id], o = (A.persona_own_view || {})[id] || {};
+    persBox.appendChild(h("li", null, pname(id) + "：用他的權重看 → " + (optLabel[l.winner] || l.winner) + "；他自己打的分數 → " + (optLabel[o.winner] || o.winner)));
+  });
+  app.appendChild(h("div", { class: "grid2" },
+    h("div", { class: "card" }, h("h2", null, "翻盤點"), tipBox),
+    h("div", { class: "card" }, h("h2", null, "各人格視角"), persBox,
+      h("div", { class: "muted" }, "最大後悔（越小越安全）：" + M.options.map(function (o) { return (o.label || o.id) + " " + (A.max_regret[o.id] != null ? A.max_regret[o.id].toFixed(2) : "-"); }).join("、")))));
+
+  // ---------- extras
+  function listCard(title, items, fn) {
+    if (!items || !items.length) return;
+    var ul = h("ul"); items.forEach(function (it) { ul.appendChild(h("li", null, fn(it))); });
+    app.appendChild(h("div", { class: "card" }, h("h2", null, title), ul));
+  }
+  listCard("關鍵權衡", X.key_tradeoffs, function (t) { return [h("strong", null, t.title), "：得到 " + (t.gain || "") + "；付出 " + (t.cost || "")]; });
+  listCard("盲點", X.blind_spots, function (b) { return [h("span", { class: "sev-" + (b.severity || "low") }, "[" + (b.severity || "") + "] "), h("strong", null, b.title), "：" + (b.description || "") + (b.why_it_matters ? "（" + b.why_it_matters + "）" : "")]; });
+  listCard("沒人挑戰的假設", X.challenged_assumptions, function (a) { return [h("strong", null, a.assumption), "：" + (a.challenge || "")]; });
+  listCard("未解爭議", X.unresolved_disputes, function (d) { return [h("strong", null, d.title), "。要解決它：" + (d.what_would_settle_it || "")]; });
+  listCard("下一步驗證實驗", X.next_experiments, function (e) { return [h("strong", null, e.title), "（" + (e.effort || "?") + "）" + (e.description || "") + (e.decides ? " → 可決定：" + e.decides : "")]; });
+  listCard("風險登記", X.risks, function (r) { return [h("strong", null, optLabel[r.option_id] || r.option_id), "：" + (r.risk || "") + "（可能性 " + (r.likelihood || "?") + " / 衝擊 " + (r.impact || "?") + "）；緩解：" + (r.mitigation || "")]; });
+  listCard("翻盤條件", v.conditions_to_flip, function (c) { return c; });
+  listCard("高光時刻", X.highlights, function (x) { return [h("strong", null, x.title + "（" + pname(x.speaker_id) + "）"), h("div", { class: "quote" }, x.quote), x.why]; });
+  if (X.mvp) app.appendChild(h("div", { class: "card" }, h("h2", null, "🏆 MVP"), h("p", null, pname(X.mvp.speaker_id) + "：" + (X.mvp.comment || ""))));
+  if (X.audit) app.appendChild(h("div", { class: "card" }, h("h2", null, "稽核"), h("p", null, X.audit)));
+  if ((DATA.warnings || []).length) listCard("資料警告", DATA.warnings, function (w) { return w; });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1277 @@
+{
+  "question": "3 人新創做 B2B SaaS 後端，該選 Go 還是 Rust？（範例資料，非真實辯論）",
+  "options": [
+    {
+      "id": "go",
+      "label": "Go",
+      "description": "用 Go 重寫核心後端"
+    },
+    {
+      "id": "rust",
+      "label": "Rust",
+      "description": "用 Rust 重寫核心後端"
+    },
+    {
+      "id": "python",
+      "label": "維持 Python",
+      "description": "留在 Python/FastAPI，必要處再最佳化"
+    }
+  ],
+  "criteria": [
+    {
+      "id": "delivery_speed",
+      "label": "交付速度",
+      "description": "交付速度（分數越高越好）",
+      "higher_is_better_phrasing": "交付速度越高越好"
+    },
+    {
+      "id": "ops_simplicity",
+      "label": "維運簡單度",
+      "description": "維運簡單度（分數越高越好）",
+      "higher_is_better_phrasing": "維運簡單度越高越好"
+    },
+    {
+      "id": "hiring",
+      "label": "招募與技能匹配",
+      "description": "招募與技能匹配（分數越高越好）",
+      "higher_is_better_phrasing": "招募與技能匹配越高越好"
+    },
+    {
+      "id": "performance",
+      "label": "性能與資源效率",
+      "description": "性能與資源效率（分數越高越好）",
+      "higher_is_better_phrasing": "性能與資源效率越高越好"
+    },
+    {
+      "id": "safety",
+      "label": "可靠性與記憶體安全",
+      "description": "可靠性與記憶體安全（分數越高越好）",
+      "higher_is_better_phrasing": "可靠性與記憶體安全越高越好"
+    },
+    {
+      "id": "ecosystem",
+      "label": "生態成熟度",
+      "description": "生態成熟度（分數越高越好）",
+      "higher_is_better_phrasing": "生態成熟度越高越好"
+    },
+    {
+      "id": "evolvability",
+      "label": "演進彈性",
+      "description": "演進彈性（分數越高越好）",
+      "higher_is_better_phrasing": "演進彈性越高越好"
+    }
+  ],
+  "chairSamples": [
+    {
+      "weights": {
+        "delivery_speed": 24,
+        "ops_simplicity": 20,
+        "hiring": 16,
+        "performance": 9,
+        "safety": 10,
+        "ecosystem": 11,
+        "evolvability": 9
+      },
+      "weight_rationale": {
+        "delivery_speed": "範例：依三人團隊與一年內 500 家客戶的情境設定",
+        "ops_simplicity": "範例：依三人團隊與一年內 500 家客戶的情境設定",
+        "hiring": "範例：依三人團隊與一年內 500 家客戶的情境設定",
+        "performance": "範例：依三人團隊與一年內 500 家客戶的情境設定",
+        "safety": "範例：依三人團隊與一年內 500 家客戶的情境設定",
+        "ecosystem": "範例：依三人團隊與一年內 500 家客戶的情境設定",
+        "evolvability": "範例：依三人團隊與一年內 500 家客戶的情境設定"
+      },
+      "cells": [
+        {
+          "option_id": "go",
+          "criterion_id": "delivery_speed",
+          "score": 7,
+          "rationale": "Go 在「交付速度」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "ops_simplicity",
+          "score": 9,
+          "rationale": "Go 在「維運簡單度」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2",
+            "kiss.1"
+          ],
+          "confidence": "medium"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "hiring",
+          "score": 7,
+          "rationale": "Go 在「招募與技能匹配」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2"
+          ],
+          "confidence": "medium"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "performance",
+          "score": 6,
+          "rationale": "Go 在「性能與資源效率」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2",
+            "kiss.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "safety",
+          "score": 8,
+          "rationale": "Go 在「可靠性與記憶體安全」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2"
+          ],
+          "confidence": "medium"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "ecosystem",
+          "score": 8,
+          "rationale": "Go 在「生態成熟度」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2",
+            "kiss.1"
+          ],
+          "confidence": "medium"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "evolvability",
+          "score": 6,
+          "rationale": "Go 在「演進彈性」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "delivery_speed",
+          "score": 3,
+          "rationale": "Rust 在「交付速度」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "ops_simplicity",
+          "score": 6,
+          "rationale": "Rust 在「維運簡單度」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2",
+            "kiss.1"
+          ],
+          "confidence": "medium"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "hiring",
+          "score": 3,
+          "rationale": "Rust 在「招募與技能匹配」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2"
+          ],
+          "confidence": "medium"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "performance",
+          "score": 9,
+          "rationale": "Rust 在「性能與資源效率」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2",
+            "kiss.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "safety",
+          "score": 10,
+          "rationale": "Rust 在「可靠性與記憶體安全」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2"
+          ],
+          "confidence": "medium"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "ecosystem",
+          "score": 6,
+          "rationale": "Rust 在「生態成熟度」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2",
+            "kiss.1"
+          ],
+          "confidence": "medium"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "evolvability",
+          "score": 6,
+          "rationale": "Rust 在「演進彈性」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "python",
+          "criterion_id": "delivery_speed",
+          "score": 8,
+          "rationale": "維持 Python 在「交付速度」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "python",
+          "criterion_id": "ops_simplicity",
+          "score": 7,
+          "rationale": "維持 Python 在「維運簡單度」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2",
+            "kiss.1"
+          ],
+          "confidence": "medium"
+        },
+        {
+          "option_id": "python",
+          "criterion_id": "hiring",
+          "score": 9,
+          "rationale": "維持 Python 在「招募與技能匹配」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2"
+          ],
+          "confidence": "medium"
+        },
+        {
+          "option_id": "python",
+          "criterion_id": "performance",
+          "score": 2,
+          "rationale": "維持 Python 在「性能與資源效率」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2",
+            "kiss.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "python",
+          "criterion_id": "safety",
+          "score": 5,
+          "rationale": "維持 Python 在「可靠性與記憶體安全」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2"
+          ],
+          "confidence": "medium"
+        },
+        {
+          "option_id": "python",
+          "criterion_id": "ecosystem",
+          "score": 9,
+          "rationale": "維持 Python 在「生態成熟度」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2",
+            "kiss.1"
+          ],
+          "confidence": "medium"
+        },
+        {
+          "option_id": "python",
+          "criterion_id": "evolvability",
+          "score": 3,
+          "rationale": "維持 Python 在「演進彈性」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2"
+          ],
+          "confidence": "high"
+        }
+      ]
+    },
+    {
+      "weights": {
+        "delivery_speed": 25,
+        "ops_simplicity": 21,
+        "hiring": 14,
+        "performance": 10,
+        "safety": 11,
+        "ecosystem": 9,
+        "evolvability": 10
+      },
+      "weight_rationale": {
+        "delivery_speed": "範例：依三人團隊與一年內 500 家客戶的情境設定",
+        "ops_simplicity": "範例：依三人團隊與一年內 500 家客戶的情境設定",
+        "hiring": "範例：依三人團隊與一年內 500 家客戶的情境設定",
+        "performance": "範例：依三人團隊與一年內 500 家客戶的情境設定",
+        "safety": "範例：依三人團隊與一年內 500 家客戶的情境設定",
+        "ecosystem": "範例：依三人團隊與一年內 500 家客戶的情境設定",
+        "evolvability": "範例：依三人團隊與一年內 500 家客戶的情境設定"
+      },
+      "cells": [
+        {
+          "option_id": "go",
+          "criterion_id": "delivery_speed",
+          "score": 8,
+          "rationale": "Go 在「交付速度」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2",
+            "kiss.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "ops_simplicity",
+          "score": 7,
+          "rationale": "Go 在「維運簡單度」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2"
+          ],
+          "confidence": "medium"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "hiring",
+          "score": 8,
+          "rationale": "Go 在「招募與技能匹配」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2",
+            "kiss.1"
+          ],
+          "confidence": "medium"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "performance",
+          "score": 7,
+          "rationale": "Go 在「性能與資源效率」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "safety",
+          "score": 6,
+          "rationale": "Go 在「可靠性與記憶體安全」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2",
+            "kiss.1"
+          ],
+          "confidence": "medium"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "ecosystem",
+          "score": 9,
+          "rationale": "Go 在「生態成熟度」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2"
+          ],
+          "confidence": "medium"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "evolvability",
+          "score": 7,
+          "rationale": "Go 在「演進彈性」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2",
+            "kiss.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "delivery_speed",
+          "score": 4,
+          "rationale": "Rust 在「交付速度」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2",
+            "kiss.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "ops_simplicity",
+          "score": 4,
+          "rationale": "Rust 在「維運簡單度」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2"
+          ],
+          "confidence": "medium"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "hiring",
+          "score": 4,
+          "rationale": "Rust 在「招募與技能匹配」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2",
+            "kiss.1"
+          ],
+          "confidence": "medium"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "performance",
+          "score": 10,
+          "rationale": "Rust 在「性能與資源效率」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "safety",
+          "score": 9,
+          "rationale": "Rust 在「可靠性與記憶體安全」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2",
+            "kiss.1"
+          ],
+          "confidence": "medium"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "ecosystem",
+          "score": 7,
+          "rationale": "Rust 在「生態成熟度」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2"
+          ],
+          "confidence": "medium"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "evolvability",
+          "score": 7,
+          "rationale": "Rust 在「演進彈性」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2",
+            "kiss.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "python",
+          "criterion_id": "delivery_speed",
+          "score": 9,
+          "rationale": "維持 Python 在「交付速度」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2",
+            "kiss.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "python",
+          "criterion_id": "ops_simplicity",
+          "score": 5,
+          "rationale": "維持 Python 在「維運簡單度」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2"
+          ],
+          "confidence": "medium"
+        },
+        {
+          "option_id": "python",
+          "criterion_id": "hiring",
+          "score": 10,
+          "rationale": "維持 Python 在「招募與技能匹配」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2",
+            "kiss.1"
+          ],
+          "confidence": "medium"
+        },
+        {
+          "option_id": "python",
+          "criterion_id": "performance",
+          "score": 3,
+          "rationale": "維持 Python 在「性能與資源效率」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "python",
+          "criterion_id": "safety",
+          "score": 3,
+          "rationale": "維持 Python 在「可靠性與記憶體安全」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2",
+            "kiss.1"
+          ],
+          "confidence": "medium"
+        },
+        {
+          "option_id": "python",
+          "criterion_id": "ecosystem",
+          "score": 10,
+          "rationale": "維持 Python 在「生態成熟度」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2"
+          ],
+          "confidence": "medium"
+        },
+        {
+          "option_id": "python",
+          "criterion_id": "evolvability",
+          "score": 4,
+          "rationale": "維持 Python 在「演進彈性」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2",
+            "kiss.1"
+          ],
+          "confidence": "high"
+        }
+      ]
+    },
+    {
+      "weights": {
+        "delivery_speed": 26,
+        "ops_simplicity": 19,
+        "hiring": 15,
+        "performance": 11,
+        "safety": 9,
+        "ecosystem": 10,
+        "evolvability": 11
+      },
+      "weight_rationale": {
+        "delivery_speed": "範例：依三人團隊與一年內 500 家客戶的情境設定",
+        "ops_simplicity": "範例：依三人團隊與一年內 500 家客戶的情境設定",
+        "hiring": "範例：依三人團隊與一年內 500 家客戶的情境設定",
+        "performance": "範例：依三人團隊與一年內 500 家客戶的情境設定",
+        "safety": "範例：依三人團隊與一年內 500 家客戶的情境設定",
+        "ecosystem": "範例：依三人團隊與一年內 500 家客戶的情境設定",
+        "evolvability": "範例：依三人團隊與一年內 500 家客戶的情境設定"
+      },
+      "cells": [
+        {
+          "option_id": "go",
+          "criterion_id": "delivery_speed",
+          "score": 9,
+          "rationale": "Go 在「交付速度」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "ops_simplicity",
+          "score": 8,
+          "rationale": "Go 在「維運簡單度」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2",
+            "kiss.1"
+          ],
+          "confidence": "medium"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "hiring",
+          "score": 6,
+          "rationale": "Go 在「招募與技能匹配」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2"
+          ],
+          "confidence": "medium"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "performance",
+          "score": 8,
+          "rationale": "Go 在「性能與資源效率」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2",
+            "kiss.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "safety",
+          "score": 7,
+          "rationale": "Go 在「可靠性與記憶體安全」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2"
+          ],
+          "confidence": "medium"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "ecosystem",
+          "score": 7,
+          "rationale": "Go 在「生態成熟度」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2",
+            "kiss.1"
+          ],
+          "confidence": "medium"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "evolvability",
+          "score": 8,
+          "rationale": "Go 在「演進彈性」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "delivery_speed",
+          "score": 5,
+          "rationale": "Rust 在「交付速度」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "ops_simplicity",
+          "score": 5,
+          "rationale": "Rust 在「維運簡單度」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2",
+            "kiss.1"
+          ],
+          "confidence": "medium"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "hiring",
+          "score": 2,
+          "rationale": "Rust 在「招募與技能匹配」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2"
+          ],
+          "confidence": "medium"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "performance",
+          "score": 10,
+          "rationale": "Rust 在「性能與資源效率」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2",
+            "kiss.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "safety",
+          "score": 10,
+          "rationale": "Rust 在「可靠性與記憶體安全」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2"
+          ],
+          "confidence": "medium"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "ecosystem",
+          "score": 5,
+          "rationale": "Rust 在「生態成熟度」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2",
+            "kiss.1"
+          ],
+          "confidence": "medium"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "evolvability",
+          "score": 8,
+          "rationale": "Rust 在「演進彈性」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "python",
+          "criterion_id": "delivery_speed",
+          "score": 10,
+          "rationale": "維持 Python 在「交付速度」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "python",
+          "criterion_id": "ops_simplicity",
+          "score": 6,
+          "rationale": "維持 Python 在「維運簡單度」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2",
+            "kiss.1"
+          ],
+          "confidence": "medium"
+        },
+        {
+          "option_id": "python",
+          "criterion_id": "hiring",
+          "score": 8,
+          "rationale": "維持 Python 在「招募與技能匹配」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2"
+          ],
+          "confidence": "medium"
+        },
+        {
+          "option_id": "python",
+          "criterion_id": "performance",
+          "score": 4,
+          "rationale": "維持 Python 在「性能與資源效率」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2",
+            "kiss.1"
+          ],
+          "confidence": "high"
+        },
+        {
+          "option_id": "python",
+          "criterion_id": "safety",
+          "score": 4,
+          "rationale": "維持 Python 在「可靠性與記憶體安全」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2"
+          ],
+          "confidence": "medium"
+        },
+        {
+          "option_id": "python",
+          "criterion_id": "ecosystem",
+          "score": 8,
+          "rationale": "維持 Python 在「生態成熟度」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2",
+            "kiss.1"
+          ],
+          "confidence": "medium"
+        },
+        {
+          "option_id": "python",
+          "criterion_id": "evolvability",
+          "score": 5,
+          "rationale": "維持 Python 在「演進彈性」：範例理由（示範資料）",
+          "evidence_claim_ids": [
+            "cto.2"
+          ],
+          "confidence": "high"
+        }
+      ]
+    }
+  ],
+  "personaScores": [
+    {
+      "speaker_id": "conservative_cto",
+      "weights": {
+        "delivery_speed": 15,
+        "ops_simplicity": 30,
+        "hiring": 30,
+        "performance": 5,
+        "safety": 5,
+        "ecosystem": 10,
+        "evolvability": 5
+      },
+      "cells": [
+        {
+          "option_id": "go",
+          "criterion_id": "delivery_speed",
+          "score": 7,
+          "reason": "Go 在「交付速度」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "ops_simplicity",
+          "score": 9,
+          "reason": "Go 在「維運簡單度」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "hiring",
+          "score": 7,
+          "reason": "Go 在「招募與技能匹配」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "performance",
+          "score": 6,
+          "reason": "Go 在「性能與資源效率」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "safety",
+          "score": 8,
+          "reason": "Go 在「可靠性與記憶體安全」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "ecosystem",
+          "score": 8,
+          "reason": "Go 在「生態成熟度」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "evolvability",
+          "score": 6,
+          "reason": "Go 在「演進彈性」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "delivery_speed",
+          "score": 3,
+          "reason": "Rust 在「交付速度」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "ops_simplicity",
+          "score": 6,
+          "reason": "Rust 在「維運簡單度」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "hiring",
+          "score": 3,
+          "reason": "Rust 在「招募與技能匹配」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "performance",
+          "score": 9,
+          "reason": "Rust 在「性能與資源效率」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "safety",
+          "score": 10,
+          "reason": "Rust 在「可靠性與記憶體安全」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "ecosystem",
+          "score": 6,
+          "reason": "Rust 在「生態成熟度」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "evolvability",
+          "score": 6,
+          "reason": "Rust 在「演進彈性」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "python",
+          "criterion_id": "delivery_speed",
+          "score": 8,
+          "reason": "維持 Python 在「交付速度」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "python",
+          "criterion_id": "ops_simplicity",
+          "score": 7,
+          "reason": "維持 Python 在「維運簡單度」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "python",
+          "criterion_id": "hiring",
+          "score": 9,
+          "reason": "維持 Python 在「招募與技能匹配」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "python",
+          "criterion_id": "performance",
+          "score": 2,
+          "reason": "維持 Python 在「性能與資源效率」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "python",
+          "criterion_id": "safety",
+          "score": 5,
+          "reason": "維持 Python 在「可靠性與記憶體安全」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "python",
+          "criterion_id": "ecosystem",
+          "score": 9,
+          "reason": "維持 Python 在「生態成熟度」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "python",
+          "criterion_id": "evolvability",
+          "score": 3,
+          "reason": "維持 Python 在「演進彈性」：人格視角（示範資料）"
+        }
+      ],
+      "final_choice": "go",
+      "one_line": "先交付，再最佳化。"
+    },
+    {
+      "speaker_id": "perf_zealot",
+      "weights": {
+        "delivery_speed": 5,
+        "ops_simplicity": 5,
+        "hiring": 5,
+        "performance": 50,
+        "safety": 25,
+        "ecosystem": 5,
+        "evolvability": 5
+      },
+      "cells": [
+        {
+          "option_id": "go",
+          "criterion_id": "delivery_speed",
+          "score": 8,
+          "reason": "Go 在「交付速度」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "ops_simplicity",
+          "score": 7,
+          "reason": "Go 在「維運簡單度」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "hiring",
+          "score": 8,
+          "reason": "Go 在「招募與技能匹配」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "performance",
+          "score": 7,
+          "reason": "Go 在「性能與資源效率」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "safety",
+          "score": 6,
+          "reason": "Go 在「可靠性與記憶體安全」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "ecosystem",
+          "score": 9,
+          "reason": "Go 在「生態成熟度」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "evolvability",
+          "score": 7,
+          "reason": "Go 在「演進彈性」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "delivery_speed",
+          "score": 4,
+          "reason": "Rust 在「交付速度」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "ops_simplicity",
+          "score": 4,
+          "reason": "Rust 在「維運簡單度」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "hiring",
+          "score": 4,
+          "reason": "Rust 在「招募與技能匹配」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "performance",
+          "score": 10,
+          "reason": "Rust 在「性能與資源效率」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "safety",
+          "score": 9,
+          "reason": "Rust 在「可靠性與記憶體安全」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "ecosystem",
+          "score": 7,
+          "reason": "Rust 在「生態成熟度」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "evolvability",
+          "score": 7,
+          "reason": "Rust 在「演進彈性」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "python",
+          "criterion_id": "delivery_speed",
+          "score": 9,
+          "reason": "維持 Python 在「交付速度」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "python",
+          "criterion_id": "ops_simplicity",
+          "score": 5,
+          "reason": "維持 Python 在「維運簡單度」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "python",
+          "criterion_id": "hiring",
+          "score": 10,
+          "reason": "維持 Python 在「招募與技能匹配」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "python",
+          "criterion_id": "performance",
+          "score": 3,
+          "reason": "維持 Python 在「性能與資源效率」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "python",
+          "criterion_id": "safety",
+          "score": 3,
+          "reason": "維持 Python 在「可靠性與記憶體安全」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "python",
+          "criterion_id": "ecosystem",
+          "score": 10,
+          "reason": "維持 Python 在「生態成熟度」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "python",
+          "criterion_id": "evolvability",
+          "score": 4,
+          "reason": "維持 Python 在「演進彈性」：人格視角（示範資料）"
+        }
+      ],
+      "final_choice": "rust",
+      "one_line": "雲端帳單是性能債的利息。"
+    },
+    {
+      "speaker_id": "kiss_hacker",
+      "weights": {
+        "delivery_speed": 35,
+        "ops_simplicity": 30,
+        "hiring": 10,
+        "performance": 5,
+        "safety": 5,
+        "ecosystem": 10,
+        "evolvability": 5
+      },
+      "cells": [
+        {
+          "option_id": "go",
+          "criterion_id": "delivery_speed",
+          "score": 9,
+          "reason": "Go 在「交付速度」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "ops_simplicity",
+          "score": 8,
+          "reason": "Go 在「維運簡單度」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "hiring",
+          "score": 6,
+          "reason": "Go 在「招募與技能匹配」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "performance",
+          "score": 8,
+          "reason": "Go 在「性能與資源效率」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "safety",
+          "score": 7,
+          "reason": "Go 在「可靠性與記憶體安全」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "ecosystem",
+          "score": 7,
+          "reason": "Go 在「生態成熟度」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "go",
+          "criterion_id": "evolvability",
+          "score": 8,
+          "reason": "Go 在「演進彈性」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "delivery_speed",
+          "score": 5,
+          "reason": "Rust 在「交付速度」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "ops_simplicity",
+          "score": 5,
+          "reason": "Rust 在「維運簡單度」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "hiring",
+          "score": 2,
+          "reason": "Rust 在「招募與技能匹配」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "performance",
+          "score": 10,
+          "reason": "Rust 在「性能與資源效率」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "safety",
+          "score": 10,
+          "reason": "Rust 在「可靠性與記憶體安全」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "ecosystem",
+          "score": 5,
+          "reason": "Rust 在「生態成熟度」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "rust",
+          "criterion_id": "evolvability",
+          "score": 8,
+          "reason": "Rust 在「演進彈性」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "python",
+          "criterion_id": "delivery_speed",
+          "score": 10,
+          "reason": "維持 Python 在「交付速度」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "python",
+          "criterion_id": "ops_simplicity",
+          "score": 6,
+          "reason": "維持 Python 在「維運簡單度」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "python",
+          "criterion_id": "hiring",
+          "score": 8,
+          "reason": "維持 Python 在「招募與技能匹配」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "python",
+          "criterion_id": "performance",
+          "score": 4,
+          "reason": "維持 Python 在「性能與資源效率」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "python",
+          "criterion_id": "safety",
+          "score": 4,
+          "reason": "維持 Python 在「可靠性與記憶體安全」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "python",
+          "criterion_id": "ecosystem",
+          "score": 8,
+          "reason": "維持 Python 在「生態成熟度」：人格視角（示範資料）"
+        },
+        {
+          "option_id": "python",
+          "criterion_id": "evolvability",
+          "score": 5,
+          "reason": "維持 Python 在「演進彈性」：人格視角（示範資料）"
+        }
+      ],
+      "final_choice": "python",
+      "one_line": "最好的程式碼是沒寫的程式碼。"
+    }
+  ],
+  "seed": 42,
+  "extras": {
+    "personas": [
+      {
+        "id": "conservative_cto",
+        "short_name": "陳CTO",
+        "emoji": "🛡️"
+      },
+      {
+        "id": "perf_zealot",
+        "short_name": "Vex",
+        "emoji": "⚡"
+      },
+      {
+        "id": "kiss_hacker",
+        "short_name": "剃刀",
+        "emoji": "🪓"
+      }
+    ],
+    "verdict": {
+      "confidence_label": "中",
+      "one_liner": "（範例）依權重與情境得出的示範判決。",
+      "recommendation_text": "這是示範資料，用來預覽矩陣頁面；真實辯論會由主席依程式計算結果撰寫。",
+      "conditions_to_flip": [
+        "（範例）性能權重提高到臨界值以上時改選性能方案"
+      ]
+    },
+    "key_tradeoffs": [
+      {
+        "title": "交付速度 vs 長期性能",
+        "gain": "更快上市",
+        "cost": "日後可能要重寫熱點"
+      }
+    ],
+    "blind_spots": [
+      {
+        "severity": "high",
+        "title": "招募市場",
+        "description": "範例盲點。",
+        "why_it_matters": "影響半年後的擴編速度"
+      }
+    ],
+    "challenged_assumptions": [
+      {
+        "assumption": "一年內會有 500 家客戶",
+        "challenge": "範例：若成長慢一半，結論是否改變？"
+      }
+    ],
+    "next_experiments": [
+      {
+        "title": "2 天壓測 spike",
+        "effort": "2 人日",
+        "description": "用真實查詢型態壓測",
+        "decides": "性能是否真的是瓶頸"
+      }
+    ]
+  }
+}
