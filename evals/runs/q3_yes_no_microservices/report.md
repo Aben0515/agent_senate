@@ -1,10 +1,26 @@
 # 虛擬內閣決策裁決報告：既有 Django 單體架構（20 萬行代碼、8 人團隊、部署一次需 40 分鐘），是否該拆分為微服務架構？
 
-## 一、 一句話結論
-> **推薦方案：維持單體但模組化 (Modular Monolith)（keep_monolith_modularize）**（勝率：97%，加權總分：8.45，信心評級：高）
+## 一、一句話結論
+
+> **推薦方案：維持單體但模組化 (Modular Monolith)（`keep_monolith_modularize`）**（模擬勝率：97%，加權總分：8.45，信心評級：高）
+>
+> 在當前情境事實約束下，強烈推薦 keep_monolith_modularize 作為最優解。
+
+經過完整交叉質詢與敏感度分析，keep_monolith_modularize 在交付速度、維運簡單度與團隊心智負擔上取得決定性領先優勢。
+
+**翻盤條件**：
+- 若業務規模或核心約束在未來幾個月內發生 10 倍以上突變，方需考慮改選 gradual_service_extraction
+
 ---
 
-## 二、 問題框定與情境約束
+## 二、問題框定與情境約束
+
+**決策題目**：既有 Django 單體架構（20 萬行代碼、8 人團隊、部署一次需 40 分鐘），是否該拆分為微服務架構？
+
+### 候選方案
+- `keep_monolith_modularize` **維持單體但模組化 (Modular Monolith)** — 梳理代碼邊界、優化測試與流水線、引入 Django apps 領域解耦
+- `split_microservices` **全面拆分微服務** — 拆為 6-8 個獨立微服務與 gRPC 呼叫
+- `gradual_service_extraction` **漸進抽取單一最痛服務** — 僅將報表與高頻任務抽出獨立
 
 ### 情境事實（硬性約束）
 - 系統運營 4 年，核心業務邏輯高度耦合，單元測試執行需 25 分鐘，CI/CD 部署耗時 40 分鐘
@@ -15,11 +31,11 @@
 
 ---
 
-## 三、 決策權衡矩陣（由程式計算產生）
+## 三、決策權衡矩陣（由程式計算產生）
 
-本矩陣由中立評審獨立評分經 `analyze.mjs` 取中位數並結合情境權重計算：
+本矩陣由 3 位中立評審獨立評分，經 `analyze.mjs` 取每格中位數並以平均權重加權：
 
-| 準則 ID | 評估準則（越高越好） | 中立權重 | 維持單體但模組化 (Modular Monolith) (`keep_monolith_modularize`) | 全面拆分微服務 (`split_microservices`) | 漸進抽取單一最痛服務 (`gradual_service_extraction`) | 關鍵理由摘要 |
+| 準則 ID | 評估準則（越高越好） | 中立權重 | 維持單體但模組化 (Modular Monolith) (`keep_monolith_modularize`) | 全面拆分微服務 (`split_microservices`) | 漸進抽取單一最痛服務 (`gradual_service_extraction`) | 贏家該格理由 |
 |---|---|:---:|:---:|:---:|:---:|---|
 | `ops_overhead` | 維運負擔可控性 | **33%** | 9.0 | 4.2 | 4.2 | 維持單體但模組化 (Modular Monolith) 在 維運負擔可控性 表現分析 |
 | `delivery_cadence` | 發布節奏與日常迭代 | **26%** | 9.0 | 4.2 | 4.2 | 維持單體但模組化 (Modular Monolith) 在 發布節奏與日常迭代 表現分析 |
@@ -29,46 +45,92 @@
 | `fault_isolation` | 故障爆炸半徑隔離 | **10%** | 7.2 | 8.8 | 8.8 | 維持單體但模組化 (Modular Monolith) 在 故障爆炸半徑隔離 評估 |
 | **加權總分** | — | **100%** | **8.45** | **6.07** | **6.07** | **領先幅度：2.38 分** |
 
+**權重理由**：
+- 維運負擔可控性（33%）：依據專案現階段核心矛盾權衡
+- 發布節奏與日常迭代（26%）：依據專案現階段核心矛盾權衡
+- 資料一致性與事務保證（10%）：依據專案現階段核心矛盾權衡
+- 團隊心智負擔與認知頻寬（10%）：依據專案現階段核心矛盾權衡
+- 遷移風險與業務中斷率（10%）：依據專案現階段核心矛盾權衡
+- 故障爆炸半徑隔離（10%）：依據專案現階段核心矛盾權衡
+
 ---
 
-## 四、 穩健度與敏感度分析
+## 四、穩健度與敏感度分析
 
 - **推薦贏家**：`keep_monolith_modularize`
 - **領先幅度 (Margin)**：2.38 分
 - **最小後悔方案 (Minimax Regret)**：`keep_monolith_modularize`
-- **Monte Carlo 模擬勝率**（在評審意見擾動與權重隨機變動下的模擬獲勝比例；註：此為模型敏感度指標，非真實商業成功機率）：
+- **Monte Carlo 模擬勝率**（評審意見擾動與權重隨機變動下的獲勝比例；這是評分的敏感度指標，不是真實商業成功機率）：
   - 維持單體但模組化 (Modular Monolith) (`keep_monolith_modularize`): **97%**
   - 全面拆分微服務 (`split_microservices`): **0%**
   - 漸進抽取單一最痛服務 (`gradual_service_extraction`): **3%**
+  > ⚠️ **評審打分高度一致**（評審平均分歧標準差僅 0.187），模擬勝率可能低估現實世界的不確定性。
+- 隨機種子：42
 
 ### 翻盤臨界點 (Tipping Points)
-- 若「**團隊心智負擔與認知頻寬**」權重從目前 10% 提高至 **64%** 以上，**gradual_service_extraction** 將翻盤勝出。
-- 若「**遷移風險與業務中斷率**」權重從目前 10% 提高至 **64%** 以上，**gradual_service_extraction** 將翻盤勝出。
-- 若「**故障爆炸半徑隔離**」權重從目前 10% 提高至 **64%** 以上，**gradual_service_extraction** 將翻盤勝出。
+- 若「**團隊心智負擔與認知頻寬**」權重從目前 10% 提高到 **64%–64% 之間**（其他權重等比例縮放），**漸進抽取單一最痛服務（`gradual_service_extraction`）** 會勝出；超出這個區間又會換人領先。
+- 若「**遷移風險與業務中斷率**」權重從目前 10% 提高到 **64%–64% 之間**（其他權重等比例縮放），**漸進抽取單一最痛服務（`gradual_service_extraction`）** 會勝出；超出這個區間又會換人領先。
+- 若「**故障爆炸半徑隔離**」權重從目前 10% 提高到 **64%–64% 之間**（其他權重等比例縮放），**漸進抽取單一最痛服務（`gradual_service_extraction`）** 會勝出；超出這個區間又會換人領先。
 
-### 各人格價值觀視角 (Persona Lens: 辯手權重 × 主席客觀分數)
-> 說明：檢驗「如果採用該辯手的核心價值觀與權重排序，但依據客觀中位數評分」，哪一個方案會勝出：
+### 各人格價值觀視角（Persona Lens：辯手權重 × 中立評審分數）
+> 如果採用該辯手的價值觀（權重），但用中立評審的中位數分數，哪個方案勝出：
 
-| 辯手身分 | 勝出方案 | 各方案得分詳情 |
+| 辯手 | 勝出方案 | 各方案得分 |
 |---|:---:|---|
-| **conservative_cto** | `keep_monolith_modularize` | keep_monolith_modularize: 8.46、split_microservices: 6.04、gradual_service_extraction: 6.04 |
-| **perf_zealot** | `gradual_service_extraction` | keep_monolith_modularize: 7.74、split_microservices: 7.88、gradual_service_extraction: 7.88 |
+| **🛡️ 陳CTO** | `keep_monolith_modularize` | keep_monolith_modularize: 8.46、split_microservices: 6.04、gradual_service_extraction: 6.04 |
+| **⚡ Vex** | `gradual_service_extraction` | keep_monolith_modularize: 7.74、split_microservices: 7.88、gradual_service_extraction: 7.88 |
 
-### 辯手主觀立場評分 (Persona Own View: 辯手自身主觀打分)
-> 說明：辯手完全基於自身偏好與立場各自打出的主觀評分總結：
+### 辯手主觀立場評分（Persona Own View：辯手權重 × 辯手自己的分數）
+> 辯手完全依自身偏好打分的結果，僅供對照，不參與贏家判定：
 
-| 辯手身分 | 主觀推薦 | 各方案主觀得分 | 總結一句話 |
-|---|:---:|---|---|
-| **conservative_cto** | `keep_monolith_modularize` | keep_monolith_modularize: 9.00、split_microservices: 5.00、gradual_service_extraction: 5.00 |  |
-| **perf_zealot** | `gradual_service_extraction` | keep_monolith_modularize: 6.00、split_microservices: 6.00、gradual_service_extraction: 9.50 |  |
+| 辯手 | 主觀推薦 | 自報最終選擇 | 各方案主觀得分 | 一句話總結 |
+|---|:---:|:---:|---|---|
+| **🛡️ 陳CTO** | `keep_monolith_modularize` | `keep_monolith_modularize` | keep_monolith_modularize: 9.00、split_microservices: 5.00、gradual_service_extraction: 5.00 | 首年生存至上，嚴控試錯成本。 |
+| **⚡ Vex** | `gradual_service_extraction` | `gradual_service_extraction` | keep_monolith_modularize: 6.00、split_microservices: 6.00、gradual_service_extraction: 9.50 | 底層架構的技術債會加倍奉還。 |
 
 ---
 
-## 八、 辯論精華與計分板
+## 五、紅隊警示（落敗方案最強反向辯護）
+
+【反方技術紅隊警示】若選擇 keep_monolith_modularize，團隊切不可因為初期的開發順遂而放鬆架構紀律。一旦未來出現特定極限計算或合規硬性限制，當初未選 gradual_service_extraction 將迫使團隊啟動局部的微服務抽取或重構。
+
+---
+
+## 六、關鍵權衡 (Key Trade-offs)
+
+### 即時交付速度 vs 極致架構擴展性
+- **獲得**：快速上線驗證
+- **代價**：承擔長期局部重構可能性
+
+---
+
+## 七、盲點清單與假設挑戰 (Blind Spots)
+
+### 盲點獵人發現的盲點
+- **[MEDIUM] 團隊擴張時的認知負擔溢價**：新成員進駐後的系統邊界理解成本（*為何重要：影響團隊擴展速度*）
+
+---
+
+## 八、建議的低成本下一步驗證實驗
+
+- **核心資料流原型壓測 Spike**（預估工時：2 天）
+  - 實驗內容：針對預估尖峰量級實施 2 天原型驗證
+  - 能決定：確認是否真有架構瓶頸風險
+
+---
+
+## 九、辯論精華與計分板
 
 ### 辯手表現計分板
 | 辯手 | 提出論點數 | 攻擊命中 | 主動讓步 | 被標謬誤 | 查核存疑 | MVP得分 |
 |---|---:|---:|---:|---:|---:|---:|
-| conservative_cto | 3 | 1 | 0 | 0 | 0 | **3** |
-| perf_zealot | 2 | 1 | 1 | 0 | 0 | **4** |
-| kiss_hacker | 2 | 1 | 0 | 0 | 0 | **3** |
+| 🛡️ 陳CTO | 3 | 0 | 0 | 0 | 0 | **0** |
+| ⚡ Vex | 2 | 0 | 1 | 0 | 0 | **1** |
+| 🪓 剃刀 | 2 | 0 | 0 | 0 | 0 | **0** |
+
+### 辯論高光時刻 (Highlights)
+- **最具殺傷力的商業提問**（🛡️ 陳CTO）
+  > 「新創團隊的第一法則是活到下一個季度」
+  *點評：精準直擊新創技術選型的本質*
+
+🏆 **本場 MVP**：**🛡️ 陳CTO** — 始終緊扣業務生存與現金流硬約束

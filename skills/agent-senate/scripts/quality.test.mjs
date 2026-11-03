@@ -78,7 +78,7 @@ test('evaluateDebateQuality penalizes flattery and vague openings', () => {
         type: 'debater',
         kind: 'rebuttal',
         speaker: 'vex',
-        text: '您說得有道理，我非常同意陳 CTO 的觀點。',
+        text: '您說得有道理，我非常同意陳 CTO 的觀點，確實很有見地。',
       },
     ],
     claims: {},
@@ -88,4 +88,22 @@ test('evaluateDebateQuality penalizes flattery and vague openings', () => {
   assert.equal(res.passed, false);
   assert.equal(res.breakdown.stance_clarity, 0);
   assert.equal(res.breakdown.zero_flattery, 0);
+});
+
+test('quality rubric alignment: missing directives score 0, closings must come from every debater', () => {
+  const res = evaluateDebateQuality({
+    brief: { options: [{ id: 'go', label: 'Go' }] },
+    turns: [
+      { type: 'debater', kind: 'opening', speaker: 'cto', text: 'Go。' },
+      { type: 'debater', kind: 'opening', speaker: 'vex', text: 'Go 也行。' },
+      { type: 'debater', kind: 'closing', speaker: 'cto', text: '結辯 Go。' },
+      { type: 'debater', kind: 'rebuttal', speaker: 'vex', text: '【讓步 #vex.1】好吧。' },
+    ],
+    claims: {},
+    fact_checks: [{ verdict: 'questionable' }],
+  });
+  assert.equal(res.breakdown.chair_sharpness, 0);
+  assert.equal(res.breakdown.closing_integrity, 1);
+  assert.equal(res.breakdown.quote_compliance, 0, 'a concession marker is not a quote');
+  assert.equal(res.breakdown.factuality, 1, 'one questionable flag is worth 1 point per rubric');
 });

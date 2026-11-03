@@ -1,10 +1,25 @@
 # 虛擬內閣決策裁決報告：客服對話摘要功能（每日 5 萬次呼叫、含敏感客戶個資）：該自架開源 LLM 還是使用雲端商業 API？
 
-## 一、 一句話結論
-> **推薦方案：雲端商業 API + 本地去識別化前置代理（cloud_api_with_anonymization）**（勝率：97%，加權總分：8.45，信心評級：高）
+## 一、一句話結論
+
+> **推薦方案：雲端商業 API + 本地去識別化前置代理（`cloud_api_with_anonymization`）**（模擬勝率：97%，加權總分：8.45，信心評級：高）
+>
+> 在當前情境事實約束下，強烈推薦 cloud_api_with_anonymization 作為最優解。
+
+經過完整交叉質詢與敏感度分析，cloud_api_with_anonymization 在交付速度、維運簡單度與團隊心智負擔上取得決定性領先優勢。
+
+**翻盤條件**：
+- 若業務規模或核心約束在未來幾個月內發生 10 倍以上突變，方需考慮改選 self_hosted_open_llm
+
 ---
 
-## 二、 問題框定與情境約束
+## 二、問題框定與情境約束
+
+**決策題目**：客服對話摘要功能（每日 5 萬次呼叫、含敏感客戶個資）：該自架開源 LLM 還是使用雲端商業 API？
+
+### 候選方案
+- `cloud_api_with_anonymization` **雲端商業 API + 本地去識別化前置代理** — 在內部網關使用 Presidio/正則脫敏後調用頂級商業 API
+- `self_hosted_open_llm` **自架開源私有化 LLM (vLLM)** — 在內網部署開源模型 (如 Llama-3/Qwen) 確保數據不出境
 
 ### 情境事實（硬性約束）
 - 客服系統每日處理 5 萬通客服對話，內含電話、地址與信用卡後四碼
@@ -15,11 +30,11 @@
 
 ---
 
-## 三、 決策權衡矩陣（由程式計算產生）
+## 三、決策權衡矩陣（由程式計算產生）
 
-本矩陣由中立評審獨立評分經 `analyze.mjs` 取中位數並結合情境權重計算：
+本矩陣由 3 位中立評審獨立評分，經 `analyze.mjs` 取每格中位數並以平均權重加權：
 
-| 準則 ID | 評估準則（越高越好） | 中立權重 | 雲端商業 API + 本地去識別化前置代理 (`cloud_api_with_anonymization`) | 自架開源私有化 LLM (vLLM) (`self_hosted_open_llm`) | 關鍵理由摘要 |
+| 準則 ID | 評估準則（越高越好） | 中立權重 | 雲端商業 API + 本地去識別化前置代理 (`cloud_api_with_anonymization`) | 自架開源私有化 LLM (vLLM) (`self_hosted_open_llm`) | 贏家該格理由 |
 |---|---|:---:|:---:|:---:|---|
 | `regulatory_compliance` | 個資法法規合規與審計安全性 | **33%** | 9.0 | 4.2 | 雲端商業 API + 本地去識別化前置代理 在 個資法法規合規與審計安全性 表現分析 |
 | `summary_quality` | 長文本對話摘要品質與精準度 | **26%** | 9.0 | 4.2 | 雲端商業 API + 本地去識別化前置代理 在 長文本對話摘要品質與精準度 表現分析 |
@@ -29,45 +44,91 @@
 | `vendor_lockin` | 供應商鎖定防範 | **10%** | 7.2 | 8.8 | 雲端商業 API + 本地去識別化前置代理 在 供應商鎖定防範 評估 |
 | **加權總分** | — | **100%** | **8.45** | **6.07** | **領先幅度：2.38 分** |
 
+**權重理由**：
+- 個資法法規合規與審計安全性（33%）：依據專案現階段核心矛盾權衡
+- 長文本對話摘要品質與精準度（26%）：依據專案現階段核心矛盾權衡
+- 基礎設施三年總持有成本 (TCO)（10%）：依據專案現階段核心矛盾權衡
+- 維運簡單度與 SLA 保證（10%）：依據專案現階段核心矛盾權衡
+- 尖峰流量彈性伸縮（10%）：依據專案現階段核心矛盾權衡
+- 供應商鎖定防範（10%）：依據專案現階段核心矛盾權衡
+
 ---
 
-## 四、 穩健度與敏感度分析
+## 四、穩健度與敏感度分析
 
 - **推薦贏家**：`cloud_api_with_anonymization`
 - **領先幅度 (Margin)**：2.38 分
 - **最小後悔方案 (Minimax Regret)**：`cloud_api_with_anonymization`
-- **Monte Carlo 模擬勝率**（在評審意見擾動與權重隨機變動下的模擬獲勝比例；註：此為模型敏感度指標，非真實商業成功機率）：
+- **Monte Carlo 模擬勝率**（評審意見擾動與權重隨機變動下的獲勝比例；這是評分的敏感度指標，不是真實商業成功機率）：
   - 雲端商業 API + 本地去識別化前置代理 (`cloud_api_with_anonymization`): **97%**
   - 自架開源私有化 LLM (vLLM) (`self_hosted_open_llm`): **3%**
+  > ⚠️ **評審打分高度一致**（評審平均分歧標準差僅 0.177），模擬勝率可能低估現實世界的不確定性。
+- 隨機種子：42
 
 ### 翻盤臨界點 (Tipping Points)
-- 若「**維運簡單度與 SLA 保證**」權重從目前 10% 提高至 **64%** 以上，**self_hosted_open_llm** 將翻盤勝出。
-- 若「**尖峰流量彈性伸縮**」權重從目前 10% 提高至 **64%** 以上，**self_hosted_open_llm** 將翻盤勝出。
-- 若「**供應商鎖定防範**」權重從目前 10% 提高至 **64%** 以上，**self_hosted_open_llm** 將翻盤勝出。
+- 若「**維運簡單度與 SLA 保證**」權重從目前 10% 提高到 **64%** 以上（其他權重等比例縮放），**自架開源私有化 LLM (vLLM)（`self_hosted_open_llm`）** 將翻盤勝出。
+- 若「**尖峰流量彈性伸縮**」權重從目前 10% 提高到 **64%** 以上（其他權重等比例縮放），**自架開源私有化 LLM (vLLM)（`self_hosted_open_llm`）** 將翻盤勝出。
+- 若「**供應商鎖定防範**」權重從目前 10% 提高到 **64%** 以上（其他權重等比例縮放），**自架開源私有化 LLM (vLLM)（`self_hosted_open_llm`）** 將翻盤勝出。
 
-### 各人格價值觀視角 (Persona Lens: 辯手權重 × 主席客觀分數)
-> 說明：檢驗「如果採用該辯手的核心價值觀與權重排序，但依據客觀中位數評分」，哪一個方案會勝出：
+### 各人格價值觀視角（Persona Lens：辯手權重 × 中立評審分數）
+> 如果採用該辯手的價值觀（權重），但用中立評審的中位數分數，哪個方案勝出：
 
-| 辯手身分 | 勝出方案 | 各方案得分詳情 |
+| 辯手 | 勝出方案 | 各方案得分 |
 |---|:---:|---|
-| **security_paranoid** | `cloud_api_with_anonymization` | cloud_api_with_anonymization: 8.46、self_hosted_open_llm: 6.04 |
-| **conservative_cto** | `self_hosted_open_llm` | cloud_api_with_anonymization: 7.74、self_hosted_open_llm: 7.88 |
+| **🔐 資安官** | `cloud_api_with_anonymization` | cloud_api_with_anonymization: 8.46、self_hosted_open_llm: 6.04 |
+| **🛡️ 陳CTO** | `self_hosted_open_llm` | cloud_api_with_anonymization: 7.74、self_hosted_open_llm: 7.88 |
 
-### 辯手主觀立場評分 (Persona Own View: 辯手自身主觀打分)
-> 說明：辯手完全基於自身偏好與立場各自打出的主觀評分總結：
+### 辯手主觀立場評分（Persona Own View：辯手權重 × 辯手自己的分數）
+> 辯手完全依自身偏好打分的結果，僅供對照，不參與贏家判定：
 
-| 辯手身分 | 主觀推薦 | 各方案主觀得分 | 總結一句話 |
-|---|:---:|---|---|
-| **security_paranoid** | `cloud_api_with_anonymization` | cloud_api_with_anonymization: 9.00、self_hosted_open_llm: 5.00 |  |
-| **conservative_cto** | `self_hosted_open_llm` | cloud_api_with_anonymization: 6.00、self_hosted_open_llm: 9.50 |  |
+| 辯手 | 主觀推薦 | 自報最終選擇 | 各方案主觀得分 | 一句話總結 |
+|---|:---:|:---:|---|---|
+| **🔐 資安官** | `cloud_api_with_anonymization` | `cloud_api_with_anonymization` | cloud_api_with_anonymization: 9.00、self_hosted_open_llm: 5.00 | 首年生存至上，嚴控試錯成本。 |
+| **🛡️ 陳CTO** | `self_hosted_open_llm` | `self_hosted_open_llm` | cloud_api_with_anonymization: 6.00、self_hosted_open_llm: 9.50 | 底層架構的技術債會加倍奉還。 |
 
 ---
 
-## 八、 辯論精華與計分板
+## 五、紅隊警示（落敗方案最強反向辯護）
+
+【反方技術紅隊警示】若選擇 cloud_api_with_anonymization，團隊切不可因為初期的開發順遂而放鬆架構紀律。一旦未來出現特定極限計算或合規硬性限制，當初未選 self_hosted_open_llm 將迫使團隊啟動局部的微服務抽取或重構。
+
+---
+
+## 六、關鍵權衡 (Key Trade-offs)
+
+### 即時交付速度 vs 極致架構擴展性
+- **獲得**：快速上線驗證
+- **代價**：承擔長期局部重構可能性
+
+---
+
+## 七、盲點清單與假設挑戰 (Blind Spots)
+
+### 盲點獵人發現的盲點
+- **[MEDIUM] 團隊擴張時的認知負擔溢價**：新成員進駐後的系統邊界理解成本（*為何重要：影響團隊擴展速度*）
+
+---
+
+## 八、建議的低成本下一步驗證實驗
+
+- **核心資料流原型壓測 Spike**（預估工時：2 天）
+  - 實驗內容：針對預估尖峰量級實施 2 天原型驗證
+  - 能決定：確認是否真有架構瓶頸風險
+
+---
+
+## 九、辯論精華與計分板
 
 ### 辯手表現計分板
 | 辯手 | 提出論點數 | 攻擊命中 | 主動讓步 | 被標謬誤 | 查核存疑 | MVP得分 |
 |---|---:|---:|---:|---:|---:|---:|
-| security_paranoid | 3 | 1 | 0 | 0 | 0 | **3** |
-| conservative_cto | 2 | 1 | 1 | 0 | 0 | **4** |
-| kiss_hacker | 2 | 1 | 0 | 0 | 0 | **3** |
+| 🔐 資安官 | 3 | 0 | 0 | 0 | 0 | **0** |
+| 🛡️ 陳CTO | 2 | 0 | 1 | 0 | 0 | **1** |
+| 🪓 剃刀 | 2 | 0 | 0 | 0 | 0 | **0** |
+
+### 辯論高光時刻 (Highlights)
+- **最具殺傷力的商業提問**（🔐 資安官）
+  > 「新創團隊的第一法則是活到下一個季度」
+  *點評：精準直擊新創技術選型的本質*
+
+🏆 **本場 MVP**：**🔐 資安官** — 始終緊扣業務生存與現金流硬約束

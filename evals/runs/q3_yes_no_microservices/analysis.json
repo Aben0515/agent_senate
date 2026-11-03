@@ -268,6 +268,26 @@
       "gradual_service_extraction|migration_risk": 1.613,
       "gradual_service_extraction|fault_isolation": 1.613
     },
+    "judge_spread": {
+      "keep_monolith_modularize|ops_overhead": 0.094,
+      "keep_monolith_modularize|delivery_cadence": 0.094,
+      "keep_monolith_modularize|data_consistency": 0.094,
+      "keep_monolith_modularize|org_cognitive_load": 0.205,
+      "keep_monolith_modularize|migration_risk": 0.205,
+      "keep_monolith_modularize|fault_isolation": 0.205,
+      "split_microservices|ops_overhead": 0.205,
+      "split_microservices|delivery_cadence": 0.205,
+      "split_microservices|data_consistency": 0.205,
+      "split_microservices|org_cognitive_load": 0.205,
+      "split_microservices|migration_risk": 0.205,
+      "split_microservices|fault_isolation": 0.205,
+      "gradual_service_extraction|ops_overhead": 0.205,
+      "gradual_service_extraction|delivery_cadence": 0.205,
+      "gradual_service_extraction|data_consistency": 0.205,
+      "gradual_service_extraction|org_cognitive_load": 0.205,
+      "gradual_service_extraction|migration_risk": 0.205,
+      "gradual_service_extraction|fault_isolation": 0.205
+    },
     "persona_scores": [
       {
         "speaker_id": "conservative_cto",
@@ -537,7 +557,8 @@
         "current_weight": 0.102,
         "threshold": 0.639,
         "direction": "increase",
-        "new_winner": "gradual_service_extraction"
+        "new_winner": "gradual_service_extraction",
+        "window_end": 0.639
       },
       {
         "criterion_id": "migration_risk",
@@ -545,7 +566,8 @@
         "current_weight": 0.102,
         "threshold": 0.639,
         "direction": "increase",
-        "new_winner": "gradual_service_extraction"
+        "new_winner": "gradual_service_extraction",
+        "window_end": 0.639
       },
       {
         "criterion_id": "fault_isolation",
@@ -553,7 +575,8 @@
         "current_weight": 0.102,
         "threshold": 0.639,
         "direction": "increase",
-        "new_winner": "gradual_service_extraction"
+        "new_winner": "gradual_service_extraction",
+        "window_end": 0.639
       }
     ],
     "win_probability": {
@@ -682,11 +705,14 @@
       }
     ],
     "diagnostics": {
-      "judge_agreement_avg_spread": 1.39,
-      "high_agreement_warning": false,
+      "judge_agreement_avg_spread": 0.187,
+      "overall_avg_spread": 1.39,
+      "high_agreement_warning": true,
+      "single_judge_warning": false,
       "effective_samples": 3,
       "spread_floor_used": 0.5
-    }
+    },
+    "input_digest": "c2ddd87fca5ef04c"
   },
   "warnings": [],
   "sample_count": 3

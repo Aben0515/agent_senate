@@ -145,3 +145,33 @@ test('renderHtml is XSS-safe and survives dollar patterns in data', () => {
   const parsed = JSON.parse(m[1]);
   assert.equal(parsed.extras.verdict.one_liner, evil.verdict.one_liner);
 });
+
+test('judge-agreement diagnostic ignores persona scores; hotspots skip zero-spread cells', () => {
+  const options = [{ id: 'a' }, { id: 'b' }];
+  const criteria = [{ id: 'x' }];
+  const judge = (sa, sb) => ({ weights: { x: 1 }, cells: [{ option_id: 'a', criterion_id: 'x', score: sa }, { option_id: 'b', criterion_id: 'x', score: sb }] });
+  const res = analyze({
+    options, criteria, seed: 1,
+    chairSamples: [judge(8, 5), judge(8, 5), judge(8, 5)], // judges copy each other
+    personaScores: [{ speaker_id: 'cto', weights: { x: 1 }, cells: [{ option_id: 'a', criterion_id: 'x', score: 1 }, { option_id: 'b', criterion_id: 'x', score: 10 }] }],
+  });
+  assert.equal(res.analysis.diagnostics.judge_agreement_avg_spread, 0);
+  assert.equal(res.analysis.diagnostics.high_agreement_warning, true, 'advocate personas must not mask copy-cat judges');
+  assert.ok(res.analysis.diagnostics.overall_avg_spread > 0);
+  assert.ok(res.analysis.persona_lens.conservative_cto, 'persona ids are canonicalised');
+  const flat = analyze({ options, criteria, seed: 1, chairSamples: [judge(8, 5), judge(8, 5)] });
+  assert.deepEqual(flat.analysis.disagreement_hotspots, []);
+});
+
+test('tipping points are computed against the reported winner when totals tie', () => {
+  const options = [{ id: 'a' }, { id: 'b' }];
+  const criteria = [{ id: 'x', label: 'x' }, { id: 'y', label: 'y' }];
+  const scores = { 'a|x': 8, 'a|y': 4, 'b|x': 4, 'b|y': 8 };
+  const tp = findTippingPoints(options, criteria, { x: 0.5, y: 0.5 }, scores, 'b');
+  assert.ok(tp.every((t) => t.new_winner === 'a'), JSON.stringify(tp));
+});
+
+test('analyze rejects malformed input with a readable message', () => {
+  assert.throws(() => analyze({ options: [{ id: 'a' }, { id: 'a' }], criteria: [{ id: 'x' }], chairSamples: [{}] }), /重複的 id/);
+  assert.throws(() => analyze({ options: [{ id: 'a' }], criteria: [{ id: 'x' }] }), /chairSamples/);
+});

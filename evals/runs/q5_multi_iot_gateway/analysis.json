@@ -268,6 +268,26 @@
       "c|dev_velocity_maintain": 1.613,
       "c|bus_factor": 1.613
     },
+    "judge_spread": {
+      "rust|memory_footprint": 0.094,
+      "rust|memory_safety": 0.094,
+      "rust|cross_compile_ota": 0.094,
+      "rust|concurrency_io": 0.205,
+      "rust|dev_velocity_maintain": 0.205,
+      "rust|bus_factor": 0.205,
+      "go|memory_footprint": 0.205,
+      "go|memory_safety": 0.205,
+      "go|cross_compile_ota": 0.205,
+      "go|concurrency_io": 0.205,
+      "go|dev_velocity_maintain": 0.205,
+      "go|bus_factor": 0.205,
+      "c|memory_footprint": 0.205,
+      "c|memory_safety": 0.205,
+      "c|cross_compile_ota": 0.205,
+      "c|concurrency_io": 0.205,
+      "c|dev_velocity_maintain": 0.205,
+      "c|bus_factor": 0.205
+    },
     "persona_scores": [
       {
         "speaker_id": "conservative_cto",
@@ -537,7 +557,8 @@
         "current_weight": 0.102,
         "threshold": 0.639,
         "direction": "increase",
-        "new_winner": "c"
+        "new_winner": "c",
+        "window_end": 0.639
       },
       {
         "criterion_id": "dev_velocity_maintain",
@@ -545,7 +566,8 @@
         "current_weight": 0.102,
         "threshold": 0.639,
         "direction": "increase",
-        "new_winner": "c"
+        "new_winner": "c",
+        "window_end": 0.639
       },
       {
         "criterion_id": "bus_factor",
@@ -553,7 +575,8 @@
         "current_weight": 0.102,
         "threshold": 0.639,
         "direction": "increase",
-        "new_winner": "c"
+        "new_winner": "c",
+        "window_end": 0.639
       }
     ],
     "win_probability": {
@@ -682,11 +705,14 @@
       }
     ],
     "diagnostics": {
-      "judge_agreement_avg_spread": 1.39,
-      "high_agreement_warning": false,
+      "judge_agreement_avg_spread": 0.187,
+      "overall_avg_spread": 1.39,
+      "high_agreement_warning": true,
+      "single_judge_warning": false,
       "effective_samples": 3,
       "spread_floor_used": 0.5
-    }
+    },
+    "input_digest": "f38b0b91ee5edc6a"
   },
   "warnings": [],
   "sample_count": 3

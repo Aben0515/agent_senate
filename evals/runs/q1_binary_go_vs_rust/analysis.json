@@ -197,6 +197,20 @@
       "rust|resource_efficiency": 1.613,
       "rust|b2b_ecosystem": 1.613
     },
+    "judge_spread": {
+      "go|delivery_velocity": 0.094,
+      "go|learning_curve": 0.094,
+      "go|hiring_and_bus_factor": 0.094,
+      "go|ops_observability": 0.205,
+      "go|resource_efficiency": 0.205,
+      "go|b2b_ecosystem": 0.205,
+      "rust|delivery_velocity": 0.205,
+      "rust|learning_curve": 0.205,
+      "rust|hiring_and_bus_factor": 0.205,
+      "rust|ops_observability": 0.205,
+      "rust|resource_efficiency": 0.205,
+      "rust|b2b_ecosystem": 0.205
+    },
     "persona_scores": [
       {
         "speaker_id": "conservative_cto",
@@ -392,7 +406,8 @@
         "current_weight": 0.102,
         "threshold": 0.639,
         "direction": "increase",
-        "new_winner": "rust"
+        "new_winner": "rust",
+        "window_end": null
       },
       {
         "criterion_id": "resource_efficiency",
@@ -400,7 +415,8 @@
         "current_weight": 0.102,
         "threshold": 0.639,
         "direction": "increase",
-        "new_winner": "rust"
+        "new_winner": "rust",
+        "window_end": null
       },
       {
         "criterion_id": "b2b_ecosystem",
@@ -408,7 +424,8 @@
         "current_weight": 0.102,
         "threshold": 0.639,
         "direction": "increase",
-        "new_winner": "rust"
+        "new_winner": "rust",
+        "window_end": null
       }
     ],
     "win_probability": {
@@ -527,11 +544,14 @@
       }
     ],
     "diagnostics": {
-      "judge_agreement_avg_spread": 1.419,
-      "high_agreement_warning": false,
+      "judge_agreement_avg_spread": 0.177,
+      "overall_avg_spread": 1.419,
+      "high_agreement_warning": true,
+      "single_judge_warning": false,
       "effective_samples": 3,
       "spread_floor_used": 0.5
-    }
+    },
+    "input_digest": "2b432cfb8c29a3ec"
   },
   "warnings": [],
   "sample_count": 3

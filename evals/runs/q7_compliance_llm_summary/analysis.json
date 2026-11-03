@@ -197,6 +197,20 @@
       "self_hosted_open_llm|scalability_concurrency": 1.613,
       "self_hosted_open_llm|vendor_lockin": 1.613
     },
+    "judge_spread": {
+      "cloud_api_with_anonymization|regulatory_compliance": 0.094,
+      "cloud_api_with_anonymization|summary_quality": 0.094,
+      "cloud_api_with_anonymization|tco_infrastructure": 0.094,
+      "cloud_api_with_anonymization|ops_simplicity": 0.205,
+      "cloud_api_with_anonymization|scalability_concurrency": 0.205,
+      "cloud_api_with_anonymization|vendor_lockin": 0.205,
+      "self_hosted_open_llm|regulatory_compliance": 0.205,
+      "self_hosted_open_llm|summary_quality": 0.205,
+      "self_hosted_open_llm|tco_infrastructure": 0.205,
+      "self_hosted_open_llm|ops_simplicity": 0.205,
+      "self_hosted_open_llm|scalability_concurrency": 0.205,
+      "self_hosted_open_llm|vendor_lockin": 0.205
+    },
     "persona_scores": [
       {
         "speaker_id": "security_paranoid",
@@ -392,7 +406,8 @@
         "current_weight": 0.102,
         "threshold": 0.639,
         "direction": "increase",
-        "new_winner": "self_hosted_open_llm"
+        "new_winner": "self_hosted_open_llm",
+        "window_end": null
       },
       {
         "criterion_id": "scalability_concurrency",
@@ -400,7 +415,8 @@
         "current_weight": 0.102,
         "threshold": 0.639,
         "direction": "increase",
-        "new_winner": "self_hosted_open_llm"
+        "new_winner": "self_hosted_open_llm",
+        "window_end": null
       },
       {
         "criterion_id": "vendor_lockin",
@@ -408,7 +424,8 @@
         "current_weight": 0.102,
         "threshold": 0.639,
         "direction": "increase",
-        "new_winner": "self_hosted_open_llm"
+        "new_winner": "self_hosted_open_llm",
+        "window_end": null
       }
     ],
     "win_probability": {
@@ -527,11 +544,14 @@
       }
     ],
     "diagnostics": {
-      "judge_agreement_avg_spread": 1.419,
-      "high_agreement_warning": false,
+      "judge_agreement_avg_spread": 0.177,
+      "overall_avg_spread": 1.419,
+      "high_agreement_warning": true,
+      "single_judge_warning": false,
       "effective_samples": 3,
       "spread_floor_used": 0.5
-    }
+    },
+    "input_digest": "15b5fa4daee0a39d"
   },
   "warnings": [],
   "sample_count": 3

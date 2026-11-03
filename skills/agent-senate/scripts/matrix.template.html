@@ -7,11 +7,11 @@
 <style>
   :root {
     --bg: #f6f6f8; --card: #ffffff; --ink: #1b1b22; --muted: #6a6a78; --line: #e2e2e9;
-    --accent: #6b3fd4; --win: #138a4b; --warn: #b45309; --bad: #c0264b;
+    --accent: #6b3fd4; --accent-ink: #ffffff; --win: #138a4b; --warn: #b45309; --bad: #c0264b;
   }
   @media (prefers-color-scheme: dark) {
     :root { --bg: #131318; --card: #1c1c24; --ink: #ececf2; --muted: #9a9aaa; --line: #2e2e3a;
-      --accent: #a98bff; --win: #3ecf8e; --warn: #f5a524; --bad: #ff6b8b; }
+      --accent: #a98bff; --accent-ink: #131318; --win: #3ecf8e; --warn: #f5a524; --bad: #ff6b8b; }
   }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); color: var(--ink);
@@ -25,7 +25,8 @@
   .nav-tabs { display: flex; gap: 8px; border-bottom: 2px solid var(--line); margin-bottom: 20px; overflow-x: auto; padding-bottom: 4px; }
   .nav-tab-btn { background: none; border: none; font: inherit; font-size: 15px; font-weight: 600; color: var(--muted); padding: 8px 16px; border-radius: 8px; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
   .nav-tab-btn:hover { color: var(--ink); background: var(--line); }
-  .nav-tab-btn[aria-selected="true"] { color: #fff; background: var(--accent); }
+  .nav-tab-btn[aria-selected="true"] { color: var(--accent-ink); background: var(--accent); }
+  .nav-tab-btn:focus-visible, .btn:focus-visible, .lens button:focus-visible, .claim-item:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
   .tab-content { display: none; }
   .tab-content.active { display: block; }
@@ -34,8 +35,8 @@
   .verdict { border-left: 4px solid var(--win); }
   .verdict .big { font-size: 26px; font-weight: 700; color: var(--win); }
   .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); font-size: 12px; color: var(--muted); margin-left: 6px; }
-  .badge.win { background: var(--win); color: #fff; border-color: var(--win); }
-  .badge.warn { background: var(--warn); color: #fff; border-color: var(--warn); }
+  .badge.win { background: var(--win); color: var(--accent-ink); border-color: var(--win); }
+  .badge.warn { background: var(--warn); color: var(--accent-ink); border-color: var(--warn); }
 
   .bars > div { display: grid; grid-template-columns: 140px 1fr 56px; gap: 10px; align-items: center; margin: 6px 0; }
   .bar { height: 12px; border-radius: 6px; background: var(--line); overflow: hidden; }
@@ -54,7 +55,9 @@
   input[type=range] { width: 100%; accent-color: var(--accent); }
   .lens button, .btn { font: inherit; padding: 4px 12px; margin: 0 6px 6px 0; border-radius: 999px;
     border: 1px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer; }
-  .lens button[aria-pressed=true] { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .lens button[aria-pressed=true] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .prewrap { white-space: pre-wrap; }
+  input[type=search], select { background: var(--card); color: var(--ink); }
   ul { margin: 6px 0; padding-left: 20px; }
   li { margin: 4px 0; }
   .sev-high { color: var(--bad); font-weight: 600; } .sev-medium { color: var(--warn); font-weight: 600; } .sev-low { color: var(--muted); }
@@ -87,6 +90,19 @@
   var M = DATA.matrix, A = DATA.analysis, X = DATA.extras || {};
   var app = document.getElementById("app");
 
+  // LLM-provided fields may be objects instead of strings; never let that break the page.
+  function asText(x) {
+    if (x == null) return "";
+    if (typeof x === "string") return x;
+    if (typeof x !== "object") return String(x);
+    if (x.criterion_id && x.threshold != null && x.new_winner) {
+      return "若「" + (x.criterion_label || x.criterion_id) + "」權重" + (x.direction === "increase" ? "提高" : "降低") + "到 " + Math.round(x.threshold * 100) + "%，改選 " + x.new_winner;
+    }
+    var keys = ["text", "description", "condition", "content", "markdown"];
+    for (var i = 0; i < keys.length; i++) if (typeof x[keys[i]] === "string") return x[keys[i]];
+    return JSON.stringify(x);
+  }
+  function toNode(x) { return x instanceof Node ? x : document.createTextNode(asText(x)); }
   function h(tag, attrs) {
     var el = document.createElement(tag);
     if (attrs) Object.keys(attrs).forEach(function (k) {
@@ -98,8 +114,8 @@
     for (var i = 2; i < arguments.length; i++) {
       var c = arguments[i];
       if (c == null || c === false) continue;
-      if (Array.isArray(c)) c.forEach(function (x) { if (x != null) el.appendChild(typeof x === "object" ? x : document.createTextNode(String(x))); });
-      else el.appendChild(typeof c === "object" ? c : document.createTextNode(String(c)));
+      if (Array.isArray(c)) c.forEach(function (x) { if (x != null && x !== false) el.appendChild(toNode(x)); });
+      else el.appendChild(toNode(c));
     }
     return el;
   }
@@ -141,11 +157,15 @@
   app.appendChild(h("p", { class: "sub" }, M.question));
 
   // Navigation Tabs
-  var tabNav = h("div", { class: "nav-tabs" });
-  var tabMatrixBtn = h("button", { class: "nav-tab-btn", "aria-selected": "true", onclick: function () { switchTab("matrix"); } }, "📊 決策權衡矩陣");
-  var tabReplayBtn = h("button", { class: "nav-tab-btn", "aria-selected": "false", onclick: function () { switchTab("replay"); } }, "🎬 辯論重播");
-  var tabClaimsBtn = h("button", { class: "nav-tab-btn", "aria-selected": "false", onclick: function () { switchTab("claims"); } }, "⚔️ 論點圖譜");
-  var tabTransBtn = h("button", { class: "nav-tab-btn", "aria-selected": "false", onclick: function () { switchTab("transcript"); } }, "📜 逐字稿");
+  var tabNav = h("div", { class: "nav-tabs", role: "tablist", "aria-label": "結果分頁" });
+  function tabBtn(name, label, selected) {
+    return h("button", { class: "nav-tab-btn", role: "tab", id: "tabbtn-" + name, "aria-controls": "tab-" + name,
+      "aria-selected": String(selected), onclick: function () { switchTab(name); } }, label);
+  }
+  var tabMatrixBtn = tabBtn("matrix", "📊 決策權衡矩陣", true);
+  var tabReplayBtn = tabBtn("replay", "🎬 辯論重播", false);
+  var tabClaimsBtn = tabBtn("claims", "⚔️ 論點圖譜", false);
+  var tabTransBtn = tabBtn("transcript", "📜 逐字稿", false);
 
   tabNav.appendChild(tabMatrixBtn);
   tabNav.appendChild(tabReplayBtn);
@@ -153,10 +173,10 @@
   tabNav.appendChild(tabTransBtn);
   app.appendChild(tabNav);
 
-  var tabMatrix = h("div", { class: "tab-content active", id: "tab-matrix" });
-  var tabReplay = h("div", { class: "tab-content", id: "tab-replay" });
-  var tabClaims = h("div", { class: "tab-content", id: "tab-claims" });
-  var tabTranscript = h("div", { class: "tab-content", id: "tab-transcript" });
+  var tabMatrix = h("div", { class: "tab-content active", id: "tab-matrix", role: "tabpanel", "aria-labelledby": "tabbtn-matrix" });
+  var tabReplay = h("div", { class: "tab-content", id: "tab-replay", role: "tabpanel", "aria-labelledby": "tabbtn-replay" });
+  var tabClaims = h("div", { class: "tab-content", id: "tab-claims", role: "tabpanel", "aria-labelledby": "tabbtn-claims" });
+  var tabTranscript = h("div", { class: "tab-content", id: "tab-transcript", role: "tabpanel", "aria-labelledby": "tabbtn-transcript" });
 
   app.appendChild(tabMatrix);
   app.appendChild(tabReplay);
@@ -179,13 +199,22 @@
   // TAB 1: MATRIX CONTENT
   // ==========================================
   var v = X.verdict || {};
+  var vText = v.recommendation_text || v.text || "";
   var winner = A.winner;
+  var winP = (A.win_probability || {})[winner] || 0;
+  // Same rule as report.mjs: the confidence band is derived from the computed win probability.
+  var confidence = winP >= 0.75 ? "高" : winP >= 0.5 ? "中" : "低";
+  var bestP = Object.keys(A.win_probability || {}).sort(function (a, b) { return A.win_probability[b] - A.win_probability[a]; })[0];
+  var closeCall = (A.margin != null && A.margin < 0.1) || (bestP && bestP !== winner && A.win_probability[bestP] > winP);
+  var flips = Array.isArray(v.conditions_to_flip) ? v.conditions_to_flip : [];
   tabMatrix.appendChild(h("div", { class: "card verdict" },
-    h("div", { class: "muted" }, "主席判決推薦"),
+    h("div", { class: "muted" }, "主席判決推薦（贏家由程式計算）"),
     h("div", { class: "big" }, optLabel[winner] || winner,
-      v.confidence_label ? h("span", { class: "badge win" }, "信心評級：" + v.confidence_label) : null),
+      h("span", { class: "badge win" }, "信心評級：" + confidence)),
+    closeCall ? h("p", { class: "sev-high" }, "⚠️ 結果過於接近：請先做下一步驗證實驗再定案。") : null,
     v.one_liner ? h("p", { style: "font-weight: 600; margin: 8px 0;" }, v.one_liner) : null,
-    v.recommendation_text ? h("p", { class: "muted" }, v.recommendation_text) : null,
+    vText ? h("p", { class: "muted prewrap" }, vText) : null,
+    flips.length ? h("div", null, h("strong", null, "翻盤條件："), h("ul", null, flips.map(function (f) { return h("li", null, f); }))) : null,
     A.minimax_regret_option && A.minimax_regret_option !== winner
       ? h("p", { class: "sev-medium" }, "⚠️ 注意：最小化最大後悔 (Minimax Regret) 方案為「" + (optLabel[A.minimax_regret_option] || A.minimax_regret_option) + "」，與贏家不同。")
       : null
@@ -223,7 +252,7 @@
   var sliders = {};
   M.criteria.forEach(function (c) {
     sliders[c.id] = h("input", { type: "range", min: "0", max: "100", step: "1", "aria-label": "權重：" + (c.label || c.id),
-      oninput: function (e) { W[c.id] = Number(e.target.value) / 100; setActive("custom"); render(); } });
+      oninput: function (e) { W[c.id] = Number(e.target.value) / 100; if (activeLens !== "custom") setActive("custom"); render(); } });
   });
 
   function setActive(name) { activeLens = name; renderLens(); }
@@ -233,10 +262,10 @@
     items.forEach(function (it) {
       lensBox.appendChild(h("button", { "aria-pressed": String(activeLens === it[0]), onclick: function () {
         var w = it[0] === "chair" ? chairW : (M.persona_scores.filter(function (p) { return p.speaker_id === it[0]; })[0] || {}).weights;
-        activeLens = it[0]; setWeights(w || chairW);
+        activeLens = it[0]; setWeights(w || chairW); renderLens();
       } }, it[1]));
     });
-    lensBox.appendChild(h("button", { class: "btn", onclick: function () { activeLens = "chair"; setWeights(chairW); } }, "重設為主席權重"));
+    lensBox.appendChild(h("button", { class: "btn", onclick: function () { activeLens = "chair"; setWeights(chairW); renderLens(); } }, "重設為主席權重"));
   }
 
   function render() {
@@ -251,10 +280,12 @@
       var row = h("tr", null, h("td", { title: rationale || c.description || "" },
         h("span", { class: "crit-name" }, c.label || c.id), h("span", { class: "crit-w" }, "權重 " + pct(nw[c.id])), sliders[c.id]));
       M.options.forEach(function (o) {
-        var k = o.id + "|" + c.id, s = score[k], info = cellInfo[k] || {};
+        var k = o.id + "|" + c.id, s = score[k], info = cellInfo[k] || {}, js = M.judge_spread || {};
         var hue = Math.round((s - 1) / 9 * 120);
         var tip = (info.rationale || "") + (info.evidence_claim_ids && info.evidence_claim_ids.length ? "\n證據：" + info.evidence_claim_ids.join(", ") : "")
-          + "\n信心：" + (info.confidence || "-") + "\n評審分歧標準差：" + (spread[k] != null ? spread[k] : "-");
+          + "\n信心：" + (info.confidence || "-")
+          + (js[k] != null ? "\n評審間分歧標準差：" + js[k] : "")
+          + "\n評審＋辯手分歧標準差：" + (spread[k] != null ? spread[k] : "-");
         row.appendChild(h("td", { class: "cell" + (hotKeys[k] ? " hot" : ""), style: "background:hsl(" + hue + " 60% 45% / .28)", title: tip }, s.toFixed(1)));
       });
       tbl.appendChild(row);
@@ -277,18 +308,24 @@
   var tipBox = h("ul");
   function applyTip(tp) {
     var w = {}, k = tp.criterion_id, cur = chairW[k], other = 1 - cur;
-    var t = Math.min(1, Math.max(0, tp.threshold + (tp.direction === "increase" ? 0.005 : -0.005)));
+    var dir = tp.direction === "increase" ? 1 : -1;
+    // Step just past the threshold, but stay inside the window where the new winner leads.
+    var stepIn = tp.window_end != null ? Math.min(0.005, Math.abs(tp.window_end - tp.threshold) / 2) : 0.005;
+    var t = Math.min(1, Math.max(0, tp.threshold + dir * stepIn));
     M.criteria.forEach(function (c) { w[c.id] = c.id === k ? t : chairW[c.id] * (1 - t) / other; });
     activeLens = "custom"; setWeights(w); renderLens();
   }
   if ((A.tipping_points || []).length) {
     A.tipping_points.forEach(function (tp) {
       tipBox.appendChild(h("li", null,
-        "若「" + (tp.criterion_label || critLabel[tp.criterion_id]) + "」權重" + (tp.direction === "increase" ? "提高" : "降低") + "至 " + pct(tp.threshold)
+        "若「" + (tp.criterion_label || critLabel[tp.criterion_id]) + "」權重" + (tp.direction === "increase" ? "提高" : "降低") + "到 "
+        + (tp.window_end != null
+          ? (tp.direction === "increase" ? pct(tp.threshold) + "–" + pct(tp.window_end) : pct(tp.window_end) + "–" + pct(tp.threshold)) + " 之間"
+          : pct(tp.threshold) + (tp.direction === "increase" ? " 以上" : " 以下"))
         + "（目前 " + pct(tp.current_weight) + "），" + (optLabel[tp.new_winner] || tp.new_winner) + " 將翻盤勝出。 ",
         h("button", { class: "btn", onclick: function () { applyTip(tp); } }, "示範翻盤")));
     });
-  } else tipBox.appendChild(h("li", null, "在合理範圍內無單一準則可翻盤，結論極其穩健。"));
+  } else tipBox.appendChild(h("li", null, "任何單一準則的權重在 0–100% 間變動，都不會改變贏家。"));
 
   var persBox = h("ul");
   Object.keys(A.persona_lens || {}).forEach(function (id) {
@@ -304,7 +341,7 @@
   if (X.red_team || X.runner_up_defense) {
     tabMatrix.appendChild(h("div", { class: "card", style: "border-left: 4px solid var(--warn);" },
       h("h2", { class: "sev-medium" }, "🛡️ 紅隊警示（落敗方案最強反向辯護）"),
-      h("p", null, X.red_team || X.runner_up_defense)
+      h("p", { class: "prewrap" }, X.red_team || X.runner_up_defense)
     ));
   }
 
@@ -319,22 +356,27 @@
   listCard("💡 未挑戰之假設", X.challenged_assumptions, function (a) { return [h("strong", null, a.assumption), "：" + (a.challenge || "")]; });
   listCard("🧪 建議下一步驗證實驗", X.next_experiments, function (e) { return [h("strong", null, e.title), "（" + (e.effort || "?") + "）" + (e.description || "") + (e.decides ? " → 可決定：" + e.decides : "")]; });
   listCard("⚠️ 風險登記表", X.risks, function (r) { return [h("strong", null, optLabel[r.option_id] || r.option_id), "：" + (r.risk || "") + "（可能性 " + (r.likelihood || "?") + " / 衝擊 " + (r.impact || "?") + "）；緩解：" + (r.mitigation || "")]; });
-  listCard("🌟 高光時刻", X.highlights, function (x) { return [h("strong", null, x.title + "（" + pname(x.speaker_id) + "）"), h("div", { class: "quote" }, x.quote), x.why]; });
-  if (X.mvp) tabMatrix.appendChild(h("div", { class: "card" }, h("h2", null, "🏆 本場 MVP"), h("p", null, pname(X.mvp.speaker_id) + "：" + (X.mvp.comment || ""))));
+  listCard("🧩 未解決的爭議", X.unresolved_disputes, function (d) {
+    var pos = Object.keys(d.positions || {}).map(function (k) { return pname(k) + "：" + d.positions[k]; }).join("；");
+    return [h("strong", null, d.title || ""), pos ? "（" + pos + "）" : "", d.what_would_settle_it ? " → 如何解決：" + d.what_would_settle_it : ""];
+  });
+  listCard("🌟 高光時刻", X.highlights, function (x) {
+    var who = x.speaker_id || x.speaker || "";
+    return [h("strong", null, (x.title || "高光") + (who ? "（" + pname(who) + "）" : "")), h("div", { class: "quote" }, x.quote || ""), x.why || x.comment || ""];
+  });
+  if (X.mvp) tabMatrix.appendChild(h("div", { class: "card" }, h("h2", null, "🏆 本場 MVP"), h("p", null, pname(X.mvp.speaker_id || X.mvp.speaker) + "：" + (X.mvp.comment || ""))));
 
   // Export buttons
+  function download(name, obj) {
+    var url = URL.createObjectURL(new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" }));
+    var a = h("a", { href: url, download: name, style: "display:none" });
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
   var exportBox = h("div", { class: "card", style: "display: flex; gap: 8px; align-items: center; flex-wrap: wrap;" },
     h("span", { style: "font-weight: 600;" }, "📥 匯出資料："),
-    h("button", { class: "btn", onclick: function () {
-      var blob = new Blob([JSON.stringify(normalize(W), null, 2)], { type: "application/json" });
-      var a = h("a", { href: URL.createObjectURL(blob), download: "senate-weights.json" });
-      a.click();
-    } }, "下載目前權重設定 (JSON)"),
-    h("button", { class: "btn", onclick: function () {
-      var blob = new Blob([JSON.stringify(DATA, null, 2)], { type: "application/json" });
-      var a = h("a", { href: URL.createObjectURL(blob), download: "senate-analysis.json" });
-      a.click();
-    } }, "下載完整分析數據 (JSON)")
+    h("button", { class: "btn", onclick: function () { download("senate-weights.json", normalize(W)); } }, "下載目前權重設定 (JSON)"),
+    h("button", { class: "btn", onclick: function () { download("senate-analysis.json", DATA); } }, "下載完整分析數據 (JSON)")
   );
   tabMatrix.appendChild(exportBox);
 
@@ -359,7 +401,9 @@
     }
     replayIndex = Math.max(0, Math.min(idx, turnsData.length - 1));
     var t = turnsData[replayIndex];
-    replaySpeaker.textContent = (t.type === "chair" ? "⚖️ 天秤主席" : pname(t.speaker || t.speaker_id)) + " ｜ " + (t.kind || "") + (t.round ? " (第 " + t.round + " 輪)" : "");
+    var KIND = { opening: "開場陳述", rebuttal: "交叉質詢", steelman: "鋼人論證", closing: "結辯", directive: "主席指令", devil_advocate: "指派魔鬼代言人", factcheck: "事實查核", verdict: "判決" };
+    var who = t.type === "chair" ? "⚖️ 天秤主席" : t.type === "factcheck" ? "🔎 事實查核員" : pname(t.speaker || t.speaker_id);
+    replaySpeaker.textContent = who + " ｜ " + (KIND[t.kind] || t.kind || "") + (t.round ? "（第 " + t.round + " 輪）" : "") + "　" + (replayIndex + 1) + " / " + turnsData.length;
     replayBody.textContent = t.text || t.full_text || "";
   }
 
@@ -406,14 +450,16 @@
 
   if (claimsList.length) {
     claimsList.forEach(function (c) {
-      var item = h("div", { class: "claim-item", id: "claim-" + c.id },
+      var item = h("div", { class: "claim-item", id: "claim-" + c.id, tabindex: "0", role: "button", "aria-label": "論點 " + c.id },
         h("div", { style: "display: flex; justify-content: space-between; font-weight: 600; margin-bottom: 4px;" },
           "#" + c.id + " (" + pname(c.speaker) + ")",
           h("span", { class: "badge" }, c.status || "open")
         ),
         h("div", null, c.text || ""),
-        h("div", { class: "muted", style: "font-size: 13px; margin-top: 4px;" }, "原文：「" + (c.quote || "") + "」")
+        h("div", { class: "muted", style: "font-size: 13px; margin-top: 4px;" }, "原文：「" + (c.quote || "") + "」"),
+        (c.attacks_claim_ids || []).length ? h("div", { class: "muted", style: "font-size: 12px; margin-top: 4px;" }, "⚔️ 攻擊 → " + c.attacks_claim_ids.join(", ")) : null
       );
+      item.onkeydown = function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); item.onclick(); } };
       item.onclick = function () {
         document.querySelectorAll(".claim-item").forEach(function (el) { el.classList.remove("selected", "target-highlight"); });
         item.classList.add("selected");
@@ -438,7 +484,7 @@
   // TAB 4: TRANSCRIPT
   // ==========================================
   var transText = X.transcript || DATA.transcript || "";
-  var searchInput = h("input", { type: "text", placeholder: "搜尋逐字稿關鍵字…", style: "width: 100%; padding: 8px; margin-bottom: 12px; border-radius: 6px; border: 1px solid var(--line);" });
+  var searchInput = h("input", { type: "search", "aria-label": "搜尋逐字稿", placeholder: "搜尋逐字稿關鍵字…", style: "width: 100%; padding: 8px; margin-bottom: 12px; border-radius: 6px; border: 1px solid var(--line);" });
   var transBody = h("div", { style: "white-space: pre-wrap; font-family: monospace; font-size: 13px; line-height: 1.6; max-height: 600px; overflow-y: auto;" }, transText || "未提供純文字逐字稿。");
 
   searchInput.oninput = function (e) {
