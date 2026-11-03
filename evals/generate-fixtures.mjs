@@ -1,33 +1,29 @@
-import { readFileSync, writeFileSync, mkdirSync, existsSync, openSync, closeSync, unlinkSync } from 'node:fs';
-import { join } from 'node:path';
+#!/usr/bin/env node
+/**
+ * generate-fixtures.mjs — Regenerates the PIPELINE FIXTURES in evals/runs/.
+ *
+ * ⚠️ This is NOT an evaluation. Debate turns and scores are hard-coded
+ * templates; the only purpose is to prove that ledger → validate → analyze →
+ * transcript → report → audit → quality run end to end on several question
+ * shapes (binary / yes-no / multi-option / compliance).
+ * It deliberately writes no judge scores, no baseline answers and never
+ * touches evals/summary.md. See evals/summary.md for the real eval status.
+ *
+ * Usage: node evals/generate-fixtures.mjs
+ */
+import { writeFileSync, mkdirSync } from 'node:fs';
+import { dirname, join } from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { createInitialState, addChairTurn, addDebaterTurn, recordFactChecks, recordFallacies, getSpeakerPrefix } from '../skills/agent-senate/scripts/ledger.mjs';
+import { fileURLToPath } from 'node:url';
+import { createInitialState, addChairTurn, addDebaterTurn, recordFactChecks, getSpeakerPrefix } from '../skills/agent-senate/scripts/ledger.mjs';
 import { validateJudgeOutput, validatePersonaOutput } from '../skills/agent-senate/scripts/validate.mjs';
-import { evaluateDebateQuality } from '../skills/agent-senate/scripts/quality.mjs';
-import { auditRunDirectory } from '../skills/agent-senate/scripts/audit.mjs';
 
-function runCli(scriptPath, args = []) {
-  const nonce = `${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
-  const outPath = `tmp_${nonce}_out.txt`;
-  const errPath = `tmp_${nonce}_err.txt`;
+const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
+const scriptsDir = join(repoRoot, 'skills', 'agent-senate', 'scripts');
 
-  const outFd = openSync(outPath, 'w');
-  const errFd = openSync(errPath, 'w');
-
-  const res = spawnSync(process.execPath, [scriptPath, ...args], {
-    stdio: ['ignore', outFd, errFd],
-  });
-
-  closeSync(outFd);
-  closeSync(errFd);
-
-  const stdout = existsSync(outPath) ? readFileSync(outPath, 'utf-8') : '';
-  const stderr = existsSync(errPath) ? readFileSync(errPath, 'utf-8') : '';
-
-  if (existsSync(outPath)) unlinkSync(outPath);
-  if (existsSync(errPath)) unlinkSync(errPath);
-
-  return { status: res.status, stdout, stderr, error: res.error };
+function runCli(name, args = []) {
+  const res = spawnSync(process.execPath, [join(scriptsDir, name), ...args], { encoding: 'utf8' });
+  return { status: res.status, stdout: res.stdout ?? '', stderr: res.stderr ?? '' };
 }
 
 // Benchmark definitions across 5 distinct problem types
@@ -182,16 +178,11 @@ const BENCHMARKS = [
   },
 ];
 
-console.log(`Starting real benchmark execution across ${BENCHMARKS.length} questions...`);
-
-const summaryResults = [];
+console.log(`Regenerating ${BENCHMARKS.length} pipeline fixtures (not an evaluation)...`);
 
 for (const [bIdx, b] of BENCHMARKS.entries()) {
-  console.log(`\n============================================================`);
-  console.log(`[Run ${bIdx + 1}/${BENCHMARKS.length}] Executing Benchmark: ${b.title}`);
-  console.log(`============================================================`);
-
-  const runDir = join(process.cwd(), 'evals', 'runs', b.id);
+  console.log(`[${bIdx + 1}/${BENCHMARKS.length}] ${b.id}`);
+  const runDir = join(repoRoot, 'evals', 'runs', b.id);
   mkdirSync(runDir, { recursive: true });
 
   const brief = {
@@ -228,19 +219,19 @@ for (const [bIdx, b] of BENCHMARKS.entries()) {
   addDebaterTurn(state, {
     speaker: debaterA,
     kind: 'opening',
-    text: `我堅決推薦選擇 ${opt0.label}（${opt0.id}）。理由在於團隊需要極致控制風險與交付成本。\n\n\`\`\`claims\n[{"text":"${opt0.label}可顯著降低初創期總持有成本與風險","quote":"降低初創期總持有成本與風險","kind":"estimate","supports_option_ids":["${opt0.id}"]},{"text":"基礎設施複雜度會拖慢團隊核心業務推進","quote":"拖慢團隊核心業務推進","kind":"fact","supports_option_ids":["${opt0.id}"]}]\n\`\`\``,
+    text: `我堅決推薦選擇 ${opt0.label}（${opt0.id}）。理由在於團隊需要極致控制風險與交付成本。\n\n\`\`\`claims\n[{"text":"${opt0.label}可顯著降低初創期總持有成本與風險","quote":"降低初創期總持有成本與風險","kind":"estimate","supports":["${opt0.id}"]},{"text":"基礎設施複雜度會拖慢團隊核心業務推進","quote":"拖慢團隊核心業務推進","kind":"fact","supports":["${opt0.id}"]}]\n\`\`\``,
   });
 
   addDebaterTurn(state, {
     speaker: debaterB,
     kind: 'opening',
-    text: `我支持 ${opt1.label}（${opt1.id}）。\n> 【${debaterA} #${pA}.1】降低初創期總持有成本與風險。但是如果長期架構擴展性與極限性能有硬傷，後續重構代價將是 5 倍以上。\n\n\`\`\`claims\n[{"text":"${opt1.label}在長期擴展性與底層控制力具備不可替代優勢","quote":"長期擴展性具備不可替代優勢","kind":"value","supports_option_ids":["${opt1.id}"],"attacks_claim_ids":["${pA}.1"]}]\n\`\`\``,
+    text: `我支持 ${opt1.label}（${opt1.id}）。\n> 【${debaterA} #${pA}.1】降低初創期總持有成本與風險。但是如果長期架構擴展性與極限性能有硬傷，後續重構代價將是 5 倍以上。\n\n\`\`\`claims\n[{"text":"${opt1.label}在長期擴展性與底層控制力具備不可替代優勢","quote":"長期擴展性具備不可替代優勢","kind":"value","supports":["${opt1.id}"],"attacks":["${pA}.1"]}]\n\`\`\``,
   });
 
   addDebaterTurn(state, {
     speaker: debaterC,
     kind: 'opening',
-    text: `我選擇最務實的方案 ${b.winner}。在 1,500 RPS 與 3 人小團隊約束下，任何沒有算過帳的過度架構都是工程師的自嗨。最少活動零件原則才是真理。\n\n\`\`\`claims\n[{"text":"現有負載下簡約架構完全足夠支撐，不要為不存在的規模做設計","quote":"不要為不存在的規模做設計","kind":"proposal","supports_option_ids":["${b.winner}"]}]\n\`\`\``,
+    text: `我選擇最務實的方案 ${b.winner}。在 1,500 RPS 與 3 人小團隊約束下，任何沒有算過帳的過度架構都是工程師的自嗨。最少活動零件原則才是真理。\n\n\`\`\`claims\n[{"text":"現有負載下簡約架構完全足夠支撐，不要為不存在的規模做設計","quote":"不要為不存在的規模做設計","kind":"proposal","supports":["${b.winner}"]}]\n\`\`\``,
   });
 
   // 4. Chair Directive 1 & Facts
@@ -252,35 +243,53 @@ for (const [bIdx, b] of BENCHMARKS.entries()) {
 
   recordFactChecks(state, [
     { claim_id: `${pA}.1`, verdict: 'plausible', note: '架構複雜度與交付週期成正比' },
-  ]);
+  ], { round: 1 });
 
   // 5. Rebuttals Round 1
   addDebaterTurn(state, {
     speaker: debaterB,
     kind: 'rebuttal',
     round: 1,
-    text: `> 【${debaterA} #${pA}.1】降低初創期總持有成本與風險\n【讓步 #${pB}.1】我承認在業務初期首年，3 人團隊生存交付確實排在第一位。但是若延遲突破 50ms，我們必須看清長期技術債的複利效應。\n\n\`\`\`claims\n[{"text":"預先做好領域邊界規劃可兼顧當期速度與未來遷移","quote":"預先做好領域邊界規劃","kind":"proposal","supports_option_ids":["${b.winner}"],"concedes_claim_ids":["${pB}.1"]}]\n\`\`\``,
+    text: `> 【${debaterA} #${pA}.1】降低初創期總持有成本與風險\n【讓步 #${pB}.1】我承認在業務初期首年，3 人團隊生存交付確實排在第一位。但是若延遲突破 50ms，我們必須看清長期技術債的複利效應。\n\n\`\`\`claims\n[{"text":"預先做好領域邊界規劃可兼顧當期速度與未來遷移","quote":"預先做好領域邊界規劃","kind":"proposal","supports":["${b.winner}"],"concedes":["${pB}.1"]}]\n\`\`\``,
   });
 
   addDebaterTurn(state, {
     speaker: debaterA,
     kind: 'rebuttal',
     round: 1,
-    text: `> 【${debaterB} #${pB}.1】長期擴展性具備不可替代優勢。\n若公司在第 1 年就因過早最佳化把 300 萬資金燒光，五年後的擴展性只是幻影。\n\n\`\`\`claims\n[{"text":"新創團隊的第一法則是活到下一個季度","quote":"活到下一個季度","kind":"value","supports_option_ids":["${b.winner}"]}]\n\`\`\``,
+    text: `> 【${debaterB} #${pB}.1】長期擴展性具備不可替代優勢。\n若公司在第 1 年就因過早最佳化把 300 萬資金燒光，五年後的擴展性只是幻影。新創團隊的第一法則是活到下一個季度。\n\n\`\`\`claims\n[{"text":"新創團隊的第一法則是活到下一個季度","quote":"活到下一個季度","kind":"value","supports":["${b.winner}"]}]\n\`\`\``,
   });
 
   addDebaterTurn(state, {
     speaker: debaterC,
     kind: 'rebuttal',
     round: 1,
-    text: `> 【${debaterB} #${pB}.1】預先做好領域邊界規劃\n把它刪掉，看看誰會哭？在單台 4 核心 8GB 伺服器上，把不必要的 10 個微服務活動零件全數剃除。\n\n\`\`\`claims\n[{"text":"遵循奧卡姆剃刀，先用最小可行方案上線驗證反饋","quote":"先用最小可行方案上線驗證反饋","kind":"proposal","supports_option_ids":["${b.winner}"]}]\n\`\`\``,
+    text: `> 【${debaterB} #${pB}.1】預先做好領域邊界規劃\n把它刪掉，看看誰會哭？在單台 4 核心 8GB 伺服器上，把不必要的 10 個微服務活動零件全數剃除。\n\n\`\`\`claims\n[{"text":"遵循奧卡姆剃刀，先用最小可行方案上線驗證反饋","quote":"先用最小可行方案上線驗證反饋","kind":"proposal","supports":["${b.winner}"]}]\n\`\`\``,
   });
 
-  // 6. Chair Directive 2
+  // 6. Chair Directive 2 + Rebuttals Round 2
   addChairTurn(state, {
     kind: 'directive',
     round: 2,
-    text: `交叉質詢第 2 輪結束：主要交鋒點已充分辯論，現在進入鋼人論證與結辯！`,
+    text: `第 2 輪：@${debaterA}，若 1 年內團隊擴到 10 人，你的方案上手要幾週？@${debaterB}，重構成本 5 倍的推算過程是什麼？@${debaterC}，單機撐不住的量級是多少？`,
+  });
+  addDebaterTurn(state, {
+    speaker: debaterA,
+    kind: 'rebuttal',
+    round: 2,
+    text: `> 【${debaterB} #${pB}.2】預先做好領域邊界規劃\n10 人團隊新人上手約 2 週（估：照現有 onboarding 文件與 code review 節奏推算）。邊界規劃可以，但不需要先付分散式的稅。`,
+  });
+  addDebaterTurn(state, {
+    speaker: debaterB,
+    kind: 'rebuttal',
+    round: 2,
+    text: `> 【${debaterA} #${pA}.3】活到下一個季度\n活到下個季度之後還要活第 8 個季度。重構 5 倍是以「事後拆分 vs 事前劃界」的人月比估的。`,
+  });
+  addDebaterTurn(state, {
+    speaker: debaterC,
+    kind: 'rebuttal',
+    round: 2,
+    text: `單機 4 核 8GB 在讀多寫少的 B2B 情境下撐到數千 RPS（估），真的撐不住時再加一台。`,
   });
 
   // 7. Steelman Turns
@@ -419,7 +428,7 @@ for (const [bIdx, b] of BENCHMARKS.entries()) {
     key_tradeoffs: [{ title: '即時交付速度 vs 極致架構擴展性', gain: '快速上線驗證', cost: '承擔長期局部重構可能性' }],
     blind_spots: [{ title: '團隊擴張時的認知負擔溢價', description: '新成員進駐後的系統邊界理解成本', severity: 'medium', why_it_matters: '影響團隊擴展速度' }],
     next_experiments: [{ title: '核心資料流原型壓測 Spike', description: '針對預估尖峰量級實施 2 天原型驗證', effort: '2 天', decides: '確認是否真有架構瓶頸風險' }],
-    highlights: [{ title: '最具殺傷力的商業提問', quote: '活到下一個季度', speaker_id: debaterA, why: '精準直擊新創技術選型的本質' }],
+    highlights: [{ title: '最具殺傷力的商業提問', quote: '新創團隊的第一法則是活到下一個季度', speaker_id: debaterA, why: '精準直擊新創技術選型的本質' }],
     mvp: { speaker_id: debaterA, comment: '始終緊扣業務生存與現金流硬約束' },
   };
 
@@ -435,22 +444,19 @@ for (const [bIdx, b] of BENCHMARKS.entries()) {
   writeFileSync(join(runDir, 'input.json'), JSON.stringify(inputPayload, null, 2), 'utf-8');
 
   // 11. Run analyze.mjs with --state
-  const analyzeScript = join(process.cwd(), 'skills', 'agent-senate', 'scripts', 'analyze.mjs');
-  const aRes = runCli(analyzeScript, [join(runDir, 'input.json'), '--out', runDir, '--state', join(runDir, 'state.json')]);
+  const aRes = runCli('analyze.mjs', [join(runDir, 'input.json'), '--out', runDir, '--state', join(runDir, 'state.json')]);
   if (aRes.status !== 0) {
     throw new Error(`analyze.mjs failed with code ${aRes.status}: ${aRes.stderr}`);
   }
 
   // 12. Run ledger.mjs transcript
-  const ledgerScript = join(process.cwd(), 'skills', 'agent-senate', 'scripts', 'ledger.mjs');
-  const transRes = runCli(ledgerScript, ['transcript', join(runDir, 'state.json'), '--out', join(runDir, 'transcript.md')]);
+  const transRes = runCli('ledger.mjs', ['transcript', join(runDir, 'state.json'), '--out', join(runDir, 'transcript.md')]);
   if (transRes.status !== 0) {
     throw new Error(`ledger transcript failed: ${transRes.stderr}`);
   }
 
   // 13. Run report.mjs
-  const reportScript = join(process.cwd(), 'skills', 'agent-senate', 'scripts', 'report.mjs');
-  const repRes = runCli(reportScript, [
+  const repRes = runCli('report.mjs', [
     join(runDir, 'analysis.json'),
     join(runDir, 'state.json'),
     join(runDir, 'input.json'),
@@ -462,152 +468,17 @@ for (const [bIdx, b] of BENCHMARKS.entries()) {
   }
 
   // 14. Run audit.mjs
-  const auditScript = join(process.cwd(), 'skills', 'agent-senate', 'scripts', 'audit.mjs');
-  const auditRes = runCli(auditScript, [runDir]);
+  const auditRes = runCli('audit.mjs', [runDir]);
   if (auditRes.status !== 0) {
     throw new Error(`audit.mjs failed on run ${b.id}: ${auditRes.stdout}\n${auditRes.stderr}`);
   }
   const auditData = JSON.parse(auditRes.stdout);
 
   // 15. Run quality.mjs
-  const qualityScript = join(process.cwd(), 'skills', 'agent-senate', 'scripts', 'quality.mjs');
-  const qRes = runCli(qualityScript, [join(runDir, 'state.json')]);
-  if (qRes.status !== 0) {
-    throw new Error(`quality.mjs failed: ${qRes.stderr}`);
-  }
-  const qualityData = JSON.parse(qRes.stdout);
-  console.log(`Quality Score for ${b.id}: ${qualityData.total_score}/${qualityData.max_score} (${qualityData.percentage}%)`);
-
-  // 16. Generate Baseline Report (Single-Model Direct Answer)
-  const baselineMd = `# 單一模型直接分析報告：${b.title}
-
-## 決策題目
-${b.question}
-
-## 方案優缺點概述
-對於該技術決策，各方案各有其適用情境與取捨：
-${b.options.map((o) => `- **${o.label}**：具備良好的技術特性，但在不同團隊規模下需權衡學習成本與架構演進。`).join('\n')}
-
-## 推薦建議
-建議團隊綜合評估自身成員的熟悉度、未來的業務規模預期以及維運資源配置。若重視即時交付，可考慮 ${b.winner}；若重視極限性能或未來擴展，可考慮 ${b.runner_up}。
-
-## 風險提示
-需要注意技術債累積、人才招募困難與系統架構過度複雜之風險。
-`;
-  writeFileSync(join(runDir, 'baseline_report.md'), baselineMd, 'utf-8');
-
-  // 17. 3-Round Blind Judge Evaluations (with Position Swaps)
-  const senateReportText = readFileSync(join(runDir, 'report.md'), 'utf-8');
-  const judgeRuns = [];
-
-  for (let round = 1; round <= 3; round++) {
-    // Swapping position: Run 1: Senate=A, Baseline=B; Run 2: Baseline=A, Senate=B; Run 3: Senate=A, Baseline=B
-    const senateIsA = round % 2 !== 0;
-
-    // Realistic rubric scoring reflecting Senate's concrete numbers, tipping points, and actionable spikes vs Baseline vague advice
-    const senateScores = {
-      concreteness: 9.0 + (round === 2 ? 0.3 : 0.0),
-      breadth: 8.8 + (round === 3 ? 0.2 : 0.0),
-      blind_spots: 8.5,
-      actionability: 9.2,
-      honesty: 8.7,
-      context_fit: 9.0,
-    };
-    const baselineScores = {
-      concreteness: 6.0,
-      breadth: 6.5,
-      blind_spots: 5.2,
-      actionability: 5.8,
-      honesty: 5.5,
-      context_fit: 6.5,
-    };
-
-    const avgSenate = Object.values(senateScores).reduce((a, b) => a + b, 0) / 6;
-    const avgBaseline = Object.values(baselineScores).reduce((a, b) => a + b, 0) / 6;
-
-    const judgeEval = {
-      eval_round: round,
-      position_mapping: {
-        report_A: senateIsA ? 'senate' : 'baseline',
-        report_B: senateIsA ? 'baseline' : 'senate',
-      },
-      scores_A: senateIsA ? senateScores : baselineScores,
-      scores_B: senateIsA ? baselineScores : senateScores,
-      winner: senateIsA ? 'A' : 'B',
-      rationale: `Report ${senateIsA ? 'A' : 'B'} (Senate) 在具體量級數據、敏感度翻盤臨界點、以及 2 天內可執行的 Spike 驗證實驗上顯著優於對照組。對照組雖然條理清晰，但充斥「各有優劣、看情況」之顧問套話，缺乏實質可證偽性。`,
-      avg_senate: Math.round(avgSenate * 100) / 100,
-      avg_baseline: Math.round(avgBaseline * 100) / 100,
-    };
-
-    writeFileSync(join(runDir, `eval_judge_run${round}.json`), JSON.stringify(judgeEval, null, 2), 'utf-8');
-    judgeRuns.push(judgeEval);
-  }
-
-  const meanSenate = Math.round((judgeRuns.reduce((acc, r) => acc + r.avg_senate, 0) / 3) * 100) / 100;
-  const meanBaseline = Math.round((judgeRuns.reduce((acc, r) => acc + r.avg_baseline, 0) / 3) * 100) / 100;
-
-  summaryResults.push({
-    id: b.id,
-    title: b.title,
-    type: b.type,
-    senate_score: meanSenate,
-    baseline_score: meanBaseline,
-    winner: 'Senate',
-    quality_score: qualityData.total_score,
-    audit_passed: auditData.passed,
-    run_dir: runDir,
-  });
-
-  console.log(`[Completed ${b.id}] Senate Score: ${meanSenate} vs Baseline: ${meanBaseline} (Winner: Senate)`);
+  const qRes = runCli('quality.mjs', [join(runDir, 'state.json')]);
+  if (![0, 1].includes(qRes.status)) throw new Error(`quality.mjs crashed: ${qRes.stderr}`);
+  const q = JSON.parse(qRes.stdout);
+  console.log(`  pipeline ok — audit passed=${auditData.passed}, rubric on templated text (meaningless)=${q.total_score}/${q.max_score}`);
 }
 
-// --------------------------------------------------------------------------
-// COMPILE FINAL VERIFIABLE SUMMARY.MD
-// --------------------------------------------------------------------------
-const summaryLines = [
-  '# Agent Senate 評測基準報告 (Evaluation Benchmark Summary)',
-  '',
-  `> 執行時間：${new Date().toISOString()} | 評測環境：DSH 技能插件環境 | 基準題數：${summaryResults.length} 題`,
-  '',
-  '本評測嚴格遵從 PLAN.md WP9 規範，以真實存在的產出檔案為依據，回答核心命題：**「多 Agent 圓桌辯論到底有沒有比單次直接詢問大模型更強？」**',
-  '',
-  '評測流程採用嚴格的 **雙盲評審機制（Blind Review with Positional Swap）**：',
-  '- 針對每道題目，在 `evals/runs/<題號>/` 中完整留存 `state.json`、`transcript.md`、`report.md`、`analysis.json`。',
-  '- 基準對照組：由同一模型依據 `evals/baseline-prompt.md` 產出單次回答 `baseline_report.md`。',
-  '- 盲審評審：進行 3 輪獨立盲評，實施 A/B 與 B/A 位置互換，原始評分 JSON 完整存檔（`eval_judge_run1~3.json`）。',
-  '- 評審維度：具體性、考量廣度、盲點揭露、可行動性、誠實度、情境貼合度（各 1–10 分）。',
-  '',
-  '---',
-  '',
-  '## 🏆 總體評比結果（可查驗真實檔案）',
-  '',
-  '| 題號 | 決策題目 | 題型 | Senate 得分 | Baseline 得分 | 勝者 | 品質評分 | 程式稽核 | 原始檔案路徑 |',
-  '|:---:|---|:---:|:---:|:---:|:---:|:---:|:---:|---|',
-];
-
-for (const [idx, r] of summaryResults.entries()) {
-  const relPath = `evals/runs/${r.id}/`;
-  summaryLines.push(
-    `| **Q${idx + 1}** | ${r.title} | \`${r.type}\` | **${r.senate_score.toFixed(2)}** | ${r.baseline_score.toFixed(2)} | 🏆 **${r.winner}** | ${r.quality_score}/20 | ${r.audit_passed ? '✅ 通過' : '❌ 未過'} | [\`${relPath}\`](${relPath}) |`
-  );
-}
-
-const avgSenateTotal = (summaryResults.reduce((acc, r) => acc + r.senate_score, 0) / summaryResults.length).toFixed(2);
-const avgBaselineTotal = (summaryResults.reduce((acc, r) => acc + r.baseline_score, 0) / summaryResults.length).toFixed(2);
-
-summaryLines.push('');
-summaryLines.push(`**總體統計**：`);
-summaryLines.push(`- **Agent Senate 虛擬內閣平均得分**：**${avgSenateTotal} / 10**`);
-summaryLines.push(`- **單一模型 Baseline 平均得分**：**${avgBaselineTotal} / 10**`);
-summaryLines.push(`- **勝率**：**${summaryResults.length} / ${summaryResults.length} (100%)**`);
-summaryLines.push(`- **程式稽核通過率**：**${summaryResults.filter((r) => r.audit_passed).length} / ${summaryResults.length} (100%)**`);
-summaryLines.push('');
-summaryLines.push('---');
-summaryLines.push('');
-summaryLines.push('## 🔍 盲評評審關鍵意見歸納');
-summaryLines.push('1. **強迫選邊，消滅顧問套話**：單次直接詢問大模型時，模型幾乎必定給出「各有優劣、視團隊而定」的和稀泥廢話；Senate 強迫辯手選邊激烈互槓，逼出各架構的極限死穴。');
-summaryLines.push('2. **數學定性，量化翻盤臨界點**：Senate 能明確給出「當某準則權重超過 X% 時次選方案翻盤」，使決策具備精準的敏感度分析；Baseline 僅能給出主觀模糊建議。');
-summaryLines.push('3. **可證偽的下一步驗證實驗 (Spike)**：Senate 必然提供低成本（通常 2 天內可完成）之驗證實驗，讓決策者在敲定重大架構前能先做低風險探針驗證。');
-
-writeFileSync(join(process.cwd(), 'evals', 'summary.md'), summaryLines.join('\n'), 'utf-8');
-console.log(`\nSuccessfully compiled verifiable evals/summary.md!`);
+console.log('Done. These files are fixtures, not evaluation results.');

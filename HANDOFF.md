@@ -12,7 +12,7 @@
 
 - **不需要任何 API Key**：辯手就是 DSH 目前的模型，透過 DSH 的 subagent 工具派出。
 - **沒有 Python、沒有伺服器**：只有 Markdown 提示詞 + 一支 Node 腳本 + 一個 HTML 模板。
-- GitHub：<https://github.com/Aben0515/agent_debate>（分支 `main`）。套件名稱是 `agent-senate-dsh`（**不可改名**，見 §6）。
+- GitHub：<https://github.com/Aben0515/agent_senate>（分支 `main`）。套件名稱是 `agent-senate-dsh`（**不可改名**，見 §6）。
 
 ## 2. 歷史（為什麼會有兩個版本）
 1. 使用者想要「多 Agent 圓桌辯論室」。Claude 先寫了一份很長的實作規格書，交給 Gemini（跑在 DSH 裡）實作。
@@ -23,11 +23,11 @@
 ## 3. 檔案地圖
 ```
 agent-senate-dsh/
-├─ package.json            DSH 插件清單。name 必須是 agent-senate-dsh；dsh.bundle.patch 指向 cordis.patch.yml (v0.3.0)
+├─ package.json            DSH 插件清單。name 必須是 agent-senate-dsh；dsh.bundle.patch 指向 cordis.patch.yml (v0.3.1)
 ├─ cordis.patch.yml        告訴 DSH：把 skills/ 資料夾註冊成技能來源（照抄 @tt-a1i/archify-dsh 的格式）
 ├─ lib/index.js            必要的入口檔；匯出 resolveSenateSkillRoot（解析套件路徑）
 ├─ LICENSE, README.md, CHANGELOG.md, DEV_LOG.md, PLAN.md, HANDOFF.md(本檔), .gitignore
-├─ evals/                  評測題目 (questions.yaml)、基線資料與評測狀態說明 (summary.md，目前尚未有真實評測)
+├─ evals/                  評測題目 (questions.yaml)、唯一真實基線 (baseline-go-vs-rust/)、管線夾具 (runs/，由 generate-fixtures.mjs 產生，不是評測)、評測狀態 (summary.md，尚未有真實評測)
 └─ skills/agent-senate/
    ├─ SKILL.md             ★ 整個辯論流程的「程式」。DSH agent 讀它就知道怎麼主持（見 §4）
    ├─ references/
@@ -42,7 +42,8 @@ agent-senate-dsh/
    │  ├─ report.mjs        ★ 報告組裝器：確定性組裝 report.md，精確呈現雙重辯手視角
    │  ├─ audit.mjs         ★ 程式稽核器：連續引言比對、論點狀態檢查與數值一致性檢驗
    │  ├─ quality.mjs       ★ 品質評分器：自動評估客套詞、引用合規率與提問尖銳度
-   │  ├─ run-all-tests.mjs 單行程整合測試執行器（npm test 調用，全套 30 項測試）
+   │  ├─ common.mjs        ★ 共用契約：人格 id↔論點前綴、論點編號語法、【引用】/【讓步】解析、信心評級、判決欄位正規化、CLI 錯誤處理
+   │  ├─ run-all-tests.mjs 單行程測試執行器（npm test 調用，全套 52 項，含端到端管線測試 cli.test.mjs）
    │  ├─ *.test.mjs        各模組之單元測試
    │  └─ matrix.template.html  互動矩陣網頁模板（含實境重播、論點圖譜、逐字稿搜尋、純前端 XSS-Safe）
    └─ examples/
@@ -73,7 +74,7 @@ agent-senate-dsh/
 輸入格式見 SKILL.md「input.json 格式」與 `examples/sample-input.json`。指令：
 ```
 node skills/agent-senate/scripts/analyze.mjs <input.json> [--out <資料夾>]   # 輸出 analysis.json + matrix.html
-npm test                                                                       # 11 個測試
+npm test                                                                       # 52 個測試
 ```
 - **aggregate**：每格取 3 份評審分數的**中位數**；理由/證據取「最接近中位數」的那份；權重取平均後正規化；**spread = 評審 + 所有人格分數的母體標準差**（Monte Carlo 與「🔥分歧」標記都用它）。每份樣本必須「每個方案×準則恰好一格」，缺格的整份丟棄並警告，全丟光則報錯；分數夾在 1–10。
 - **排名**：總分 → Monte Carlo 勝率 → id 字母序。總分差 < 1e-9 視為平手。
@@ -89,6 +90,19 @@ npm test                                                                       #
 3. **翻盤點「示範」按鈕沒真的翻**：閾值有四捨五入，剛好停在交點前面。修法：示範時往交點方向多走 0.005。
 4. **`String.replace` 的 `$&`、`` $` `` 特殊替換**：資料裡有 `$` 會被誤展開。修法：用函式形式 `replace(x, () => data)`。
 5. **`</script>` 注入**：嵌入 JSON 前把 `<` 換成 `\u003c`（原始碼裡要寫成 `'\\u003c'`，見 §7 地雷）。
+
+### v0.3.1 審查修掉的 bug（別改回去）
+6. **提示詞與記帳本格式不一致**：模板 A 要辯手輸出 `supports/attacks/concedes` 且沒有 `quote`，`ledger.mjs` 卻只認 `*_option_ids/*_claim_ids` 並在缺 `quote` 時直接報錯——照提示詞走的真實辯論第一則發言就會失敗。現在兩種欄位名都接受，`quote` 可缺（以 text 代替並警告）。
+7. **report.mjs 讀不到 extras**：SKILL.md 傳的是 `input.json`，報告卻把整份當成 extras 讀，判決、紅隊、權衡、高光全部消失。現在 `{extras:{…}}` 與裸 extras 都接受。
+8. **信心評級寫死「高」**、只檢查 ≥75% 與 <50% 兩段：現在由勝率推導（高/中/低），report 與 audit 用同一個 `confidenceLabel()`。
+9. **翻盤點「降低」方向仍寫「以上」**：改成「以下」。
+10. **引用解析過寬**：舊正規式會把 `【讓步 #x】` 當成攻擊、把 `【cto.1】` 解析成 `to.1`、並把整段發言的引用套到該回合每一個論點。現在由 `common.mjs` 的 `parseInTextRefs()` 嚴格解析。
+11. **讓步語意顛倒**：讓步別人的論點會把對方論點標成 `conceded`，使它不能當證據（等於懲罰被承認的一方）。現在只能讓步自己的論點；讓步別人的記為「承認」。
+12. **被攻擊會覆蓋 `disputed_fact`**：查核判錯的論點一被攻擊就變回 `attacked`，又能當證據了。
+13. **高光引言稽核被論點索引騙過**：舊版拿整份 transcript（含索引裡的「原文：…」）比對；現在逐則發言比對、允許 `…` 省略、禁止跨發言拼接。
+14. **評審一致性診斷混入辯手分數**：辯手是倡議者，分數分歧大，會掩蓋三位評審互相抄的情況。診斷現在只看評審。
+15. **analyze.mjs 參數解析**：`--out dir input.json` 會把 `dir` 當輸入檔。
+16. **`evals/run-all-benchmarks.mjs` 會覆寫 `evals/summary.md`** 為寫死的假評測結果，已改為只產生管線夾具的 `generate-fixtures.mjs`。
 
 ## 6. DSH 插件格式（為什麼長這樣）
 這是**技能型（skill-only）插件**，格式照抄使用者已安裝、可正常運作的 `@tt-a1i/archify-dsh`（在 `~/.dsh/profiles/desktop/node_modules/@tt-a1i/archify-dsh/`）：
@@ -106,7 +120,7 @@ npm test                                                                       #
 
 ## 8. 驗證狀態（誠實版）
 **已驗證**
-- `npm test`：**30/30 全數通過**（涵蓋 analyze、validate、ledger、report、audit、statistical-calibration、quality）。
+- `npm test`：**52/52 全數通過**（涵蓋 analyze、validate、ledger、report、audit、statistical-calibration、quality、CLI 與端到端管線）。
 - `validate.mjs`：實測驗證基線 `input.json`，精準攔截缺格、重複格與無效證據引用。
 - `ledger.mjs`：實測驗證 3 辯手 2 輪交叉交鋒，確定性產生完整包含主席指令之逐字稿。
 - `report.mjs`：實測將基線數據組裝為格式精確之 `report.md`，雙重視角完全分離。
@@ -149,7 +163,7 @@ node skills/agent-senate/scripts/analyze.mjs skills/agent-senate/examples/sample
 `sample-input.json` 當初由一支拋棄式腳本產生，腳本沒保留——要改示範資料請**直接編輯 JSON**。
 
 ## 11. Git / 發佈
-- Remote：`origin` = `https://github.com/Aben0515/agent_debate.git`，分支 `main`。
+- Remote：`origin` = `https://github.com/Aben0515/agent_senate.git`，分支 `main`。
 - 這個資料夾是**獨立的 git repo**，但位於 `plugin/` 底下（`plugin/` 本身是另一個 git repo，對它而言這個資料夾是 untracked）。**在這個資料夾裡 commit，不要在 `plugin/` 根目錄 commit。**
 - 本 repo 的 commit 身分已在 repo 本機設定（`user.name=Aben0515`，信箱為使用者的 Gmail）。推送會公開顯示該信箱。
 - commit 訊息慣例：中文摘要 + 說明；結尾加 `Co-Authored-By:` 行標註協作的 AI。

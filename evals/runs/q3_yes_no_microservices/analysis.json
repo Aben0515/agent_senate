@@ -682,11 +682,14 @@
       }
     ],
     "diagnostics": {
-      "judge_agreement_avg_spread": 1.39,
-      "high_agreement_warning": false,
+      "judge_agreement_avg_spread": 0.187,
+      "overall_avg_spread": 1.39,
+      "high_agreement_warning": true,
+      "single_judge_warning": false,
       "effective_samples": 3,
       "spread_floor_used": 0.5
-    }
+    },
+    "input_digest": "c2ddd87fca5ef04c"
   },
   "warnings": [],
   "sample_count": 3

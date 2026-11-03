@@ -65,7 +65,7 @@ test('validateJudgeOutput catches missing cell slot', () => {
   };
   const res = validateJudgeOutput(mockBrief, missingOne, mockLedger);
   assert.equal(res.ok, false);
-  assert.ok(res.errors.some((e) => e.includes('缺少評合格子：`go|perf`')));
+  assert.ok(res.errors.some((e) => e.includes('缺少評分格子：`go|perf`')));
 });
 
 test('validateJudgeOutput catches duplicate slot', () => {
@@ -177,4 +177,27 @@ test('validateTurnMarkdown checks claims block and kind validity', () => {
   const resInvalid = validateTurnMarkdown(invalidKindMd, 'cto', mockLedger);
   assert.equal(resInvalid.ok, false);
   assert.ok(resInvalid.errors.some((e) => e.includes('kind `concession` 無效')));
+});
+
+test('extractJsonFromText returns whole arrays (claims blocks) even with trailing commas or chatter', () => {
+  assert.deepEqual(extractJsonFromText('[{"a":1},{"b":2},]'), [{ a: 1 }, { b: 2 }]);
+  assert.deepEqual(extractJsonFromText('這是論點：\n[{"a":1},{"b":2}]\n以上'), [{ a: 1 }, { b: 2 }]);
+  assert.deepEqual(extractJsonFromText('{"t":"逗號, ]不能被吃掉",}'), { t: '逗號, ]不能被吃掉' });
+  assert.throws(() => extractJsonFromText('沒有 JSON'), /找不到 JSON/);
+});
+
+test('validators survive null cells and report them instead of crashing', () => {
+  const res = validateJudgeOutput(mockBrief, { weights: { ops_simplicity: 1, perf: 1 }, cells: [null] });
+  assert.equal(res.ok, false);
+  assert.ok(res.errors.some((e) => e.includes('cells[0] 不是物件')));
+  const p = validatePersonaOutput(mockBrief, { speaker_id: 'cto', final_choice: 'go', weights: { ops_simplicity: 'x', perf: 1 }, cells: [] }, 'conservative_cto');
+  assert.ok(!p.errors.some((e) => e.includes('speaker_id 不符')), 'aliases are accepted for speaker_id');
+  assert.ok(p.errors.some((e) => e.includes('權重必須是非負數')));
+});
+
+test('validateTurnMarkdown accepts the prompts.md claim fields and flags malformed reference ids', () => {
+  const md = '我選 Go。兩週上手。\n```claims\n[{"text":"兩週上手","quote":"兩週上手","kind":"estimate","supports":["go"],"attacks":["#cto-1"]}]\n```';
+  const res = validateTurnMarkdown(md, 'cto', mockLedger);
+  assert.equal(res.ok, false);
+  assert.ok(res.errors.some((e) => e.includes('格式錯誤')));
 });

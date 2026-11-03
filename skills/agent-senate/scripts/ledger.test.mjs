@@ -138,9 +138,74 @@ test('ledger manages turns, claim prefixes, concessions, and scoreboard', () => 
 
   // 10. Verify transcript output includes chair speeches and directives
   const transcript = generateTranscriptMarkdown(state);
-  assert.ok(transcript.includes('### ⚖️ 天秤主席 ｜ opening'));
-  assert.ok(transcript.includes('### ⚖️ 天秤主席 ｜ directive (第 1 輪)'));
-  assert.ok(transcript.includes('### conservative_cto ｜ opening'));
+  assert.ok(transcript.includes('### ⚖️ 天秤主席 ｜ 開場陳述'));
+  assert.ok(transcript.includes('### ⚖️ 天秤主席 ｜ 主席指令（第 1 輪）'));
+  assert.ok(transcript.includes('### 🛡️ 陳CTO ｜ 開場陳述'));
+  assert.ok(transcript.includes('### 🔎 事實查核'));
   assert.ok(transcript.includes('最終論點索引表'));
   assert.ok(transcript.includes('辯手計分板'));
+});
+
+const briefGoRust = { options: [{ id: 'go', label: 'Go' }, { id: 'rust', label: 'Rust' }] };
+const claims = (arr) => '\n```claims\n' + JSON.stringify(arr) + '\n```\n';
+
+test('ledger accepts the claim format that prompts.md template A asks for (supports/attacks/concedes, no quote)', () => {
+  const state = createInitialState('q', briefGoRust);
+  addDebaterTurn(state, { speaker: 'conservative_cto', kind: 'opening', text: '選 Go。兩週上手。' + claims([{ id: 'cto.1', text: 'Go 兩週上手', kind: 'estimate', supports: ['go'] }]) });
+  const res = addDebaterTurn(state, {
+    speaker: 'perf_zealot', kind: 'rebuttal', round: 1,
+    text: '> 【陳CTO #cto.1】兩週上手\n兩週只夠寫 hello world。' + claims([{ id: 'vex.1', text: '兩週不夠', kind: 'estimate', supports: ['rust'], attacks: ['cto.1'], concedes: [] }]),
+  });
+  assert.equal(res.new_claims[0].id, 'vex.1');
+  assert.deepEqual(res.new_claims[0].supports_option_ids, ['rust']);
+  assert.deepEqual(res.new_claims[0].attacks_claim_ids, ['cto.1']);
+  assert.equal(state.claims['cto.1'].status, 'attacked');
+  assert.equal(state.claims['cto.1'].quote, 'Go 兩週上手', 'missing quote falls back to text');
+});
+
+test('in-text reference parsing: strict ids, no false positives, concessions are not attacks', async () => {
+  const { parseInTextRefs } = await import('./common.mjs');
+  assert.deepEqual(parseInTextRefs('【cto.1】').references, ['cto.1']);
+  assert.deepEqual(parseInTextRefs('> 【陳CTO #cto.12】原話').references, ['cto.12']);
+  assert.deepEqual(parseInTextRefs('【Rust】【重點】【Go 生態】').references, []);
+  const r = parseInTextRefs('【讓步 #vex.2】我承認');
+  assert.deepEqual(r.concessions, ['vex.2']);
+  assert.deepEqual(r.references, []);
+});
+
+test('conceding an opponent claim is an acknowledgement, not a withdrawal of their claim', () => {
+  const state = createInitialState('q', briefGoRust);
+  addDebaterTurn(state, { speaker: 'cto', kind: 'opening', text: 'Go。' + claims([{ text: 'Go 招募池大', quote: 'Go', kind: 'fact' }]) });
+  const res = addDebaterTurn(state, { speaker: 'vex', kind: 'rebuttal', round: 1, text: '【讓步 #cto.1】招募池確實大。' });
+  assert.equal(state.claims['cto.1'].status, 'open', 'opponent claim must stay usable as evidence');
+  assert.deepEqual(state.claims['cto.1'].acknowledged_by, ['perf_zealot']);
+  assert.ok(res.warnings.some((w) => w.includes('承認對手論點')));
+});
+
+test('a concession in a turn without a claims block still marks the own claim conceded', () => {
+  const state = createInitialState('q', briefGoRust);
+  addDebaterTurn(state, { speaker: 'perf_zealot', kind: 'opening', text: 'Rust。' + claims([{ text: 'p99 差 10 倍', quote: 'Rust', kind: 'estimate' }]) });
+  addDebaterTurn(state, { speaker: 'perf_zealot', kind: 'rebuttal', round: 1, text: '【讓步 #vex.1】這個數字我收回。' });
+  assert.equal(state.claims['vex.1'].status, 'conceded');
+});
+
+test('attacking a claim does not erase a likely_false fact-check verdict', () => {
+  const state = createInitialState('q', briefGoRust);
+  addDebaterTurn(state, { speaker: 'vex', kind: 'opening', text: 'Rust 快。' + claims([{ text: 'Rust 快 100 倍', quote: 'Rust 快', kind: 'fact' }]) });
+  recordFactChecks(state, [{ claim_id: 'vex.1', verdict: 'likely_false', note: '誇大' }], { round: 1 });
+  addDebaterTurn(state, { speaker: 'cto', kind: 'rebuttal', round: 1, text: '亂講。' + claims([{ text: '沒有 100 倍', quote: '亂講', kind: 'value', attacks: ['vex.1'] }]) });
+  assert.equal(state.claims['vex.1'].status, 'disputed_fact');
+  assert.equal(computeScoreboard(state).conservative_cto.attacks_landed, 1);
+});
+
+test('an invalid turn leaves the ledger untouched and aliases map to canonical ids', () => {
+  const state = createInitialState('q', briefGoRust);
+  assert.throws(() => addDebaterTurn(state, { speaker: 'cto', kind: 'opening', text: 'x' + claims([{ text: 'a', kind: 'concession' }]) }), /無效的 claim kind/);
+  assert.equal(Object.keys(state.claims).length, 0);
+  assert.equal(state.turns.length, 0);
+  assert.equal(state.speaker_counters.cto ?? 0, 0);
+  addDebaterTurn(state, { speaker: 'CTO', kind: 'opening', text: 'x' + claims([{ text: 'a', quote: 'x', kind: 'value' }]) });
+  assert.equal(state.claims['cto.1'].speaker, 'conservative_cto');
+  recordFallacies(state, [{ claim_id: 'cto.1', type: 'appeal_to_authority' }]);
+  assert.equal(computeScoreboard(state).conservative_cto.fallacies_flagged, 1, 'speaker inferred from claim id');
 });

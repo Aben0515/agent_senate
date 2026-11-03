@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "question": "客服對話摘要功能（每日 5 萬次呼叫、含敏感客戶個資）：該自架開源 LLM 還是使用雲端商業 API？",
   "brief": {
     "restated_question": "客服對話摘要功能（每日 5 萬次呼叫、含敏感客戶個資）：該自架開源 LLM 還是使用雲端商業 API？",
@@ -60,7 +60,7 @@
       }
     ]
   },
-  "created_at": "2026-10-03T23:22:50.362Z",
+  "created_at": "2026-11-03T14:25:33.680Z",
   "turns": [
     {
       "id": "chair_opening_1",
@@ -68,7 +68,7 @@
       "kind": "opening",
       "round": null,
       "text": "歡迎各位蒞臨 Agent Senate 虛擬內閣。今天議事日程為【客服對話摘要功能隱私與個資選型】。請各位辯手就座，開門見山亮出立場與量級依據！",
-      "timestamp": "2026-10-03T23:22:50.362Z"
+      "timestamp": "2026-11-03T14:25:33.680Z"
     },
     {
       "id": "turn_security_paranoid_opening_2",
@@ -77,13 +77,15 @@
       "kind": "opening",
       "round": null,
       "text": "我堅決推薦選擇 雲端商業 API + 本地去識別化前置代理（cloud_api_with_anonymization）。理由在於團隊需要極致控制風險與交付成本。",
-      "full_text": "我堅決推薦選擇 雲端商業 API + 本地去識別化前置代理（cloud_api_with_anonymization）。理由在於團隊需要極致控制風險與交付成本。\n\n```claims\n[{\"text\":\"雲端商業 API + 本地去識別化前置代理可顯著降低初創期總持有成本與風險\",\"quote\":\"降低初創期總持有成本與風險\",\"kind\":\"estimate\",\"supports_option_ids\":[\"cloud_api_with_anonymization\"]},{\"text\":\"基礎設施複雜度會拖慢團隊核心業務推進\",\"quote\":\"拖慢團隊核心業務推進\",\"kind\":\"fact\",\"supports_option_ids\":[\"cloud_api_with_anonymization\"]}]\n```",
+      "full_text": "我堅決推薦選擇 雲端商業 API + 本地去識別化前置代理（cloud_api_with_anonymization）。理由在於團隊需要極致控制風險與交付成本。\n\n```claims\n[{\"text\":\"雲端商業 API + 本地去識別化前置代理可顯著降低初創期總持有成本與風險\",\"quote\":\"降低初創期總持有成本與風險\",\"kind\":\"estimate\",\"supports\":[\"cloud_api_with_anonymization\"]},{\"text\":\"基礎設施複雜度會拖慢團隊核心業務推進\",\"quote\":\"拖慢團隊核心業務推進\",\"kind\":\"fact\",\"supports\":[\"cloud_api_with_anonymization\"]}]\n```",
       "claims": [
         "sec.1",
         "sec.2"
       ],
+      "attacks": [],
       "concessions": [],
-      "timestamp": "2026-10-03T23:22:50.362Z"
+      "acknowledgements": [],
+      "timestamp": "2026-11-03T14:25:33.681Z"
     },
     {
       "id": "turn_conservative_cto_opening_3",
@@ -92,12 +94,16 @@
       "kind": "opening",
       "round": null,
       "text": "我支持 自架開源私有化 LLM (vLLM)（self_hosted_open_llm）。\n> 【security_paranoid #sec.1】降低初創期總持有成本與風險。但是如果長期架構擴展性與極限性能有硬傷，後續重構代價將是 5 倍以上。",
-      "full_text": "我支持 自架開源私有化 LLM (vLLM)（self_hosted_open_llm）。\n> 【security_paranoid #sec.1】降低初創期總持有成本與風險。但是如果長期架構擴展性與極限性能有硬傷，後續重構代價將是 5 倍以上。\n\n```claims\n[{\"text\":\"自架開源私有化 LLM (vLLM)在長期擴展性與底層控制力具備不可替代優勢\",\"quote\":\"長期擴展性具備不可替代優勢\",\"kind\":\"value\",\"supports_option_ids\":[\"self_hosted_open_llm\"],\"attacks_claim_ids\":[\"sec.1\"]}]\n```",
+      "full_text": "我支持 自架開源私有化 LLM (vLLM)（self_hosted_open_llm）。\n> 【security_paranoid #sec.1】降低初創期總持有成本與風險。但是如果長期架構擴展性與極限性能有硬傷，後續重構代價將是 5 倍以上。\n\n```claims\n[{\"text\":\"自架開源私有化 LLM (vLLM)在長期擴展性與底層控制力具備不可替代優勢\",\"quote\":\"長期擴展性具備不可替代優勢\",\"kind\":\"value\",\"supports\":[\"self_hosted_open_llm\"],\"attacks\":[\"sec.1\"]}]\n```",
       "claims": [
         "cto.1"
       ],
+      "attacks": [
+        "sec.1"
+      ],
       "concessions": [],
-      "timestamp": "2026-10-03T23:22:50.362Z"
+      "acknowledgements": [],
+      "timestamp": "2026-11-03T14:25:33.681Z"
     },
     {
       "id": "turn_kiss_hacker_opening_4",
@@ -106,12 +112,14 @@
       "kind": "opening",
       "round": null,
       "text": "我選擇最務實的方案 cloud_api_with_anonymization。在 1,500 RPS 與 3 人小團隊約束下，任何沒有算過帳的過度架構都是工程師的自嗨。最少活動零件原則才是真理。",
-      "full_text": "我選擇最務實的方案 cloud_api_with_anonymization。在 1,500 RPS 與 3 人小團隊約束下，任何沒有算過帳的過度架構都是工程師的自嗨。最少活動零件原則才是真理。\n\n```claims\n[{\"text\":\"現有負載下簡約架構完全足夠支撐，不要為不存在的規模做設計\",\"quote\":\"不要為不存在的規模做設計\",\"kind\":\"proposal\",\"supports_option_ids\":[\"cloud_api_with_anonymization\"]}]\n```",
+      "full_text": "我選擇最務實的方案 cloud_api_with_anonymization。在 1,500 RPS 與 3 人小團隊約束下，任何沒有算過帳的過度架構都是工程師的自嗨。最少活動零件原則才是真理。\n\n```claims\n[{\"text\":\"現有負載下簡約架構完全足夠支撐，不要為不存在的規模做設計\",\"quote\":\"不要為不存在的規模做設計\",\"kind\":\"proposal\",\"supports\":[\"cloud_api_with_anonymization\"]}]\n```",
       "claims": [
         "kiss.1"
       ],
+      "attacks": [],
       "concessions": [],
-      "timestamp": "2026-10-03T23:22:50.363Z"
+      "acknowledgements": [],
+      "timestamp": "2026-11-03T14:25:33.681Z"
     },
     {
       "id": "chair_directive_1",
@@ -119,7 +127,15 @@
       "kind": "directive",
       "round": 1,
       "text": "戰況總結：交鋒焦點聚焦於即時交付 vs 長期擴展性。請各辯手針對具體量級數據展開正面質詢！@conservative_cto，請說明如果流量在 1 年內達到 5,000 QPS，成本相差多少？",
-      "timestamp": "2026-10-03T23:22:50.363Z"
+      "timestamp": "2026-11-03T14:25:33.681Z"
+    },
+    {
+      "id": "factcheck_1",
+      "type": "factcheck",
+      "kind": "factcheck",
+      "round": 1,
+      "text": "- ✅ #sec.1 plausible：架構複雜度與交付週期成正比",
+      "timestamp": "2026-11-03T14:25:33.681Z"
     },
     {
       "id": "turn_conservative_cto_rebuttal_1",
@@ -128,14 +144,18 @@
       "kind": "rebuttal",
       "round": 1,
       "text": "> 【security_paranoid #sec.1】降低初創期總持有成本與風險\n【讓步 #cto.1】我承認在業務初期首年，3 人團隊生存交付確實排在第一位。但是若延遲突破 50ms，我們必須看清長期技術債的複利效應。",
-      "full_text": "> 【security_paranoid #sec.1】降低初創期總持有成本與風險\n【讓步 #cto.1】我承認在業務初期首年，3 人團隊生存交付確實排在第一位。但是若延遲突破 50ms，我們必須看清長期技術債的複利效應。\n\n```claims\n[{\"text\":\"預先做好領域邊界規劃可兼顧當期速度與未來遷移\",\"quote\":\"預先做好領域邊界規劃\",\"kind\":\"proposal\",\"supports_option_ids\":[\"cloud_api_with_anonymization\"],\"concedes_claim_ids\":[\"cto.1\"]}]\n```",
+      "full_text": "> 【security_paranoid #sec.1】降低初創期總持有成本與風險\n【讓步 #cto.1】我承認在業務初期首年，3 人團隊生存交付確實排在第一位。但是若延遲突破 50ms，我們必須看清長期技術債的複利效應。\n\n```claims\n[{\"text\":\"預先做好領域邊界規劃可兼顧當期速度與未來遷移\",\"quote\":\"預先做好領域邊界規劃\",\"kind\":\"proposal\",\"supports\":[\"cloud_api_with_anonymization\"],\"concedes\":[\"cto.1\"]}]\n```",
       "claims": [
         "cto.2"
+      ],
+      "attacks": [
+        "sec.1"
       ],
       "concessions": [
         "cto.1"
       ],
-      "timestamp": "2026-10-03T23:22:50.363Z"
+      "acknowledgements": [],
+      "timestamp": "2026-11-03T14:25:33.681Z"
     },
     {
       "id": "turn_security_paranoid_rebuttal_1",
@@ -143,13 +163,17 @@
       "speaker": "security_paranoid",
       "kind": "rebuttal",
       "round": 1,
-      "text": "> 【conservative_cto #cto.1】長期擴展性具備不可替代優勢。\n若公司在第 1 年就因過早最佳化把 300 萬資金燒光，五年後的擴展性只是幻影。",
-      "full_text": "> 【conservative_cto #cto.1】長期擴展性具備不可替代優勢。\n若公司在第 1 年就因過早最佳化把 300 萬資金燒光，五年後的擴展性只是幻影。\n\n```claims\n[{\"text\":\"新創團隊的第一法則是活到下一個季度\",\"quote\":\"活到下一個季度\",\"kind\":\"value\",\"supports_option_ids\":[\"cloud_api_with_anonymization\"]}]\n```",
+      "text": "> 【conservative_cto #cto.1】長期擴展性具備不可替代優勢。\n若公司在第 1 年就因過早最佳化把 300 萬資金燒光，五年後的擴展性只是幻影。新創團隊的第一法則是活到下一個季度。",
+      "full_text": "> 【conservative_cto #cto.1】長期擴展性具備不可替代優勢。\n若公司在第 1 年就因過早最佳化把 300 萬資金燒光，五年後的擴展性只是幻影。新創團隊的第一法則是活到下一個季度。\n\n```claims\n[{\"text\":\"新創團隊的第一法則是活到下一個季度\",\"quote\":\"活到下一個季度\",\"kind\":\"value\",\"supports\":[\"cloud_api_with_anonymization\"]}]\n```",
       "claims": [
         "sec.3"
       ],
+      "attacks": [
+        "cto.1"
+      ],
       "concessions": [],
-      "timestamp": "2026-10-03T23:22:50.363Z"
+      "acknowledgements": [],
+      "timestamp": "2026-11-03T14:25:33.681Z"
     },
     {
       "id": "turn_kiss_hacker_rebuttal_1",
@@ -158,23 +182,73 @@
       "kind": "rebuttal",
       "round": 1,
       "text": "> 【conservative_cto #cto.1】預先做好領域邊界規劃\n把它刪掉，看看誰會哭？在單台 4 核心 8GB 伺服器上，把不必要的 10 個微服務活動零件全數剃除。",
-      "full_text": "> 【conservative_cto #cto.1】預先做好領域邊界規劃\n把它刪掉，看看誰會哭？在單台 4 核心 8GB 伺服器上，把不必要的 10 個微服務活動零件全數剃除。\n\n```claims\n[{\"text\":\"遵循奧卡姆剃刀，先用最小可行方案上線驗證反饋\",\"quote\":\"先用最小可行方案上線驗證反饋\",\"kind\":\"proposal\",\"supports_option_ids\":[\"cloud_api_with_anonymization\"]}]\n```",
+      "full_text": "> 【conservative_cto #cto.1】預先做好領域邊界規劃\n把它刪掉，看看誰會哭？在單台 4 核心 8GB 伺服器上，把不必要的 10 個微服務活動零件全數剃除。\n\n```claims\n[{\"text\":\"遵循奧卡姆剃刀，先用最小可行方案上線驗證反饋\",\"quote\":\"先用最小可行方案上線驗證反饋\",\"kind\":\"proposal\",\"supports\":[\"cloud_api_with_anonymization\"]}]\n```",
       "claims": [
         "kiss.2"
       ],
+      "attacks": [
+        "cto.1"
+      ],
       "concessions": [],
-      "timestamp": "2026-10-03T23:22:50.363Z"
+      "acknowledgements": [],
+      "timestamp": "2026-11-03T14:25:33.681Z"
     },
     {
       "id": "chair_directive_2",
       "type": "chair",
       "kind": "directive",
       "round": 2,
-      "text": "交叉質詢第 2 輪結束：主要交鋒點已充分辯論，現在進入鋼人論證與結辯！",
-      "timestamp": "2026-10-03T23:22:50.363Z"
+      "text": "第 2 輪：@security_paranoid，若 1 年內團隊擴到 10 人，你的方案上手要幾週？@conservative_cto，重構成本 5 倍的推算過程是什麼？@kiss_hacker，單機撐不住的量級是多少？",
+      "timestamp": "2026-11-03T14:25:33.681Z"
     },
     {
-      "id": "turn_security_paranoid_steelman_10",
+      "id": "turn_security_paranoid_rebuttal_2",
+      "type": "debater",
+      "speaker": "security_paranoid",
+      "kind": "rebuttal",
+      "round": 2,
+      "text": "> 【conservative_cto #cto.2】預先做好領域邊界規劃\n10 人團隊新人上手約 2 週（估：照現有 onboarding 文件與 code review 節奏推算）。邊界規劃可以，但不需要先付分散式的稅。",
+      "full_text": "> 【conservative_cto #cto.2】預先做好領域邊界規劃\n10 人團隊新人上手約 2 週（估：照現有 onboarding 文件與 code review 節奏推算）。邊界規劃可以，但不需要先付分散式的稅。",
+      "claims": [],
+      "attacks": [
+        "cto.2"
+      ],
+      "concessions": [],
+      "acknowledgements": [],
+      "timestamp": "2026-11-03T14:25:33.681Z"
+    },
+    {
+      "id": "turn_conservative_cto_rebuttal_2",
+      "type": "debater",
+      "speaker": "conservative_cto",
+      "kind": "rebuttal",
+      "round": 2,
+      "text": "> 【security_paranoid #sec.3】活到下一個季度\n活到下個季度之後還要活第 8 個季度。重構 5 倍是以「事後拆分 vs 事前劃界」的人月比估的。",
+      "full_text": "> 【security_paranoid #sec.3】活到下一個季度\n活到下個季度之後還要活第 8 個季度。重構 5 倍是以「事後拆分 vs 事前劃界」的人月比估的。",
+      "claims": [],
+      "attacks": [
+        "sec.3"
+      ],
+      "concessions": [],
+      "acknowledgements": [],
+      "timestamp": "2026-11-03T14:25:33.681Z"
+    },
+    {
+      "id": "turn_kiss_hacker_rebuttal_2",
+      "type": "debater",
+      "speaker": "kiss_hacker",
+      "kind": "rebuttal",
+      "round": 2,
+      "text": "單機 4 核 8GB 在讀多寫少的 B2B 情境下撐到數千 RPS（估），真的撐不住時再加一台。",
+      "full_text": "單機 4 核 8GB 在讀多寫少的 B2B 情境下撐到數千 RPS（估），真的撐不住時再加一台。",
+      "claims": [],
+      "attacks": [],
+      "concessions": [],
+      "acknowledgements": [],
+      "timestamp": "2026-11-03T14:25:33.681Z"
+    },
+    {
+      "id": "turn_security_paranoid_steelman_14",
       "type": "debater",
       "speaker": "security_paranoid",
       "kind": "steelman",
@@ -182,11 +256,13 @@
       "text": "我為 self_hosted_open_llm 做最強辯護：如果未來流量出現 10 倍指數級增長，當初奠定的硬核架構將展現巨大的免重構優勢。這動搖了我 25%。",
       "full_text": "我為 self_hosted_open_llm 做最強辯護：如果未來流量出現 10 倍指數級增長，當初奠定的硬核架構將展現巨大的免重構優勢。這動搖了我 25%。",
       "claims": [],
+      "attacks": [],
       "concessions": [],
-      "timestamp": "2026-10-03T23:22:50.363Z"
+      "acknowledgements": [],
+      "timestamp": "2026-11-03T14:25:33.681Z"
     },
     {
-      "id": "turn_conservative_cto_steelman_11",
+      "id": "turn_conservative_cto_steelman_15",
       "type": "debater",
       "speaker": "conservative_cto",
       "kind": "steelman",
@@ -194,11 +270,13 @@
       "text": "我為 cloud_api_with_anonymization 做最強辯護：在商業市場上，交付速度就是生命線，新人快速接盤是抗風險護城河。這動搖了我 35%。",
       "full_text": "我為 cloud_api_with_anonymization 做最強辯護：在商業市場上，交付速度就是生命線，新人快速接盤是抗風險護城河。這動搖了我 35%。",
       "claims": [],
+      "attacks": [],
       "concessions": [],
-      "timestamp": "2026-10-03T23:22:50.363Z"
+      "acknowledgements": [],
+      "timestamp": "2026-11-03T14:25:33.681Z"
     },
     {
-      "id": "turn_kiss_hacker_steelman_12",
+      "id": "turn_kiss_hacker_steelman_16",
       "type": "debater",
       "speaker": "kiss_hacker",
       "kind": "steelman",
@@ -206,11 +284,13 @@
       "text": "我承認對手在極限可靠性上的深刻思考，這促使我認識到簡約架構依然必須保留清晰的模組邊界。",
       "full_text": "我承認對手在極限可靠性上的深刻思考，這促使我認識到簡約架構依然必須保留清晰的模組邊界。",
       "claims": [],
+      "attacks": [],
       "concessions": [],
-      "timestamp": "2026-10-03T23:22:50.363Z"
+      "acknowledgements": [],
+      "timestamp": "2026-11-03T14:25:33.681Z"
     },
     {
-      "id": "turn_security_paranoid_closing_13",
+      "id": "turn_security_paranoid_closing_17",
       "type": "debater",
       "speaker": "security_paranoid",
       "kind": "closing",
@@ -218,11 +298,13 @@
       "text": "結辯：我最終堅定推薦 cloud_api_with_anonymization。若團隊全員本已精通次選技術且預算無限，我的建議為錯。",
       "full_text": "結辯：我最終堅定推薦 cloud_api_with_anonymization。若團隊全員本已精通次選技術且預算無限，我的建議為錯。",
       "claims": [],
+      "attacks": [],
       "concessions": [],
-      "timestamp": "2026-10-03T23:22:50.363Z"
+      "acknowledgements": [],
+      "timestamp": "2026-11-03T14:25:33.681Z"
     },
     {
-      "id": "turn_conservative_cto_closing_14",
+      "id": "turn_conservative_cto_closing_18",
       "type": "debater",
       "speaker": "conservative_cto",
       "kind": "closing",
@@ -230,11 +312,13 @@
       "text": "結辯：我維持對底層擴展性的警示，但尊重團隊當前的交付邊界。若業務本質為低頻系統，cloud_api_with_anonymization 是務實選擇。",
       "full_text": "結辯：我維持對底層擴展性的警示，但尊重團隊當前的交付邊界。若業務本質為低頻系統，cloud_api_with_anonymization 是務實選擇。",
       "claims": [],
+      "attacks": [],
       "concessions": [],
-      "timestamp": "2026-10-03T23:22:50.363Z"
+      "acknowledgements": [],
+      "timestamp": "2026-11-03T14:25:33.681Z"
     },
     {
-      "id": "turn_kiss_hacker_closing_15",
+      "id": "turn_kiss_hacker_closing_19",
       "type": "debater",
       "speaker": "kiss_hacker",
       "kind": "closing",
@@ -242,8 +326,10 @@
       "text": "結辯：我堅定推薦 cloud_api_with_anonymization。先交付業務價值，再針對真實瓶頸優化。",
       "full_text": "結辯：我堅定推薦 cloud_api_with_anonymization。先交付業務價值，再針對真實瓶頸優化。",
       "claims": [],
+      "attacks": [],
       "concessions": [],
-      "timestamp": "2026-10-03T23:22:50.363Z"
+      "acknowledgements": [],
+      "timestamp": "2026-11-03T14:25:33.681Z"
     }
   ],
   "chair_events": [
@@ -253,7 +339,7 @@
       "kind": "opening",
       "round": null,
       "text": "歡迎各位蒞臨 Agent Senate 虛擬內閣。今天議事日程為【客服對話摘要功能隱私與個資選型】。請各位辯手就座，開門見山亮出立場與量級依據！",
-      "timestamp": "2026-10-03T23:22:50.362Z"
+      "timestamp": "2026-11-03T14:25:33.680Z"
     },
     {
       "id": "chair_directive_1",
@@ -261,15 +347,15 @@
       "kind": "directive",
       "round": 1,
       "text": "戰況總結：交鋒焦點聚焦於即時交付 vs 長期擴展性。請各辯手針對具體量級數據展開正面質詢！@conservative_cto，請說明如果流量在 1 年內達到 5,000 QPS，成本相差多少？",
-      "timestamp": "2026-10-03T23:22:50.363Z"
+      "timestamp": "2026-11-03T14:25:33.681Z"
     },
     {
       "id": "chair_directive_2",
       "type": "chair",
       "kind": "directive",
       "round": 2,
-      "text": "交叉質詢第 2 輪結束：主要交鋒點已充分辯論，現在進入鋼人論證與結辯！",
-      "timestamp": "2026-10-03T23:22:50.363Z"
+      "text": "第 2 輪：@security_paranoid，若 1 年內團隊擴到 10 人，你的方案上手要幾週？@conservative_cto，重構成本 5 倍的推算過程是什麼？@kiss_hacker，單機撐不住的量級是多少？",
+      "timestamp": "2026-11-03T14:25:33.681Z"
     }
   ],
   "claims": {
@@ -291,10 +377,12 @@
         "cto.1",
         "cto.2"
       ],
+      "acknowledged_by": [],
       "fact_check": {
         "claim_id": "sec.1",
         "verdict": "plausible",
-        "note": "架構複雜度與交付週期成正比"
+        "note": "架構複雜度與交付週期成正比",
+        "round": 1
       }
     },
     "sec.2": {
@@ -312,6 +400,7 @@
       "concedes_claim_ids": [],
       "status": "open",
       "attacked_by": [],
+      "acknowledged_by": [],
       "fact_check": null
     },
     "cto.1": {
@@ -331,11 +420,12 @@
       "concedes_claim_ids": [],
       "status": "conceded",
       "attacked_by": [
-        "cto.2",
         "sec.3",
         "kiss.2"
       ],
-      "fact_check": null
+      "acknowledged_by": [],
+      "fact_check": null,
+      "conceded_in": "turn_conservative_cto_rebuttal_1"
     },
     "kiss.1": {
       "id": "kiss.1",
@@ -352,6 +442,7 @@
       "concedes_claim_ids": [],
       "status": "open",
       "attacked_by": [],
+      "acknowledged_by": [],
       "fact_check": null
     },
     "cto.2": {
@@ -366,14 +457,14 @@
         "cloud_api_with_anonymization"
       ],
       "attacks_claim_ids": [
-        "sec.1",
-        "cto.1"
+        "sec.1"
       ],
       "concedes_claim_ids": [
         "cto.1"
       ],
       "status": "open",
       "attacked_by": [],
+      "acknowledged_by": [],
       "fact_check": null
     },
     "sec.3": {
@@ -393,6 +484,7 @@
       "concedes_claim_ids": [],
       "status": "open",
       "attacked_by": [],
+      "acknowledged_by": [],
       "fact_check": null
     },
     "kiss.2": {
@@ -412,6 +504,7 @@
       "concedes_claim_ids": [],
       "status": "open",
       "attacked_by": [],
+      "acknowledged_by": [],
       "fact_check": null
     }
   },
@@ -425,7 +518,8 @@
     {
       "claim_id": "sec.1",
       "verdict": "plausible",
-      "note": "架構複雜度與交付週期成正比"
+      "note": "架構複雜度與交付週期成正比",
+      "round": 1
     }
   ]
 }

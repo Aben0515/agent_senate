@@ -5,9 +5,9 @@
  * quotation compliance, concession moderation, and factuality.
  */
 
-import { readFileSync, existsSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import { parseArgs } from 'node:util';
-import { pathToFileURL } from 'node:url';
+import { readJson, isMain, runCli, UsageError, hasQuoteReference, canonicalSpeaker } from './common.mjs';
 
 const POLITENESS_PATTERNS = [
   /您說得有道理/i,
@@ -62,7 +62,7 @@ export function evaluateDebateQuality(state) {
   const rebuttalTurns = debaterTurns.filter((t) => t.kind === 'rebuttal');
   let quotesCount = 0;
   for (const t of rebuttalTurns) {
-    if (/(?:^|>|\n)\s*【.+?#?[a-zA-Z0-9_.-]+】/.test(t.full_text || t.text)) {
+    if (hasQuoteReference(t.full_text || t.text)) {
       quotesCount++;
     }
   }
@@ -99,13 +99,15 @@ export function evaluateDebateQuality(state) {
       sharpDirectives++;
     }
   }
-  breakdown.chair_sharpness = directiveTurns.length === 0 ? 1 : sharpDirectives === directiveTurns.length ? 2 : 1;
+  // Rubric: 0 = no questions at all, 1 = some vague questions, 2 = every directive is concrete.
+  breakdown.chair_sharpness = directiveTurns.length === 0 || sharpDirectives === 0 ? 0 : sharpDirectives === directiveTurns.length ? 2 : 1;
 
   // 7. Factuality & No Hallucination (0-2)
   const factChecks = state.fact_checks || [];
   const falseCount = factChecks.filter((fc) => fc.verdict === 'likely_false').length;
   const questCount = factChecks.filter((fc) => fc.verdict === 'questionable').length;
-  if (falseCount === 0 && questCount <= 1) {
+  // Rubric: 2 = nothing flagged, 1 = only `questionable` flags, 0 = any `likely_false`.
+  if (falseCount === 0 && questCount === 0) {
     breakdown.factuality = 2;
   } else if (falseCount === 0) {
     breakdown.factuality = 1;
@@ -114,8 +116,10 @@ export function evaluateDebateQuality(state) {
   }
 
   // 8. Closing Stance Presence (0-2)
-  const closingTurns = debaterTurns.filter((t) => t.kind === 'closing');
-  breakdown.closing_integrity = closingTurns.length >= 2 ? 2 : closingTurns.length === 1 ? 1 : 0;
+  // Every debater must deliver a closing statement.
+  const speakers = new Set(debaterTurns.map((t) => canonicalSpeaker(t.speaker)));
+  const closers = new Set(debaterTurns.filter((t) => t.kind === 'closing').map((t) => canonicalSpeaker(t.speaker)));
+  breakdown.closing_integrity = speakers.size && closers.size === speakers.size ? 2 : closers.size > 0 ? 1 : 0;
 
   // 9. Novelty / Non-redundancy (0-2)
   const allClaimTexts = Object.values(state.claims || {}).map((c) => c.text);
@@ -130,7 +134,7 @@ export function evaluateDebateQuality(state) {
       signatureHits++;
     }
   }
-  breakdown.persona_consistency = signatureHits >= debaterTurns.length * 0.7 ? 2 : 1;
+  breakdown.persona_consistency = debaterTurns.length && signatureHits >= debaterTurns.length * 0.7 ? 2 : 1;
 
   const totalScore = Object.values(breakdown).reduce((a, b) => a + b, 0);
   return {
@@ -142,21 +146,13 @@ export function evaluateDebateQuality(state) {
   };
 }
 
-// CLI Execution
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const { positionals } = parseArgs({
-    args: process.argv.slice(2),
-    allowPositionals: true,
-  });
-
+async function main() {
+  const { positionals } = parseArgs({ args: process.argv.slice(2), allowPositionals: true });
   const statePath = positionals[0];
-  if (!statePath || !existsSync(statePath)) {
-    console.error('用法：node quality.mjs <state.json>');
-    process.exit(2);
-  }
-
-  const state = JSON.parse(readFileSync(statePath, 'utf-8'));
-  const result = evaluateDebateQuality(state);
+  if (!statePath || !existsSync(statePath)) throw new UsageError('用法：node quality.mjs <state.json>');
+  const result = evaluateDebateQuality(readJson(statePath, 'state.json'));
   console.log(JSON.stringify(result, null, 2));
   process.exit(result.passed ? 0 : 1);
 }
+
+if (isMain(import.meta.url)) runCli(main);

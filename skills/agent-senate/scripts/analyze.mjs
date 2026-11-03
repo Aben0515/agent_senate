@@ -6,13 +6,16 @@
 // win probability, persona lenses, minimax regret, disagreement hotspots,
 // and renders a self-contained interactive matrix.html.
 //
-// Usage:  node analyze.mjs <input.json> [--out <dir>]
+// Usage:  node analyze.mjs <input.json> [--out <dir>] [--state <state.json>]
 // Writes: <dir>/analysis.json and <dir>/matrix.html  (dir defaults to input's folder)
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createHash } from 'node:crypto';
+import { parseArgs } from 'node:util';
 import { generateTranscriptMarkdown } from './ledger.mjs';
+import { readJson, isMain, runCli, UsageError, PERSONAS, canonicalSpeaker } from './common.mjs';
 
 const EPS = 1e-9;
 const key = (o, c) => `${o}|${c}`;
@@ -63,11 +66,12 @@ function scaledWeights(criteria, normW, k, t) {
 }
 
 /** Analytic tipping points. T[o](t) is linear in the weight t of criterion k. */
-export function findTippingPoints(options, criteria, weights, scores) {
+export function findTippingPoints(options, criteria, weights, scores, winnerOverride = null) {
   const normW = normalizeWeights(weights);
   const ranking = rankOptions(weightedTotals(options, criteria, normW, scores));
   if (!ranking.length) return [];
-  const winner = ranking[0];
+  // The caller may pass the officially reported winner (ties broken by win probability).
+  const winner = winnerOverride && ranking.includes(winnerOverride) ? winnerOverride : ranking[0];
   const result = [];
 
   for (const crit of criteria) {
@@ -215,7 +219,8 @@ export function runMonteCarlo(options, criteria, weights, scores, cellSpread, op
   const samples = opts.samples ?? 5000;
   const conc = opts.concentration ?? 20;
   const spreadFloor = opts.spreadFloor ?? 0.5;
-  const seedUsed = opts.seed ? Number(opts.seed) : 1 + Math.floor(Math.random() * 999999);
+  const requested = Math.floor(Number(opts.seed));
+  const seedUsed = Number.isFinite(requested) && requested > 0 ? requested : 1 + Math.floor(Math.random() * 999999);
   const prng = mulberry32(seedUsed);
   const { normal, dirichlet } = makeSamplers(prng);
   const normW = normalizeWeights(weights);
@@ -300,7 +305,43 @@ function validCells(sample, options, criteria, label, warnings) {
   return { map, complete: missing.length === 0 };
 }
 
+/** Fail fast with a readable message instead of a TypeError deep inside the math. */
+export function validateInputShape(input) {
+  if (!input || typeof input !== 'object') throw new Error('input.json 必須是 JSON 物件。');
+  const { options, criteria } = input;
+  if (!Array.isArray(options) || options.length < 1) throw new Error('input.options 必須是非空陣列。');
+  if (!Array.isArray(criteria) || criteria.length < 1) throw new Error('input.criteria 必須是至少 1 個準則的陣列。');
+  for (const [name, list] of [['options', options], ['criteria', criteria]]) {
+    const ids = list.map((x) => x?.id);
+    if (ids.some((id) => typeof id !== 'string' || !id.trim())) throw new Error(`input.${name} 每一項都需要字串 id。`);
+    const dup = ids.find((id, i) => ids.indexOf(id) !== i);
+    if (dup) throw new Error(`input.${name} 有重複的 id：${dup}`);
+    if (ids.some((id) => id.includes('|'))) throw new Error(`input.${name} 的 id 不可包含「|」。`);
+  }
+  if (!Array.isArray(input.chairSamples) || !input.chairSamples.length) {
+    throw new Error('input.chairSamples 必須是非空陣列（放入通過驗證的中立評審 JSON）。');
+  }
+  if (input.personaScores !== undefined && !Array.isArray(input.personaScores)) {
+    throw new Error('input.personaScores 必須是陣列。');
+  }
+}
+
+/** Digest of everything that influences the numbers (not extras), so audit can detect stale analysis.json. */
+export function inputDigest(input) {
+  const relevant = {
+    options: (input.options ?? []).map((o) => o.id),
+    criteria: (input.criteria ?? []).map((c) => c.id),
+    chairSamples: (input.chairSamples ?? []).map((s) => ({ weights: s.weights, cells: (s.cells ?? []).map((c) => [c?.option_id, c?.criterion_id, c?.score]) })),
+    personaScores: (input.personaScores ?? []).map((p) => ({ speaker_id: p.speaker_id, weights: p.weights, cells: (p.cells ?? []).map((c) => [c?.option_id, c?.criterion_id, c?.score]) })),
+    seed: input.seed ?? 0,
+    monteCarloSamples: input.monteCarloSamples ?? null,
+    dirichletConcentration: input.dirichletConcentration ?? null,
+  };
+  return createHash('sha256').update(JSON.stringify(relevant)).digest('hex').slice(0, 16);
+}
+
 export function aggregate(input) {
+  validateInputShape(input);
   const { options, criteria } = input;
   const warnings = [];
   const samples = [];
@@ -314,7 +355,7 @@ export function aggregate(input) {
   const personaScores = [];
   (input.personaScores ?? []).forEach((p, i) => {
     const { map, complete } = validCells(p, options, criteria, `personaScores[${p.speaker_id ?? i}]`, warnings);
-    if (complete) personaScores.push({ ...p, weights: normalizeWeights(fillWeights(p.weights, criteria)), map });
+    if (complete) personaScores.push({ ...p, speaker_id: canonicalSpeaker(p.speaker_id ?? `persona_${i}`), weights: normalizeWeights(fillWeights(p.weights, criteria)), map });
     else warnings.push(`personaScores[${p.speaker_id ?? i}] dropped (incomplete)`);
   });
 
@@ -336,6 +377,7 @@ export function aggregate(input) {
   const cells = [];
   const scores = {};
   const cellSpread = {};
+  const judgeSpread = {};
   for (const o of options) {
     for (const c of criteria) {
       const k = key(o.id, c.id);
@@ -345,6 +387,7 @@ export function aggregate(input) {
       scores[k] = med;
       const spreadVals = [...vals, ...personaScores.map((p) => p.map.get(k).score)];
       cellSpread[k] = round(stdev(spreadVals), 3);
+      judgeSpread[k] = round(stdev(vals), 3);
       cells.push({
         option_id: o.id,
         criterion_id: c.id,
@@ -356,7 +399,7 @@ export function aggregate(input) {
     }
   }
 
-  return { weights: normW, weightRationale, cells, scores, cellSpread, personaScores, warnings, sampleCount: samples.length, chairSamples: samples };
+  return { weights: normW, weightRationale, cells, scores, cellSpread, judgeSpread, personaScores, warnings, sampleCount: samples.length, chairSamples: samples };
 }
 
 function fillWeights(w, criteria) {
@@ -385,12 +428,16 @@ export function analyze(input) {
   const winner = ranking[0];
   const margin = ranking.length > 1 ? round(baseTotals[ranking[0]] - baseTotals[ranking[1]], 4) : 0;
 
-  const allSpreads = Object.values(cellSpread);
-  const avgSpread = allSpreads.length ? round(allSpreads.reduce((a, b) => a + b, 0) / allSpreads.length, 3) : 0.0;
-  const highAgreement = avgSpread < 0.6;
+  // Judge agreement is measured on the neutral judges only: persona scores are advocacy
+  // and would otherwise mask judges that copy each other.
+  const mean = (arr) => (arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0);
+  const judgeAvg = round(mean(Object.values(agg.judgeSpread)), 3);
+  const overallAvg = round(mean(Object.values(cellSpread)), 3);
   const diagnostics = {
-    judge_agreement_avg_spread: avgSpread,
-    high_agreement_warning: highAgreement,
+    judge_agreement_avg_spread: judgeAvg,
+    overall_avg_spread: overallAvg,
+    high_agreement_warning: agg.sampleCount > 1 && judgeAvg < 0.6,
+    single_judge_warning: agg.sampleCount < 2,
     effective_samples: agg.sampleCount,
     spread_floor_used: 0.5,
   };
@@ -424,6 +471,7 @@ export function analyze(input) {
   const minimaxRegretOption = Object.keys(maxRegret).sort((a, b) => maxRegret[a] - maxRegret[b] || (a < b ? -1 : 1))[0];
 
   const hotspots = Object.entries(cellSpread)
+    .filter(([, spread]) => spread > 0)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 5)
     .map(([k, spread]) => {
@@ -438,7 +486,7 @@ export function analyze(input) {
     ranking,
     winner,
     margin,
-    tipping_points: findTippingPoints(options, criteria, weights, scores),
+    tipping_points: findTippingPoints(options, criteria, weights, scores, winner),
     win_probability: mc.probability,
     seed_used: mc.seedUsed,
     persona_lens: personaLens,
@@ -447,6 +495,7 @@ export function analyze(input) {
     minimax_regret_option: minimaxRegretOption,
     disagreement_hotspots: hotspots,
     diagnostics,
+    input_digest: inputDigest(input),
   };
 
   const matrix = {
@@ -475,7 +524,13 @@ function roundObj(o, d = 4) {
 // ------------------------------------------------------------------ HTML
 
 export function renderHtml(result, extras = {}) {
-  const data = JSON.stringify({ ...result, extras }).replace(/</g, '\\u003c').split(String.fromCharCode(0x2028)).join('').split(String.fromCharCode(0x2029)).join('');
+  // Escape (not delete) characters that could end the <script> block or break older JS parsers.
+  const LS = String.fromCharCode(0x2028);
+  const PS = String.fromCharCode(0x2029);
+  const data = JSON.stringify({ ...result, extras })
+    .replace(/</g, '\\u003c')
+    .split(LS).join('\\u2028')
+    .split(PS).join('\\u2029');
   const here = dirname(fileURLToPath(import.meta.url));
   const tpl = readFileSync(join(here, 'matrix.template.html'), 'utf8');
   return tpl.replace('/*__DATA__*/null', () => data);
@@ -483,52 +538,47 @@ export function renderHtml(result, extras = {}) {
 
 // ------------------------------------------------------------------- CLI
 
+const USAGE = 'usage: node analyze.mjs <input.json> [--out <dir>] [--state <state.json>]';
+
 function main() {
-  const args = process.argv.slice(2);
-  const file = args.find((a) => !a.startsWith('--'));
-  if (!file) {
-    console.error('usage: node analyze.mjs <input.json> [--out <dir>]');
-    process.exit(2);
-  }
-  const outIdx = args.indexOf('--out');
-  const outDir = resolve(outIdx >= 0 ? args[outIdx + 1] : dirname(resolve(file)));
-  let input;
-  try {
-    input = JSON.parse(readFileSync(file, 'utf8').replace(/^﻿/, ''));
-  } catch (e) {
-    console.error(`cannot read ${file}: ${e.message}`);
-    process.exit(2);
-  }
+  const { values, positionals } = parseArgs({
+    args: process.argv.slice(2),
+    options: { out: { type: 'string' }, state: { type: 'string' } },
+    allowPositionals: true,
+  });
+  const file = positionals[0];
+  if (!file) throw new UsageError(USAGE);
+  const outDir = resolve(values.out ?? dirname(resolve(file)));
+  const input = readJson(file, 'input.json');
+
   let result;
   try {
     result = analyze(input);
   } catch (e) {
-    console.error(`analysis failed: ${e.message}`);
-    process.exit(1);
+    throw new Error(`analysis failed: ${e.message}`);
   }
   mkdirSync(outDir, { recursive: true });
   const analysisPath = join(outDir, 'analysis.json');
   const htmlPath = join(outDir, 'matrix.html');
 
-  // Inject state.json (turns, claims, transcript) if present
-  const stateIdx = args.indexOf('--state');
-  let statePath = stateIdx >= 0 ? args[stateIdx + 1] : null;
+  // Inject state.json (turns, claims, transcript): explicit --state, else next to input / in outDir.
+  let statePath = values.state ?? null;
+  if (statePath && !existsSync(statePath)) throw new Error(`找不到 --state 檔案：${statePath}`);
   if (!statePath) {
-    const candidate1 = join(dirname(resolve(file)), 'state.json');
-    const candidate2 = join(outDir, 'state.json');
-    if (existsSync(candidate1)) statePath = candidate1;
-    else if (existsSync(candidate2)) statePath = candidate2;
+    statePath = [join(dirname(resolve(file)), 'state.json'), join(outDir, 'state.json')].find((p) => existsSync(p)) ?? null;
   }
 
   const extras = { ...(input.extras ?? {}) };
-  if (statePath && existsSync(statePath)) {
+  // Default display names for the built-in personas, unless the chair supplied their own.
+  if (!Array.isArray(extras.personas)) {
+    extras.personas = Object.entries(PERSONAS).map(([id, p]) => ({ id, short_name: p.short_name, emoji: p.emoji }));
+  }
+  if (statePath) {
     try {
-      const state = JSON.parse(readFileSync(statePath, 'utf8'));
+      const state = readJson(statePath, 'state.json');
       if (state.turns && !extras.turns) extras.turns = state.turns;
       if (state.claims && !extras.claims) extras.claims = state.claims;
-      if (!extras.transcript && typeof generateTranscriptMarkdown === 'function') {
-        extras.transcript = generateTranscriptMarkdown(state);
-      }
+      if (!extras.transcript) extras.transcript = generateTranscriptMarkdown(state);
     } catch (err) {
       console.warn(`warning: failed to merge state.json from ${statePath}: ${err.message}`);
     }
@@ -546,8 +596,10 @@ function main() {
         win_probability: a.win_probability,
         tipping_points: a.tipping_points,
         minimax_regret_option: a.minimax_regret_option,
+        diagnostics: a.diagnostics,
+        seed_used: a.seed_used,
         warnings: result.warnings,
-        files: { analysis: analysisPath, html: htmlPath },
+        files: { analysis: analysisPath, html: htmlPath, state: statePath },
       },
       null,
       2,
@@ -555,4 +607,4 @@ function main() {
   );
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main();
+if (isMain(import.meta.url)) runCli(main);

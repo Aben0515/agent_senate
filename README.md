@@ -32,7 +32,7 @@
 **從 GitHub（建議指定版本 tag）**：在 DSH 市集搜尋欄輸入
 
 ```
-github:Aben0515/agent_senate#v0.3.0
+github:Aben0515/agent_senate#v0.3.1
 ```
 
 指定 `#版本` 後，升級時市集走的是桌面版支援的「安裝」路徑。若不帶版本（`github:Aben0515/agent_senate`），
@@ -76,20 +76,22 @@ github:Aben0515/agent_senate#v0.3.0
 | `report.mjs` | 組裝 `report.md` |
 | `audit.mjs` | 稽核：引言是否為原文連續子字串、已讓步論點是否被當證據、贏家與計算結果是否一致 |
 | `quality.mjs` | 辯論品質量表（10 項指標，滿分 20） |
+| `common.mjs` | 共用契約：人格 id／論點前綴、論點編號語法、引用與讓步解析、信心評級規則 |
 
 ```bash
-npm test    # 32 項測試，含實際執行每支 CLI
+npm test    # 52 項測試，含依 SKILL.md 指令順序跑完整條管線的端到端測試
 node skills/agent-senate/scripts/analyze.mjs skills/agent-senate/examples/sample-input.json --out ./out
 ```
 
 接手修改前請先讀 [HANDOFF.md](HANDOFF.md)（架構、已知地雷、改東西去哪改）與 [PLAN.md](PLAN.md)。版本變更見 [CHANGELOG.md](CHANGELOG.md)。
 
 ## 驗證狀態（誠實說明）
-- 單元與整合測試 32 項通過（`npm test`）。
+- 單元、整合與端到端測試 52 項通過（`npm test`）。端到端測試依 SKILL.md 記載的指令順序、餵入 `references/prompts.md` 要求的輸出格式，
+  跑完 ledger → validate → analyze → transcript → report → audit → quality。
 - 真實 DSH 辯論只跑過 **1 場**（`evals/baseline-go-vs-rust/`，舊版流程、只有 1 輪質詢）。
-  v0.3.0 的完整流程（ledger → validate → analyze → audit → report）尚未在真實 DSH 中完整實跑。
-- **沒有「辯論 vs 單一模型」的評測數據。** `evals/runs/` 是腳本產生的測試夾具，不是真實評測，不可引用其分數
-  （見 `evals/summary.md`）。
+  v0.3.x 的完整流程尚未在真實 DSH 中完整實跑。
+- **沒有「辯論 vs 單一模型」的評測數據。** `evals/runs/` 是 `evals/generate-fixtures.mjs` 用寫死模板產生的管線測試夾具，
+  不是真實評測，不可引用其分數（見 `evals/summary.md`）。
 
 ## 已知限制
 - 辯論品質取決於 DSH 目前的模型；所有角色用同一個模型時，多樣性來自人格提示與獨立 subagent，不如多家模型。
