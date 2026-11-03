@@ -13,7 +13,7 @@ import { parseArgs } from 'node:util';
 import { computeScoreboard, speakerName } from './ledger.mjs';
 import {
   readJson, isMain, runCli, UsageError, confidenceLabel, normalizeVerdict, normalizeHighlight,
-  extractExtras, PERSONAS, canonicalSpeaker,
+  extractExtras, PERSONAS, canonicalSpeaker, toText,
 } from './common.mjs';
 
 function cell(text) {
@@ -156,7 +156,14 @@ export function generateReportMarkdown(rawAnalysis, state = {}, rawExtras = {}) 
   if (analysis.tipping_points?.length) {
     for (const tp of analysis.tipping_points) {
       const up = tp.direction === 'increase';
-      L.push(`- 若「**${tp.criterion_label ?? critLabel[tp.criterion_id] ?? tp.criterion_id}**」權重從目前 ${pct(tp.current_weight)} ${up ? '提高' : '降低'}到 **${pct(tp.threshold)}** ${up ? '以上' : '以下'}（其他權重等比例縮放），**${optLabel[tp.new_winner] ?? tp.new_winner}（\`${tp.new_winner}\`）** 將翻盤勝出。`);
+      const name = tp.criterion_label ?? critLabel[tp.criterion_id] ?? tp.criterion_id;
+      const who = `**${optLabel[tp.new_winner] ?? tp.new_winner}（\`${tp.new_winner}\`）**`;
+      if (tp.window_end !== null && tp.window_end !== undefined) {
+        const [lo, hi] = up ? [tp.threshold, tp.window_end] : [tp.window_end, tp.threshold];
+        L.push(`- 若「**${name}**」權重從目前 ${pct(tp.current_weight)} ${up ? '提高' : '降低'}到 **${pct(lo)}–${pct(hi)} 之間**（其他權重等比例縮放），${who} 會勝出；超出這個區間又會換人領先。`);
+      } else {
+        L.push(`- 若「**${name}**」權重從目前 ${pct(tp.current_weight)} ${up ? '提高' : '降低'}到 **${pct(tp.threshold)}** ${up ? '以上' : '以下'}（其他權重等比例縮放），${who} 將翻盤勝出。`);
+      }
     }
   } else {
     L.push('- 任何單一準則的權重在 0–100% 間變動，都不會改變贏家。');
@@ -191,7 +198,7 @@ export function generateReportMarkdown(rawAnalysis, state = {}, rawExtras = {}) 
   const redTeam = extras.red_team ?? extras.runner_up_defense;
   if (redTeam) {
     heading('紅隊警示（落敗方案最強反向辯護）');
-    L.push(typeof redTeam === 'string' ? redTeam : JSON.stringify(redTeam, null, 2));
+    L.push(toText(redTeam));
     L.push('\n---\n');
   }
 

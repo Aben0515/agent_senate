@@ -6,7 +6,7 @@
  * confidence bands, verdict/highlight field normalisation and CLI plumbing.
  */
 
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, realpathSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -52,31 +52,45 @@ export function isClaimId(id) {
   return typeof id === 'string' && CLAIM_ID_RE.test(id.trim());
 }
 
-const BRACKET_RE = /【([^【】\n]{1,80})】/g;
-const CONCESSION_RE = new RegExp(`^\\s*讓步\\s*[:：]?\\s*((?:#?\\s*${CLAIM_ID_SOURCE}\\s*[,，、]?\\s*)+)$`);
-const TRAILING_ID_RE = new RegExp(`(?:^|[\\s#：:])#?(${CLAIM_ID_SOURCE})\\s*$`);
-const ANY_ID_RE = new RegExp(CLAIM_ID_SOURCE, 'g');
+/**
+ * Normalise a claim id as written by a model or a human: full-width → ASCII
+ * (NFKC), strip `#`, brackets and whitespace, lowercase. `#ＶＥＸ.1` → `vex.1`.
+ */
+export function normalizeClaimId(id) {
+  return String(id ?? '')
+    .normalize('NFKC')
+    .trim()
+    .replace(/^[\s#\[【(（「]+|[\s\]】)）」]+$/g, '')
+    .replace(/^#/, '')
+    .toLowerCase();
+}
+
+const BRACKET_RE = /【([^【】\n]{1,120})】/g;
+// An id inside a bracket: not glued to a preceding letter/digit (so `Rust1.2` is not an id).
+const ID_IN_TEXT_RE = new RegExp(`(?<![A-Za-z0-9_.])(${CLAIM_ID_SOURCE})(?![A-Za-z0-9_])`, 'g');
 
 /**
- * Parse in-text references in a debater turn.
- *  - `【讓步 #cto.1】`            → concession of cto.1
- *  - `> 【陳CTO #cto.1】原話…`     → quote/attack reference to cto.1
- * Anything else in 【】 (e.g. `【重點】`, `【Rust】`) is ignored.
+ * Parse in-text references in a debater turn (full-width characters are folded first).
+ *  - `【讓步 #cto.1】`, `【讓步 ＃cto.1：理由】`, `【讓步 #cto.1 與 #cto.2】` → concessions
+ *  - `> 【陳CTO #cto.1】原話…`, `【Vex #vex.1、#vex.2】`                     → quote/attack references
+ * Brackets without a claim id (`【重點】`, `【Rust】`) are ignored. A `【讓步…】`
+ * bracket without any id is reported in `malformed` so the caller can warn.
  */
 export function parseInTextRefs(text) {
   const concessions = [];
   const references = [];
+  const malformed = [];
   for (const m of String(text ?? '').matchAll(BRACKET_RE)) {
-    const inner = m[1];
-    const c = CONCESSION_RE.exec(inner);
-    if (c) {
-      for (const id of c[1].match(ANY_ID_RE) ?? []) concessions.push(id.toLowerCase());
+    const inner = m[1].normalize('NFKC');
+    const ids = [...inner.matchAll(ID_IN_TEXT_RE)].map((x) => x[1].toLowerCase());
+    if (/^\s*讓步/.test(inner)) {
+      if (ids.length) concessions.push(...ids);
+      else malformed.push(m[0]);
       continue;
     }
-    const r = TRAILING_ID_RE.exec(inner);
-    if (r) references.push(r[1].toLowerCase());
+    references.push(...ids);
   }
-  return { concessions: [...new Set(concessions)], references: [...new Set(references)] };
+  return { concessions: [...new Set(concessions)], references: [...new Set(references)], malformed };
 }
 
 /** True when the text contains at least one `【簡稱 #id】` quote-reference (concessions excluded). */
@@ -105,24 +119,37 @@ export function normalizeConfidence(label) {
  * Accept the documented verdict schema plus the field names models tend to
  * invent (`winner`, `confidence`, `text`), so reports never silently drop them.
  */
+/** Render any LLM-provided value as display text (strings pass through; objects never become `[object Object]`). */
+export function toText(x) {
+  if (x === null || x === undefined) return '';
+  if (typeof x === 'string') return x;
+  if (typeof x !== 'object') return String(x);
+  if (x.criterion_id && x.threshold !== undefined && x.new_winner) {
+    const up = x.direction === 'increase';
+    return `若「${x.criterion_label ?? x.criterion_id}」權重${up ? '提高' : '降低'}到 ${Math.round(x.threshold * 100)}% ${up ? '以上' : '以下'}，改選 ${x.new_winner}`;
+  }
+  for (const k of ['text', 'description', 'condition', 'content', 'markdown']) if (typeof x[k] === 'string') return x[k];
+  return JSON.stringify(x);
+}
+
 export function normalizeVerdict(v = {}) {
   const verdict = v && typeof v === 'object' ? v : {};
   return {
     recommended_option_id: verdict.recommended_option_id ?? verdict.winner ?? verdict.option_id ?? '',
     confidence_label: normalizeConfidence(verdict.confidence_label ?? verdict.confidence),
-    one_liner: verdict.one_liner ?? '',
-    recommendation_text: verdict.recommendation_text ?? verdict.text ?? '',
-    main_cost: verdict.main_cost ?? '',
-    conditions_to_flip: Array.isArray(verdict.conditions_to_flip) ? verdict.conditions_to_flip : [],
+    one_liner: toText(verdict.one_liner),
+    recommendation_text: toText(verdict.recommendation_text ?? verdict.text),
+    main_cost: toText(verdict.main_cost),
+    conditions_to_flip: [].concat(verdict.conditions_to_flip ?? []).map(toText).filter(Boolean),
   };
 }
 
 export function normalizeHighlight(h = {}) {
   return {
-    title: h.title ?? '',
+    title: toText(h.title),
     speaker_id: h.speaker_id ?? h.speaker ?? '',
-    quote: h.quote ?? '',
-    why: h.why ?? h.comment ?? h.reason ?? '',
+    quote: toText(h.quote),
+    why: toText(h.why ?? h.comment ?? h.reason),
   };
 }
 
@@ -141,14 +168,36 @@ export function extractExtras(obj) {
 
 export class UsageError extends Error {}
 
+const BOM = String.fromCharCode(0xfeff);
+
 export function stripBom(text) {
-  return String(text).replace(/^﻿/, '');
+  const t = String(text);
+  return t.startsWith(BOM) ? t.slice(1) : t;
+}
+
+/**
+ * Decode a text file written by any common Windows tool: UTF-8 (with/without BOM)
+ * or UTF-16LE/BE (PowerShell 5.1 `>` / `Out-File` default).
+ */
+export function decodeText(buf) {
+  if (buf.length >= 2 && buf[0] === 0xff && buf[1] === 0xfe) return buf.subarray(2).toString('utf16le');
+  if (buf.length >= 2 && buf[0] === 0xfe && buf[1] === 0xff) {
+    const swapped = Buffer.from(buf.subarray(2));
+    swapped.swap16();
+    return swapped.toString('utf16le');
+  }
+  // BOM-less UTF-16LE: ASCII-heavy text has a NUL in every other byte.
+  const sample = buf.subarray(0, Math.min(buf.length, 512));
+  let oddNuls = 0;
+  for (let i = 1; i < sample.length; i += 2) if (sample[i] === 0) oddNuls++;
+  if (sample.length >= 4 && oddNuls >= sample.length / 4) return buf.toString('utf16le');
+  return stripBom(buf.toString('utf8'));
 }
 
 export function readText(path, label = path) {
   if (!path) throw new UsageError(`缺少檔案路徑：${label}`);
   if (!existsSync(path)) throw new Error(`找不到檔案：${path}`);
-  return stripBom(readFileSync(path, 'utf8'));
+  return decodeText(readFileSync(path));
 }
 
 export function readJson(path, label = path) {
@@ -160,10 +209,28 @@ export function readJson(path, label = path) {
   }
 }
 
+/**
+ * True when this module is the script node was asked to run. Compares REAL paths:
+ * node resolves symlinks/junctions for import.meta.url but not for argv[1], so a
+ * `link:` install would otherwise make every CLI silently do nothing.
+ */
 export function isMain(importMetaUrl) {
   if (!process.argv[1]) return false;
+  const real = (p) => {
+    try {
+      return realpathSync.native(p);
+    } catch {
+      return resolve(p);
+    }
+  };
   try {
-    return resolve(process.argv[1]) === fileURLToPath(importMetaUrl);
+    let a = real(resolve(process.argv[1]));
+    let b = real(fileURLToPath(importMetaUrl));
+    if (process.platform === 'win32') {
+      a = a.toLowerCase();
+      b = b.toLowerCase();
+    }
+    return a === b;
   } catch {
     return false;
   }

@@ -61,7 +61,7 @@
       }
     ]
   },
-  "created_at": "2026-11-03T14:25:30.715Z",
+  "created_at": "2026-11-03T14:58:23.440Z",
   "turns": [
     {
       "id": "chair_opening_1",
@@ -69,7 +69,7 @@
       "kind": "opening",
       "round": null,
       "text": "歡迎各位蒞臨 Agent Senate 虛擬內閣。今天議事日程為【3 人新創 B2B SaaS 後端：Go 還是 Rust？】。請各位辯手就座，開門見山亮出立場與量級依據！",
-      "timestamp": "2026-11-03T14:25:30.715Z"
+      "timestamp": "2026-11-03T14:58:23.441Z"
     },
     {
       "id": "turn_conservative_cto_opening_2",
@@ -86,7 +86,7 @@
       "attacks": [],
       "concessions": [],
       "acknowledgements": [],
-      "timestamp": "2026-11-03T14:25:30.717Z"
+      "timestamp": "2026-11-03T14:58:23.442Z"
     },
     {
       "id": "turn_perf_zealot_opening_3",
@@ -104,7 +104,7 @@
       ],
       "concessions": [],
       "acknowledgements": [],
-      "timestamp": "2026-11-03T14:25:30.718Z"
+      "timestamp": "2026-11-03T14:58:23.443Z"
     },
     {
       "id": "turn_kiss_hacker_opening_4",
@@ -120,7 +120,7 @@
       "attacks": [],
       "concessions": [],
       "acknowledgements": [],
-      "timestamp": "2026-11-03T14:25:30.718Z"
+      "timestamp": "2026-11-03T14:58:23.443Z"
     },
     {
       "id": "chair_directive_1",
@@ -128,7 +128,7 @@
       "kind": "directive",
       "round": 1,
       "text": "戰況總結：交鋒焦點聚焦於即時交付 vs 長期擴展性。請各辯手針對具體量級數據展開正面質詢！@perf_zealot，請說明如果流量在 1 年內達到 5,000 QPS，成本相差多少？",
-      "timestamp": "2026-11-03T14:25:30.718Z"
+      "timestamp": "2026-11-03T14:58:23.443Z"
     },
     {
       "id": "factcheck_1",
@@ -136,7 +136,7 @@
       "kind": "factcheck",
       "round": 1,
       "text": "- ✅ #cto.1 plausible：架構複雜度與交付週期成正比",
-      "timestamp": "2026-11-03T14:25:30.718Z"
+      "timestamp": "2026-11-03T14:58:23.443Z"
     },
     {
       "id": "turn_perf_zealot_rebuttal_1",
@@ -156,7 +156,7 @@
         "vex.1"
       ],
       "acknowledgements": [],
-      "timestamp": "2026-11-03T14:25:30.718Z"
+      "timestamp": "2026-11-03T14:58:23.444Z"
     },
     {
       "id": "turn_conservative_cto_rebuttal_1",
@@ -174,7 +174,7 @@
       ],
       "concessions": [],
       "acknowledgements": [],
-      "timestamp": "2026-11-03T14:25:30.719Z"
+      "timestamp": "2026-11-03T14:58:23.444Z"
     },
     {
       "id": "turn_kiss_hacker_rebuttal_1",
@@ -192,7 +192,7 @@
       ],
       "concessions": [],
       "acknowledgements": [],
-      "timestamp": "2026-11-03T14:25:30.719Z"
+      "timestamp": "2026-11-03T14:58:23.445Z"
     },
     {
       "id": "chair_directive_2",
@@ -200,7 +200,7 @@
       "kind": "directive",
       "round": 2,
       "text": "第 2 輪：@conservative_cto，若 1 年內團隊擴到 10 人，你的方案上手要幾週？@perf_zealot，重構成本 5 倍的推算過程是什麼？@kiss_hacker，單機撐不住的量級是多少？",
-      "timestamp": "2026-11-03T14:25:30.719Z"
+      "timestamp": "2026-11-03T14:58:23.446Z"
     },
     {
       "id": "turn_conservative_cto_rebuttal_2",
@@ -209,14 +209,14 @@
       "kind": "rebuttal",
       "round": 2,
       "text": "> 【perf_zealot #vex.2】預先做好領域邊界規劃\n10 人團隊新人上手約 2 週（估：照現有 onboarding 文件與 code review 節奏推算）。邊界規劃可以，但不需要先付分散式的稅。",
-      "full_text": "> 【perf_zealot #vex.2】預先做好領域邊界規劃\n10 人團隊新人上手約 2 週（估：照現有 onboarding 文件與 code review 節奏推算）。邊界規劃可以，但不需要先付分散式的稅。",
+      "full_text": "> 【perf_zealot #vex.2】預先做好領域邊界規劃\n10 人團隊新人上手約 2 週（估：照現有 onboarding 文件與 code review 節奏推算）。邊界規劃可以，但不需要先付分散式的稅。\n\n```claims\n[]\n```",
       "claims": [],
       "attacks": [
         "vex.2"
       ],
       "concessions": [],
       "acknowledgements": [],
-      "timestamp": "2026-11-03T14:25:30.719Z"
+      "timestamp": "2026-11-03T14:58:23.446Z"
     },
     {
       "id": "turn_perf_zealot_rebuttal_2",
@@ -225,14 +225,14 @@
       "kind": "rebuttal",
       "round": 2,
       "text": "> 【conservative_cto #cto.3】活到下一個季度\n活到下個季度之後還要活第 8 個季度。重構 5 倍是以「事後拆分 vs 事前劃界」的人月比估的。",
-      "full_text": "> 【conservative_cto #cto.3】活到下一個季度\n活到下個季度之後還要活第 8 個季度。重構 5 倍是以「事後拆分 vs 事前劃界」的人月比估的。",
+      "full_text": "> 【conservative_cto #cto.3】活到下一個季度\n活到下個季度之後還要活第 8 個季度。重構 5 倍是以「事後拆分 vs 事前劃界」的人月比估的。\n\n```claims\n[]\n```",
       "claims": [],
       "attacks": [
         "cto.3"
       ],
       "concessions": [],
       "acknowledgements": [],
-      "timestamp": "2026-11-03T14:25:30.722Z"
+      "timestamp": "2026-11-03T14:58:23.446Z"
     },
     {
       "id": "turn_kiss_hacker_rebuttal_2",
@@ -241,12 +241,12 @@
       "kind": "rebuttal",
       "round": 2,
       "text": "單機 4 核 8GB 在讀多寫少的 B2B 情境下撐到數千 RPS（估），真的撐不住時再加一台。",
-      "full_text": "單機 4 核 8GB 在讀多寫少的 B2B 情境下撐到數千 RPS（估），真的撐不住時再加一台。",
+      "full_text": "單機 4 核 8GB 在讀多寫少的 B2B 情境下撐到數千 RPS（估），真的撐不住時再加一台。\n\n```claims\n[]\n```",
       "claims": [],
       "attacks": [],
       "concessions": [],
       "acknowledgements": [],
-      "timestamp": "2026-11-03T14:25:30.723Z"
+      "timestamp": "2026-11-03T14:58:23.446Z"
     },
     {
       "id": "turn_conservative_cto_steelman_14",
@@ -260,7 +260,7 @@
       "attacks": [],
       "concessions": [],
       "acknowledgements": [],
-      "timestamp": "2026-11-03T14:25:30.723Z"
+      "timestamp": "2026-11-03T14:58:23.446Z"
     },
     {
       "id": "turn_perf_zealot_steelman_15",
@@ -274,7 +274,7 @@
       "attacks": [],
       "concessions": [],
       "acknowledgements": [],
-      "timestamp": "2026-11-03T14:25:30.723Z"
+      "timestamp": "2026-11-03T14:58:23.447Z"
     },
     {
       "id": "turn_kiss_hacker_steelman_16",
@@ -288,7 +288,7 @@
       "attacks": [],
       "concessions": [],
       "acknowledgements": [],
-      "timestamp": "2026-11-03T14:25:30.723Z"
+      "timestamp": "2026-11-03T14:58:23.447Z"
     },
     {
       "id": "turn_conservative_cto_closing_17",
@@ -302,7 +302,7 @@
       "attacks": [],
       "concessions": [],
       "acknowledgements": [],
-      "timestamp": "2026-11-03T14:25:30.723Z"
+      "timestamp": "2026-11-03T14:58:23.447Z"
     },
     {
       "id": "turn_perf_zealot_closing_18",
@@ -316,7 +316,7 @@
       "attacks": [],
       "concessions": [],
       "acknowledgements": [],
-      "timestamp": "2026-11-03T14:25:30.723Z"
+      "timestamp": "2026-11-03T14:58:23.447Z"
     },
     {
       "id": "turn_kiss_hacker_closing_19",
@@ -330,7 +330,7 @@
       "attacks": [],
       "concessions": [],
       "acknowledgements": [],
-      "timestamp": "2026-11-03T14:25:30.723Z"
+      "timestamp": "2026-11-03T14:58:23.447Z"
     }
   ],
   "chair_events": [
@@ -340,7 +340,7 @@
       "kind": "opening",
       "round": null,
       "text": "歡迎各位蒞臨 Agent Senate 虛擬內閣。今天議事日程為【3 人新創 B2B SaaS 後端：Go 還是 Rust？】。請各位辯手就座，開門見山亮出立場與量級依據！",
-      "timestamp": "2026-11-03T14:25:30.715Z"
+      "timestamp": "2026-11-03T14:58:23.441Z"
     },
     {
       "id": "chair_directive_1",
@@ -348,7 +348,7 @@
       "kind": "directive",
       "round": 1,
       "text": "戰況總結：交鋒焦點聚焦於即時交付 vs 長期擴展性。請各辯手針對具體量級數據展開正面質詢！@perf_zealot，請說明如果流量在 1 年內達到 5,000 QPS，成本相差多少？",
-      "timestamp": "2026-11-03T14:25:30.718Z"
+      "timestamp": "2026-11-03T14:58:23.443Z"
     },
     {
       "id": "chair_directive_2",
@@ -356,7 +356,7 @@
       "kind": "directive",
       "round": 2,
       "text": "第 2 輪：@conservative_cto，若 1 年內團隊擴到 10 人，你的方案上手要幾週？@perf_zealot，重構成本 5 倍的推算過程是什麼？@kiss_hacker，單機撐不住的量級是多少？",
-      "timestamp": "2026-11-03T14:25:30.719Z"
+      "timestamp": "2026-11-03T14:58:23.446Z"
     }
   ],
   "claims": {
@@ -372,6 +372,7 @@
         "go"
       ],
       "attacks_claim_ids": [],
+      "attacks_on_settled": [],
       "concedes_claim_ids": [],
       "status": "attacked",
       "attacked_by": [
@@ -398,6 +399,7 @@
         "go"
       ],
       "attacks_claim_ids": [],
+      "attacks_on_settled": [],
       "concedes_claim_ids": [],
       "status": "open",
       "attacked_by": [],
@@ -418,6 +420,7 @@
       "attacks_claim_ids": [
         "cto.1"
       ],
+      "attacks_on_settled": [],
       "concedes_claim_ids": [],
       "status": "conceded",
       "attacked_by": [
@@ -440,6 +443,7 @@
         "go"
       ],
       "attacks_claim_ids": [],
+      "attacks_on_settled": [],
       "concedes_claim_ids": [],
       "status": "open",
       "attacked_by": [],
@@ -460,6 +464,7 @@
       "attacks_claim_ids": [
         "cto.1"
       ],
+      "attacks_on_settled": [],
       "concedes_claim_ids": [
         "vex.1"
       ],
@@ -482,6 +487,9 @@
       "attacks_claim_ids": [
         "vex.1"
       ],
+      "attacks_on_settled": [
+        "vex.1"
+      ],
       "concedes_claim_ids": [],
       "status": "open",
       "attacked_by": [],
@@ -500,6 +508,9 @@
         "go"
       ],
       "attacks_claim_ids": [
+        "vex.1"
+      ],
+      "attacks_on_settled": [
         "vex.1"
       ],
       "concedes_claim_ids": [],

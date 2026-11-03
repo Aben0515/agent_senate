@@ -268,6 +268,26 @@
       "kafka_flink|failure_recovery": 1.639,
       "kafka_flink|dev_learning_curve": 1.639
     },
+    "judge_spread": {
+      "cron_postgres|simplicity_tco": 0.094,
+      "cron_postgres|query_latency": 0.094,
+      "cron_postgres|future_scale": 0.094,
+      "cron_postgres|infra_cost": 0.205,
+      "cron_postgres|failure_recovery": 0.205,
+      "cron_postgres|dev_learning_curve": 0.205,
+      "clickhouse|simplicity_tco": 0.205,
+      "clickhouse|query_latency": 0.205,
+      "clickhouse|future_scale": 0.205,
+      "clickhouse|infra_cost": 0.205,
+      "clickhouse|failure_recovery": 0.205,
+      "clickhouse|dev_learning_curve": 0.205,
+      "kafka_flink|simplicity_tco": 0.205,
+      "kafka_flink|query_latency": 0.205,
+      "kafka_flink|future_scale": 0.205,
+      "kafka_flink|infra_cost": 0.205,
+      "kafka_flink|failure_recovery": 0.205,
+      "kafka_flink|dev_learning_curve": 0.205
+    },
     "persona_scores": [
       {
         "speaker_id": "conservative_cto",
@@ -537,7 +557,8 @@
         "current_weight": 0.102,
         "threshold": 0.639,
         "direction": "increase",
-        "new_winner": "clickhouse"
+        "new_winner": "clickhouse",
+        "window_end": 0.639
       },
       {
         "criterion_id": "failure_recovery",
@@ -545,7 +566,8 @@
         "current_weight": 0.102,
         "threshold": 0.639,
         "direction": "increase",
-        "new_winner": "clickhouse"
+        "new_winner": "clickhouse",
+        "window_end": 0.639
       },
       {
         "criterion_id": "dev_learning_curve",
@@ -553,7 +575,8 @@
         "current_weight": 0.102,
         "threshold": 0.639,
         "direction": "increase",
-        "new_winner": "clickhouse"
+        "new_winner": "clickhouse",
+        "window_end": 0.639
       }
     ],
     "win_probability": {

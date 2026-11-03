@@ -166,3 +166,15 @@ test('audit: confidence band 50–75% must be 中, and stale analysis.json is de
     assert.equal(res.passed, false);
   });
 });
+
+test('audit: a report.md generated from an older analysis.json is flagged', () => {
+  withRun({
+    'analysis.json': { analysis: { winner: 'go', margin: 1, win_probability: { go: 0.9 }, seed_used: 222 } },
+    'report.md': '推薦方案：`go` ...\n- 隨機種子：111',
+    'input.json': { extras: { highlights: [], evidence: [] }, chairSamples: [{ cells: [{ option_id: 'go', criterion_id: 'c', evidence_claim_ids: ['#CTO.1'] }] }] },
+    'state.json': { turns: [], claims: { 'cto.1': { id: 'cto.1', status: 'conceded' } } },
+  }, (res) => {
+    assert.ok(res.issues.some((i) => i.problem.includes('不是由目前的 analysis.json 產生')));
+    assert.ok(res.issues.some((i) => i.problem.includes('已被讓步')), 'evidence ids are normalised before lookup');
+  });
+});

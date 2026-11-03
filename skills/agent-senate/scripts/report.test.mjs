@@ -151,3 +151,15 @@ test('report accepts the verdict field names models actually produced (winner/co
   assert.ok(md.includes('選 Rust。'));
   assert.ok(md.includes('與程式計算贏家 `go` 不一致'));
 });
+
+test('report renders object-valued fields as text and narrow tipping windows as a range', () => {
+  const a = baseAnalysis();
+  a.analysis.tipping_points = [{ criterion_id: 'perf', criterion_label: '性能', current_weight: 0.3, threshold: 0.4, window_end: 0.42, direction: 'increase', new_winner: 'rust' }];
+  const md = generateReportMarkdown(a, { turns: [], claims: {} }, {
+    verdict: { conditions_to_flip: [a.analysis.tipping_points[0], { text: '尖峰超過 2 萬 RPS' }] },
+    red_team: { markdown: '紅隊物件' },
+  });
+  assert.ok(!md.includes('[object Object]'));
+  assert.ok(md.includes('尖峰超過 2 萬 RPS') && md.includes('紅隊物件'));
+  assert.ok(md.includes('**40%–42% 之間**'));
+});

@@ -131,9 +131,9 @@ test('ledger manages turns, claim prefixes, concessions, and scoreboard', () => 
 
   // 9. Verify claims index output
   const indexText = renderClaimsIndex(state);
-  assert.ok(indexText.includes('#cto.1'));
+  assert.ok(indexText.includes('- cto.1 ('));
   assert.ok(indexText.includes('💔已讓步'));
-  assert.ok(indexText.includes('#vex.1'));
+  assert.ok(indexText.includes('- vex.1 ('));
   assert.ok(indexText.includes('✅合理'));
 
   // 10. Verify transcript output includes chair speeches and directives
@@ -176,16 +176,16 @@ test('in-text reference parsing: strict ids, no false positives, concessions are
 test('conceding an opponent claim is an acknowledgement, not a withdrawal of their claim', () => {
   const state = createInitialState('q', briefGoRust);
   addDebaterTurn(state, { speaker: 'cto', kind: 'opening', text: 'Go。' + claims([{ text: 'Go 招募池大', quote: 'Go', kind: 'fact' }]) });
-  const res = addDebaterTurn(state, { speaker: 'vex', kind: 'rebuttal', round: 1, text: '【讓步 #cto.1】招募池確實大。' });
+  const res = addDebaterTurn(state, { speaker: 'vex', kind: 'rebuttal', round: 1, text: '【讓步 #cto.1】招募池確實大。' + claims([]) });
   assert.equal(state.claims['cto.1'].status, 'open', 'opponent claim must stay usable as evidence');
   assert.deepEqual(state.claims['cto.1'].acknowledged_by, ['perf_zealot']);
   assert.ok(res.warnings.some((w) => w.includes('承認對手論點')));
 });
 
-test('a concession in a turn without a claims block still marks the own claim conceded', () => {
+test('a concession in a turn with no new claims (empty claims block) still marks the own claim conceded', () => {
   const state = createInitialState('q', briefGoRust);
   addDebaterTurn(state, { speaker: 'perf_zealot', kind: 'opening', text: 'Rust。' + claims([{ text: 'p99 差 10 倍', quote: 'Rust', kind: 'estimate' }]) });
-  addDebaterTurn(state, { speaker: 'perf_zealot', kind: 'rebuttal', round: 1, text: '【讓步 #vex.1】這個數字我收回。' });
+  addDebaterTurn(state, { speaker: 'perf_zealot', kind: 'rebuttal', round: 1, text: '【讓步 ＃vex.1：推算有誤】這個數字我收回。' + claims([]) });
   assert.equal(state.claims['vex.1'].status, 'conceded');
 });
 
@@ -195,6 +195,15 @@ test('attacking a claim does not erase a likely_false fact-check verdict', () =>
   recordFactChecks(state, [{ claim_id: 'vex.1', verdict: 'likely_false', note: '誇大' }], { round: 1 });
   addDebaterTurn(state, { speaker: 'cto', kind: 'rebuttal', round: 1, text: '亂講。' + claims([{ text: '沒有 100 倍', quote: '亂講', kind: 'value', attacks: ['vex.1'] }]) });
   assert.equal(state.claims['vex.1'].status, 'disputed_fact');
+  assert.equal(computeScoreboard(state).conservative_cto.attacks_landed, 0, 'piling onto an already-disputed claim is not a landed attack');
+  // Attack first, fact-check later → counts once, however many claims attacked it.
+  addDebaterTurn(state, { speaker: 'vex', kind: 'rebuttal', round: 1, text: 'Go 慢。' + claims([{ text: 'Go 慢', quote: 'Go 慢', kind: 'fact' }]) });
+  addDebaterTurn(state, { speaker: 'cto', kind: 'rebuttal', round: 2, text: '不慢。' + claims([
+    { text: '不慢', quote: '不慢', kind: 'value', attacks: ['vex.2'] },
+    { text: '真的不慢', quote: '不慢', kind: 'value', attacks: ['#VEX.2'] },
+  ]) });
+  recordFactChecks(state, [{ claim_id: '[vex.2]', verdict: 'likely_false' }], { round: 2 });
+  assert.equal(state.claims['vex.2'].status, 'disputed_fact', 'fact-check ids are normalised');
   assert.equal(computeScoreboard(state).conservative_cto.attacks_landed, 1);
 });
 
@@ -208,4 +217,31 @@ test('an invalid turn leaves the ledger untouched and aliases map to canonical i
   assert.equal(state.claims['cto.1'].speaker, 'conservative_cto');
   recordFallacies(state, [{ claim_id: 'cto.1', type: 'appeal_to_authority' }]);
   assert.equal(computeScoreboard(state).conservative_cto.fallacies_flagged, 1, 'speaker inferred from claim id');
+});
+
+test('ledger rejects turns that would silently lose data, and facts/fallacies are all-or-nothing', () => {
+  const state = createInitialState('q', briefGoRust);
+  assert.throws(() => addDebaterTurn(state, { speaker: 'cto', kind: 'opening', text: '選 Go，沒附 claims。' }), /必須在末尾附上/);
+  assert.throws(() => addDebaterTurn(state, { speaker: 'cto', kind: 'opening', text: '選 Go\n```claims\n[{"text":"a","kind":"value"' }), /沒有結尾/);
+  assert.throws(() => addDebaterTurn(state, { speaker: 'cto', kind: 'rebutal', round: 1, text: 'x' + claims([]) }), /未知的發言類型/);
+  assert.throws(() => addDebaterTurn(state, { speaker: 'cto', kind: 'rebuttal', text: 'x' + claims([]) }), /--round/);
+  assert.throws(() => addChairTurn(state, { kind: 'directives', round: 1, text: 'x' }), /未知的主席發言類型/);
+  assert.equal(state.turns.length, 0);
+
+  const res = addDebaterTurn(state, { speaker: 'cto', kind: 'opening', text: '選 Go。\n```json\n[{"text":"Go 好","quote":"選 Go","kind":"value"}]\n```' });
+  assert.deepEqual(res.new_claims.map((c) => c.id), ['cto.1'], '```json fence accepted as a fallback');
+  assert.ok(res.warnings.some((w) => w.includes('```json')));
+
+  assert.throws(() => recordFactChecks(state, [{ claim_id: 'cto.1', verdict: 'likely_false' }, { claim_id: 'cto.9', verdict: 'plausible' }]), /不存在於索引/);
+  assert.equal(state.claims['cto.1'].status, 'open', 'nothing recorded when one check is bad');
+  assert.throws(() => recordFallacies(state, [{ claim_id: 'zzz.1', type: 'x' }]), /不存在/);
+  assert.equal(state.fallacies.length, 0);
+});
+
+test('steelman and closing quotes are not recorded as attacks', () => {
+  const state = createInitialState('q', briefGoRust);
+  addDebaterTurn(state, { speaker: 'vex', kind: 'opening', text: 'Rust。' + claims([{ text: 'p99 穩', quote: 'Rust', kind: 'value' }]) });
+  addDebaterTurn(state, { speaker: 'cto', kind: 'steelman', text: '> 【Vex #vex.1】p99 穩\n他說得有道理的部分是…' });
+  assert.equal(state.claims['vex.1'].status, 'open');
+  assert.deepEqual(state.claims['vex.1'].attacked_by, []);
 });

@@ -43,7 +43,7 @@ agent-senate-dsh/
    │  ├─ audit.mjs         ★ 程式稽核器：連續引言比對、論點狀態檢查與數值一致性檢驗
    │  ├─ quality.mjs       ★ 品質評分器：自動評估客套詞、引用合規率與提問尖銳度
    │  ├─ common.mjs        ★ 共用契約：人格 id↔論點前綴、論點編號語法、【引用】/【讓步】解析、信心評級、判決欄位正規化、CLI 錯誤處理
-   │  ├─ run-all-tests.mjs 單行程測試執行器（npm test 調用，全套 52 項，含端到端管線測試 cli.test.mjs）
+   │  ├─ run-all-tests.mjs 單行程測試執行器（npm test 調用，全套 60 項，含端到端管線測試 cli.test.mjs）
    │  ├─ *.test.mjs        各模組之單元測試
    │  └─ matrix.template.html  互動矩陣網頁模板（含實境重播、論點圖譜、逐字稿搜尋、純前端 XSS-Safe）
    └─ examples/
@@ -74,7 +74,7 @@ agent-senate-dsh/
 輸入格式見 SKILL.md「input.json 格式」與 `examples/sample-input.json`。指令：
 ```
 node skills/agent-senate/scripts/analyze.mjs <input.json> [--out <資料夾>]   # 輸出 analysis.json + matrix.html
-npm test                                                                       # 52 個測試
+npm test                                                                       # 60 個測試
 ```
 - **aggregate**：每格取 3 份評審分數的**中位數**；理由/證據取「最接近中位數」的那份；權重取平均後正規化；**spread = 評審 + 所有人格分數的母體標準差**（Monte Carlo 與「🔥分歧」標記都用它）。每份樣本必須「每個方案×準則恰好一格」，缺格的整份丟棄並警告，全丟光則報錯；分數夾在 1–10。
 - **排名**：總分 → Monte Carlo 勝率 → id 字母序。總分差 < 1e-9 視為平手。
@@ -103,6 +103,14 @@ npm test                                                                       #
 14. **評審一致性診斷混入辯手分數**：辯手是倡議者，分數分歧大，會掩蓋三位評審互相抄的情況。診斷現在只看評審。
 15. **analyze.mjs 參數解析**：`--out dir input.json` 會把 `dir` 當輸入檔。
 16. **`evals/run-all-benchmarks.mjs` 會覆寫 `evals/summary.md`** 為寫死的假評測結果，已改為只產生管線夾具的 `generate-fixtures.mjs`。
+17. **透過 symlink／junction 執行時所有 CLI 靜默不做事**（`link:` 安裝就會發生）：`isMain` 必須比較 realpath，Windows 不分大小寫。
+18. **缺 claims 區塊的發言會被「成功」登記成 0 個論點**且無法重登：開場／交叉質詢現在必填（可為 `[]`），未閉合（被截斷）一律拒收；```` ```json ```` 圍欄可當備援；`ledger.mjs undo` 可撤銷一步。
+19. **`seed: 0` 每次重跑都換種子**，判決照抄的勝率與信心評級會和報告對不上：評分沒變就沿用上次的 `seed_used`。
+20. **全形 `＃`、`【讓步 #x：理由】`、一個括號多個編號** 會被靜默忽略：括號內容先做 NFKC 正規化再抓所有編號；所有輸入的論點編號統一用 `normalizeClaimId()`。
+21. **facts／fallacies 遇到不存在的編號只發警告**，likely_false 因此靜默遺失：改為全部或全不。
+22. **鋼人論證／結辯引用對手原話被記成攻擊**：只在開場與交叉質詢推斷攻擊。
+23. **matrix.html 遇到物件型欄位（例如把 tipping point 物件塞進 conditions_to_flip）整頁空白**：`h()` 只接受 Node，其餘一律轉成文字。
+24. **窄翻盤窗口**：翻盤點新增 `window_end`，報告與示範按鈕改用區間。
 
 ## 6. DSH 插件格式（為什麼長這樣）
 這是**技能型（skill-only）插件**，格式照抄使用者已安裝、可正常運作的 `@tt-a1i/archify-dsh`（在 `~/.dsh/profiles/desktop/node_modules/@tt-a1i/archify-dsh/`）：
@@ -120,7 +128,7 @@ npm test                                                                       #
 
 ## 8. 驗證狀態（誠實版）
 **已驗證**
-- `npm test`：**52/52 全數通過**（涵蓋 analyze、validate、ledger、report、audit、statistical-calibration、quality、CLI 與端到端管線）。
+- `npm test`：**60/60 全數通過**（涵蓋 analyze、validate、ledger、report、audit、statistical-calibration、quality、CLI 與端到端管線）。
 - `validate.mjs`：實測驗證基線 `input.json`，精準攔截缺格、重複格與無效證據引用。
 - `ledger.mjs`：實測驗證 3 辯手 2 輪交叉交鋒，確定性產生完整包含主席指令之逐字稿。
 - `report.mjs`：實測將基線數據組裝為格式精確之 `report.md`，雙重視角完全分離。

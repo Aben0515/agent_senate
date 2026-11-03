@@ -89,7 +89,8 @@ export function evaluateDebateQuality(state) {
       }
     }
   }
-  breakdown.zero_flattery = politeHits === 0 ? 2 : politeHits === 1 ? 1 : 0;
+  // Rubric: 0 hits = 2, 1–2 hits = 1, more = 0.
+  breakdown.zero_flattery = politeHits === 0 ? 2 : politeHits <= 2 ? 1 : 0;
 
   // 6. Chair Inquiry Sharpness (0-2)
   const directiveTurns = chairTurns.filter((t) => t.kind === 'directive');

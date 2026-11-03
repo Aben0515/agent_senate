@@ -79,14 +79,14 @@ github:Aben0515/agent_senate#v0.3.1
 | `common.mjs` | 共用契約：人格 id／論點前綴、論點編號語法、引用與讓步解析、信心評級規則 |
 
 ```bash
-npm test    # 52 項測試，含依 SKILL.md 指令順序跑完整條管線的端到端測試
+npm test    # 60 項測試，含依 SKILL.md 指令順序跑完整條管線的端到端測試
 node skills/agent-senate/scripts/analyze.mjs skills/agent-senate/examples/sample-input.json --out ./out
 ```
 
 接手修改前請先讀 [HANDOFF.md](HANDOFF.md)（架構、已知地雷、改東西去哪改）與 [PLAN.md](PLAN.md)。版本變更見 [CHANGELOG.md](CHANGELOG.md)。
 
 ## 驗證狀態（誠實說明）
-- 單元、整合與端到端測試 52 項通過（`npm test`）。端到端測試依 SKILL.md 記載的指令順序、餵入 `references/prompts.md` 要求的輸出格式，
+- 單元、整合與端到端測試 60 項通過（`npm test`）。端到端測試依 SKILL.md 記載的指令順序、餵入 `references/prompts.md` 要求的輸出格式，
   跑完 ledger → validate → analyze → transcript → report → audit → quality。
 - 真實 DSH 辯論只跑過 **1 場**（`evals/baseline-go-vs-rust/`，舊版流程、只有 1 輪質詢）。
   v0.3.x 的完整流程尚未在真實 DSH 中完整實跑。

@@ -90,6 +90,19 @@
   var M = DATA.matrix, A = DATA.analysis, X = DATA.extras || {};
   var app = document.getElementById("app");
 
+  // LLM-provided fields may be objects instead of strings; never let that break the page.
+  function asText(x) {
+    if (x == null) return "";
+    if (typeof x === "string") return x;
+    if (typeof x !== "object") return String(x);
+    if (x.criterion_id && x.threshold != null && x.new_winner) {
+      return "若「" + (x.criterion_label || x.criterion_id) + "」權重" + (x.direction === "increase" ? "提高" : "降低") + "到 " + Math.round(x.threshold * 100) + "%，改選 " + x.new_winner;
+    }
+    var keys = ["text", "description", "condition", "content", "markdown"];
+    for (var i = 0; i < keys.length; i++) if (typeof x[keys[i]] === "string") return x[keys[i]];
+    return JSON.stringify(x);
+  }
+  function toNode(x) { return x instanceof Node ? x : document.createTextNode(asText(x)); }
   function h(tag, attrs) {
     var el = document.createElement(tag);
     if (attrs) Object.keys(attrs).forEach(function (k) {
@@ -101,8 +114,8 @@
     for (var i = 2; i < arguments.length; i++) {
       var c = arguments[i];
       if (c == null || c === false) continue;
-      if (Array.isArray(c)) c.forEach(function (x) { if (x != null) el.appendChild(typeof x === "object" ? x : document.createTextNode(String(x))); });
-      else el.appendChild(typeof c === "object" ? c : document.createTextNode(String(c)));
+      if (Array.isArray(c)) c.forEach(function (x) { if (x != null && x !== false) el.appendChild(toNode(x)); });
+      else el.appendChild(toNode(c));
     }
     return el;
   }
@@ -267,10 +280,12 @@
       var row = h("tr", null, h("td", { title: rationale || c.description || "" },
         h("span", { class: "crit-name" }, c.label || c.id), h("span", { class: "crit-w" }, "權重 " + pct(nw[c.id])), sliders[c.id]));
       M.options.forEach(function (o) {
-        var k = o.id + "|" + c.id, s = score[k], info = cellInfo[k] || {};
+        var k = o.id + "|" + c.id, s = score[k], info = cellInfo[k] || {}, js = M.judge_spread || {};
         var hue = Math.round((s - 1) / 9 * 120);
         var tip = (info.rationale || "") + (info.evidence_claim_ids && info.evidence_claim_ids.length ? "\n證據：" + info.evidence_claim_ids.join(", ") : "")
-          + "\n信心：" + (info.confidence || "-") + "\n評審分歧標準差：" + (spread[k] != null ? spread[k] : "-");
+          + "\n信心：" + (info.confidence || "-")
+          + (js[k] != null ? "\n評審間分歧標準差：" + js[k] : "")
+          + "\n評審＋辯手分歧標準差：" + (spread[k] != null ? spread[k] : "-");
         row.appendChild(h("td", { class: "cell" + (hotKeys[k] ? " hot" : ""), style: "background:hsl(" + hue + " 60% 45% / .28)", title: tip }, s.toFixed(1)));
       });
       tbl.appendChild(row);
@@ -293,15 +308,21 @@
   var tipBox = h("ul");
   function applyTip(tp) {
     var w = {}, k = tp.criterion_id, cur = chairW[k], other = 1 - cur;
-    var t = Math.min(1, Math.max(0, tp.threshold + (tp.direction === "increase" ? 0.005 : -0.005)));
+    var dir = tp.direction === "increase" ? 1 : -1;
+    // Step just past the threshold, but stay inside the window where the new winner leads.
+    var stepIn = tp.window_end != null ? Math.min(0.005, Math.abs(tp.window_end - tp.threshold) / 2) : 0.005;
+    var t = Math.min(1, Math.max(0, tp.threshold + dir * stepIn));
     M.criteria.forEach(function (c) { w[c.id] = c.id === k ? t : chairW[c.id] * (1 - t) / other; });
     activeLens = "custom"; setWeights(w); renderLens();
   }
   if ((A.tipping_points || []).length) {
     A.tipping_points.forEach(function (tp) {
       tipBox.appendChild(h("li", null,
-        "若「" + (tp.criterion_label || critLabel[tp.criterion_id]) + "」權重" + (tp.direction === "increase" ? "提高" : "降低") + "到 " + pct(tp.threshold)
-        + (tp.direction === "increase" ? " 以上" : " 以下") + "（目前 " + pct(tp.current_weight) + "），" + (optLabel[tp.new_winner] || tp.new_winner) + " 將翻盤勝出。 ",
+        "若「" + (tp.criterion_label || critLabel[tp.criterion_id]) + "」權重" + (tp.direction === "increase" ? "提高" : "降低") + "到 "
+        + (tp.window_end != null
+          ? (tp.direction === "increase" ? pct(tp.threshold) + "–" + pct(tp.window_end) : pct(tp.window_end) + "–" + pct(tp.threshold)) + " 之間"
+          : pct(tp.threshold) + (tp.direction === "increase" ? " 以上" : " 以下"))
+        + "（目前 " + pct(tp.current_weight) + "），" + (optLabel[tp.new_winner] || tp.new_winner) + " 將翻盤勝出。 ",
         h("button", { class: "btn", onclick: function () { applyTip(tp); } }, "示範翻盤")));
     });
   } else tipBox.appendChild(h("li", null, "任何單一準則的權重在 0–100% 間變動，都不會改變贏家。"));

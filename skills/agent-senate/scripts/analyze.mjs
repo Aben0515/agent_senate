@@ -113,17 +113,33 @@ export function findTippingPoints(options, criteria, weights, scores, winnerOver
       }
     }
     if (bestT !== null) {
+      const direction = bestT > wk ? 'increase' : 'decrease';
       result.push({
         criterion_id: k,
         criterion_label: crit.label,
         current_weight: round(wk, 3),
         threshold: round(bestT, 3),
-        direction: bestT > wk ? 'increase' : 'decrease',
+        direction,
         new_winner: bestWinner,
+        // The new winner may lead only inside a window; null = it keeps leading up to 0% / 100%.
+        window_end: tippingWindowEnd(options, criteria, normW, scores, k, bestT, direction, bestWinner),
       });
     }
   }
   return result;
+}
+
+/** Scan past the tipping point until `newWinner` stops strictly leading; return that weight (or null). */
+function tippingWindowEnd(options, criteria, normW, scores, k, tStar, direction, newWinner, step = 0.0005) {
+  const dir = direction === 'increase' ? 1 : -1;
+  for (let t = tStar + dir * step; t > -1e-12 && t < 1 + 1e-12; t += dir * step) {
+    const tt = Math.min(1, Math.max(0, t));
+    const tot = weightedTotals(options, criteria, scaledWeights(criteria, normW, k, tt), scores);
+    const lead = rankOptions(tot)[0];
+    const strictly = options.every((o) => o.id === newWinner || tot[newWinner] > tot[o.id] + EPS);
+    if (lead !== newWinner || !strictly) return round(tt, 3);
+  }
+  return null;
 }
 
 /** Brute-force reference (used by the tests to validate the analytic solution). */
@@ -410,7 +426,12 @@ function fillWeights(w, criteria) {
 
 // -------------------------------------------------------------- analysis
 
-export function analyze(input) {
+/**
+ * @param input  parsed input.json
+ * @param opts.seed  overrides input.seed for the Monte Carlo run only (used to keep
+ *                   reruns reproducible); the input digest is always taken from `input`.
+ */
+export function analyze(input, opts = {}) {
   const { options, criteria } = input;
   const agg = aggregate(input);
   const { weights, scores, cellSpread, personaScores } = agg;
@@ -419,7 +440,7 @@ export function analyze(input) {
   const mc = runMonteCarlo(options, criteria, weights, scores, cellSpread, {
     samples: input.monteCarloSamples ?? 5000,
     concentration: input.dirichletConcentration ?? 20,
-    seed: input.seed ?? 0,
+    seed: opts.seed ?? input.seed ?? 0,
     chairSamples: agg.chairSamples,
     spreadFloor: 0.5,
   });
@@ -506,6 +527,7 @@ export function analyze(input) {
     weight_rationale: agg.weightRationale,
     cells: agg.cells,
     cell_spread: cellSpread,
+    judge_spread: agg.judgeSpread,
     persona_scores: personaScores.map((p) => ({
       speaker_id: p.speaker_id,
       weights: roundObj(p.weights, 4),
@@ -551,9 +573,24 @@ function main() {
   const outDir = resolve(values.out ?? dirname(resolve(file)));
   const input = readJson(file, 'input.json');
 
+  // seed 0 means "pick one at random" — but the workflow reruns analyze several times
+  // (adding extras, after audit fixes). Reuse the previous seed while the scoring inputs
+  // are unchanged, so the numbers already quoted in the verdict stay identical.
+  let seedOpt;
+  const prevPath = join(outDir, 'analysis.json');
+  if (!(Number(input.seed) > 0) && existsSync(prevPath)) {
+    try {
+      const prev = readJson(prevPath).analysis;
+      validateInputShape(input);
+      if (prev?.input_digest === inputDigest(input) && Number(prev.seed_used) > 0) seedOpt = prev.seed_used;
+    } catch {
+      /* unreadable previous analysis: draw a fresh seed */
+    }
+  }
+
   let result;
   try {
-    result = analyze(input);
+    result = analyze(input, { seed: seedOpt });
   } catch (e) {
     throw new Error(`analysis failed: ${e.message}`);
   }

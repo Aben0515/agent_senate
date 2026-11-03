@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, writeFileSync, readFileSync, rmSync, existsSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, readFileSync, rmSync, existsSync, symlinkSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -254,6 +254,76 @@ test('end-to-end pipeline following SKILL.md commands passes validate → analyz
     const quality = JSON.parse(run('quality.mjs', [p('state.json')]).stdout);
     assert.equal(quality.breakdown.closing_integrity, 2);
     assert.equal(quality.breakdown.quote_compliance, 2);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('CLIs work when invoked through a symlinked skill folder (link: installs)', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'senate-link-'));
+  try {
+    const link = join(dir, 'skill');
+    symlinkSync(join(here, '..'), link, process.platform === 'win32' ? 'junction' : 'dir');
+    const res = spawnSync(process.execPath, [join(link, 'scripts', 'ledger.mjs'), 'init', join(dir, 's.json'), '--question', 'q'], { encoding: 'utf8' });
+    assert.equal(res.status, 0, res.stderr);
+    assert.ok(existsSync(join(dir, 's.json')), 'main() must run when argv[1] is a symlink path');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('analyze reruns with seed 0 reuse the previous seed while scoring inputs are unchanged', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'senate-seed-'));
+  try {
+    const input = JSON.parse(readFileSync(join(repoRoot, 'skills', 'agent-senate', 'examples', 'sample-input.json'), 'utf8'));
+    input.seed = 0;
+    writeFileSync(join(dir, 'input.json'), JSON.stringify(input));
+    const a = JSON.parse(run('analyze.mjs', [join(dir, 'input.json')]).stdout);
+    input.extras = { verdict: { one_liner: 'extras changed, scores did not' } };
+    writeFileSync(join(dir, 'input.json'), JSON.stringify(input));
+    const b = JSON.parse(run('analyze.mjs', [join(dir, 'input.json')]).stdout);
+    assert.equal(b.seed_used, a.seed_used);
+    assert.deepEqual(b.win_probability, a.win_probability);
+    input.chairSamples[0].cells[0].score = input.chairSamples[0].cells[0].score === 1 ? 2 : 1;
+    writeFileSync(join(dir, 'input.json'), JSON.stringify(input));
+    const c = JSON.parse(run('analyze.mjs', [join(dir, 'input.json')]).stdout);
+    assert.ok(c.seed_used > 0);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('ledger undo reverts the last registration; brief updates the stored criteria', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'senate-undo-'));
+  const st = join(dir, 'state.json');
+  try {
+    writeFileSync(join(dir, 'brief.json'), JSON.stringify(brief));
+    assert.equal(run('ledger.mjs', ['init', st, '--brief', join(dir, 'brief.json')]).status, 0);
+    writeFileSync(join(dir, 't.md'), turnText.cto_open);
+    assert.equal(run('ledger.mjs', ['turn', st, '--speaker', 'cto', '--kind', 'opening', '--file', join(dir, 't.md')]).status, 0);
+    assert.equal(JSON.parse(readFileSync(st, 'utf8')).turns.length, 1);
+    assert.equal(run('ledger.mjs', ['undo', st]).status, 0);
+    assert.equal(JSON.parse(readFileSync(st, 'utf8')).turns.length, 0);
+    assert.equal(run('ledger.mjs', ['undo', st]).status, 1, 'only one level of undo');
+    const b2 = { ...brief, criteria: [...brief.criteria, { id: 'security', label: '安全性' }] };
+    writeFileSync(join(dir, 'brief2.json'), JSON.stringify(b2));
+    assert.equal(run('ledger.mjs', ['brief', st, '--brief', join(dir, 'brief2.json')]).status, 0);
+    assert.ok(run('ledger.mjs', ['transcript', st]).stdout.includes('`security` 安全性'));
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('ledger reads UTF-16LE files written by Windows PowerShell 5.1', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'senate-u16-'));
+  const st = join(dir, 'state.json');
+  try {
+    assert.equal(run('ledger.mjs', ['init', st, '--question', 'q']).status, 0);
+    const bom = Buffer.from([0xff, 0xfe]);
+    writeFileSync(join(dir, 't.md'), Buffer.concat([bom, Buffer.from(turnText.cto_open, 'utf16le')]));
+    const res = run('ledger.mjs', ['turn', st, '--speaker', 'cto', '--kind', 'opening', '--file', join(dir, 't.md')]);
+    assert.equal(res.status, 0, res.stderr);
+    assert.deepEqual(JSON.parse(res.stdout).new_claims, ['cto.1']);
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

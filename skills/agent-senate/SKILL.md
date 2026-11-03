@@ -63,7 +63,8 @@ description: 虛擬內閣 — 多 Agent 圓桌辯論室。使用者提出重大�
 
 ### Phase 0 — 框定
 1. 判斷是否需要追問。**只有當缺少的資訊會根本性改變結論**（團隊規模、流量量級、期限、既有技術）才問，最多 3 題，每題附預設假設；使用者不答就用預設。能不問就不問。
-2. 產出決策簡報並貼給使用者，同時存成 `$D/brief.json`：
+2. 建立輸出資料夾 `$D` = `senate-runs/<yyyy-mm-dd>-<題目簡稱>/`（在目前工作目錄下）。若使用者提供了專案檔案（README、package.json…），讀取後把重點摘進下一步的 `context_facts`。
+3. 產出決策簡報並貼給使用者，同時存成 `$D/brief.json`（UTF-8；用你的檔案寫入工具，不要用 PowerShell 5.1 的 `>` / `Out-File`）：
    ```json
    {"restated_question":"…",
     "options":[{"id":"go","label":"Go","description":"…"}],
@@ -80,13 +81,11 @@ description: 虛擬內閣 — 多 Agent 圓桌辯論室。使用者提出重大�
    - `context_facts`：只列使用者明確給的事實，不編造。
    - `assumptions`：辯論需要但沒給的資訊，寫你採用的預設值、為何需要、錯了影響多大。
    - `criteria`：6–9 個，從交付速度、維運簡單度、招募與技能匹配、性能與資源效率、可靠性與正確性、生態成熟度、演進彈性與遷移成本、安全性、基礎設施成本、學習曲線挑最相關的並具體化。**一律表述成「分數越高越好」**（用「維運簡單度」而不是「維運成本」）。id 用小寫 snake_case，不可含 `|`。
-3. 若使用者提供了專案檔案（README、package.json…），讀取後把重點摘進 `context_facts`。
-4. 建立輸出資料夾 `senate-runs/<yyyy-mm-dd>-<題目簡稱>/`（在目前工作目錄下）。
-5. 初始化記帳本（已存在時會拒絕覆寫，確定要重來才加 `--force`）：
+4. 初始化記帳本（已存在時會拒絕覆寫，確定要重來才加 `--force`）：
    ```bash
    node "$S/ledger.mjs" init "$D/state.json" --question "<題目>" --brief "$D/brief.json"
    ```
-6. 以主席口吻做開場白（≤200 字）：介紹題目、方案、情境，戲劇性地介紹每位辯手，宣布開場陳述。存成 `$D/chair_opening.md` 並登記：
+5. 以主席口吻做開場白（≤200 字）：介紹題目、方案、情境，戲劇性地介紹每位辯手，宣布開場陳述。存成 `$D/chair_opening.md` 並登記：
    ```bash
    node "$S/ledger.mjs" chair "$D/state.json" --kind opening --file "$D/chair_opening.md"
    ```
@@ -99,7 +98,8 @@ node "$S/ledger.mjs" turn "$D/state.json" --speaker <persona_id> --kind opening 
 ```
 - `--speaker` 用人格 id（`conservative_cto`、`perf_zealot`、`kiss_hacker`、`security_paranoid`、`product_pm`）。
 - 腳本會**自動指派**論點編號 `前綴.序號`（subagent 自己寫的 id 會被忽略），並回傳 `new_claims`、`attacks`、`concessions` 與 `warnings`。
-- `ledger.mjs` 解析失敗（例如 kind 不合法、claims JSON 壞掉）時**記帳本不會被改動**：把錯誤訊息貼回給同一個 subagent 要求只修正 claims 區塊，再登記一次。也可以先跑 `node "$S/validate.mjs" turn "$D/turn_x.md" --ledger "$D/state.json"` 預檢。
+- `ledger.mjs` 解析失敗時**記帳本不會被改動**，常見原因：缺少 ```` ```claims ```` 區塊（開場與交叉質詢必填，沒有新論點也要寫 `[]`）、區塊沒有結尾（輸出被截斷）、claim 的 kind 不合法、`--kind` 拼錯、交叉質詢沒帶 `--round`。把錯誤訊息貼回給同一個 subagent 要求修正後重新輸出，再登記一次。也可以先跑 `node "$S/validate.mjs" turn "$D/turn_x.md" --ledger "$D/state.json"` 預檢。
+- **登記錯了**（例如 `--speaker` 填錯人）：立刻執行 `node "$S/ledger.mjs" undo "$D/state.json"` 撤銷上一次登記（只能撤銷一步），再重新登記。不要手動編輯 `state.json`。
 - 有 `warnings`（例如 quote 不是本文原文、引用了不存在的編號）時記在心裡，下一輪主席指令可點名。
 
 登記完印出最新論點索引，之後每次派 subagent 都貼這份：
@@ -114,7 +114,7 @@ node "$S/ledger.mjs" index "$D/state.json"
    ```bash
    node "$S/ledger.mjs" facts "$D/state.json" --file "$D/facts_rN.json" --round N
    ```
-   `likely_false` 的論點狀態會變成 `disputed_fact`，之後不能當證據。
+   `likely_false` 的論點狀態會變成 `disputed_fact`，之後不能當證據。這個指令是「全部或全不」：只要有一個 `claim_id` 不在索引裡或 verdict 不合法，整批都不會登記——把錯誤告訴查核員修正後重送。
 2. **寫主席指令**（你自己寫，貼給使用者），存成 `$D/chair_rN.md` 並登記：
    ```bash
    node "$S/ledger.mjs" chair "$D/state.json" --kind directive --round N --file "$D/chair_rN.md"
@@ -144,11 +144,17 @@ node "$S/ledger.mjs" index "$D/state.json"
 ### Phase 4 — 結辯（依序，與開場相反的順序）
 任務 `closing`，逐一登記 `--kind closing`。辯手可以改變立場，但要說明被哪個論點說服。**每位辯手都必須結辯**（稽核會檢查）。
 
+結辯後做**最後一次事實查核**：把最後一輪交叉質詢、鋼人論證與結辯中新出現、尚未查核的 `fact` / `estimate` 論點交給查核員（模板 B），用 `ledger.mjs facts`（不帶 `--round`）登記。否則這些論點永遠不會被判 `likely_false`，可以被評審自由引用。
+
 ### Phase 5 — 盲點獵人
 派一個**沒有人格**的 subagent（模板 C），給簡報、完整逐字稿（`ledger.mjs transcript`）與論點索引。
 
 ### Phase 6 — 定案準則
-依盲點，最多新增 2 個準則（id snake_case、越高越好），總數不超過 10。**把最終準則寫回 `$D/brief.json` 的 `criteria`**——`validate.mjs` 以它為準。之後**所有評分都用這組鎖定的 id**。
+依盲點，最多新增 2 個準則（id snake_case、越高越好），總數不超過 10。**把最終準則寫回 `$D/brief.json` 的 `criteria`**——`validate.mjs` 以它為準——並同步到記帳本，讓之後產生的逐字稿（要貼給評審）列出最終準則：
+```bash
+node "$S/ledger.mjs" brief "$D/state.json" --brief "$D/brief.json"
+```
+之後**所有評分都用這組鎖定的 id**。
 
 ### Phase 7 — 評分（全部在同一則訊息平行派出）
 使用 `subagent` 工具（`run_in_background=true`）在同一則訊息中平行派發：
@@ -168,11 +174,14 @@ node "$S/validate.mjs" persona "$D/brief.json" "$D/persona_conservative_cto.raw.
 node "$S/analyze.mjs" "$D/input.json" --out "$D"
 ```
 它會寫出 `analysis.json` 與 `matrix.html`，並印出贏家、總分、勝率、翻盤點、診斷與警告。**一字不改地使用它的數字。**
+之後的重跑（補 extras、修稽核問題）只要評分沒變，就會沿用同一個隨機種子，數字保持不變；若改了評分，種子與數字都會重算，判決裡引用的數字也要跟著更新。
+翻盤點若帶 `window_end`，代表新贏家只在 `threshold` 到 `window_end` 之間領先，判決要寫成區間，不要寫「以上／以下」。
 若 `node` 不存在或腳本失敗：把錯誤告訴使用者並停止判決——不要自己心算總分假裝完成。
 
 ### Phase 9 — 判決與紅隊反向辯護
 1. 你撰寫判決（`extras.verdict`，欄位見下方 input.json 格式），規則：
    - `recommended_option_id` = `analysis.winner`，不得更改。
+   - `conditions_to_flip`：每條寫成一句**文字**（可以引用 `tipping_points` 的數字，但不要直接貼物件）。
    - `confidence_label`：贏家勝率 ≥75% 為「高」，50–75% 為「中」，<50% 為「低」（`report.mjs` 會依數字自動判定，填錯會被標出）。
    - 若贏家的勝率**不是**最高、或領先幅度 `margin` < 0.1，明說「過於接近」，把「下一步驗證實驗」放在最前面（報告會自動加上警示）。
    - 若 `minimax_regret_option` 與贏家不同，必須討論。

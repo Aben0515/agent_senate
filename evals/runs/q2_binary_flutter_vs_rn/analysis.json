@@ -197,6 +197,20 @@
       "react_native|long_term_maintenance": 1.613,
       "react_native|ota_flexibility": 1.613
     },
+    "judge_spread": {
+      "flutter|ble_camera_integration": 0.094,
+      "flutter|ui_performance": 0.094,
+      "flutter|team_learning_curve": 0.094,
+      "flutter|third_party_ecosystem": 0.205,
+      "flutter|long_term_maintenance": 0.205,
+      "flutter|ota_flexibility": 0.205,
+      "react_native|ble_camera_integration": 0.205,
+      "react_native|ui_performance": 0.205,
+      "react_native|team_learning_curve": 0.205,
+      "react_native|third_party_ecosystem": 0.205,
+      "react_native|long_term_maintenance": 0.205,
+      "react_native|ota_flexibility": 0.205
+    },
     "persona_scores": [
       {
         "speaker_id": "conservative_cto",
@@ -392,7 +406,8 @@
         "current_weight": 0.102,
         "threshold": 0.639,
         "direction": "increase",
-        "new_winner": "react_native"
+        "new_winner": "react_native",
+        "window_end": null
       },
       {
         "criterion_id": "long_term_maintenance",
@@ -400,7 +415,8 @@
         "current_weight": 0.102,
         "threshold": 0.639,
         "direction": "increase",
-        "new_winner": "react_native"
+        "new_winner": "react_native",
+        "window_end": null
       },
       {
         "criterion_id": "ota_flexibility",
@@ -408,7 +424,8 @@
         "current_weight": 0.102,
         "threshold": 0.639,
         "direction": "increase",
-        "new_winner": "react_native"
+        "new_winner": "react_native",
+        "window_end": null
       }
     ],
     "win_probability": {

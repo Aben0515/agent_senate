@@ -277,19 +277,19 @@ for (const [bIdx, b] of BENCHMARKS.entries()) {
     speaker: debaterA,
     kind: 'rebuttal',
     round: 2,
-    text: `> 【${debaterB} #${pB}.2】預先做好領域邊界規劃\n10 人團隊新人上手約 2 週（估：照現有 onboarding 文件與 code review 節奏推算）。邊界規劃可以，但不需要先付分散式的稅。`,
+    text: `> 【${debaterB} #${pB}.2】預先做好領域邊界規劃\n10 人團隊新人上手約 2 週（估：照現有 onboarding 文件與 code review 節奏推算）。邊界規劃可以，但不需要先付分散式的稅。\n\n\`\`\`claims\n[]\n\`\`\``,
   });
   addDebaterTurn(state, {
     speaker: debaterB,
     kind: 'rebuttal',
     round: 2,
-    text: `> 【${debaterA} #${pA}.3】活到下一個季度\n活到下個季度之後還要活第 8 個季度。重構 5 倍是以「事後拆分 vs 事前劃界」的人月比估的。`,
+    text: `> 【${debaterA} #${pA}.3】活到下一個季度\n活到下個季度之後還要活第 8 個季度。重構 5 倍是以「事後拆分 vs 事前劃界」的人月比估的。\n\n\`\`\`claims\n[]\n\`\`\``,
   });
   addDebaterTurn(state, {
     speaker: debaterC,
     kind: 'rebuttal',
     round: 2,
-    text: `單機 4 核 8GB 在讀多寫少的 B2B 情境下撐到數千 RPS（估），真的撐不住時再加一台。`,
+    text: `單機 4 核 8GB 在讀多寫少的 B2B 情境下撐到數千 RPS（估），真的撐不住時再加一台。\n\n\`\`\`claims\n[]\n\`\`\``,
   });
 
   // 7. Steelman Turns

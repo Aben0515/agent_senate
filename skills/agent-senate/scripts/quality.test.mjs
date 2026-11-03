@@ -78,7 +78,7 @@ test('evaluateDebateQuality penalizes flattery and vague openings', () => {
         type: 'debater',
         kind: 'rebuttal',
         speaker: 'vex',
-        text: '您說得有道理，我非常同意陳 CTO 的觀點。',
+        text: '您說得有道理，我非常同意陳 CTO 的觀點，確實很有見地。',
       },
     ],
     claims: {},

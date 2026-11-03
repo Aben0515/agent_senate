@@ -13,6 +13,7 @@ import { join } from 'node:path';
 import { parseArgs } from 'node:util';
 import {
   readJson, readText, isMain, runCli, UsageError, confidenceLabel, normalizeVerdict, normalizeHighlight, canonicalSpeaker,
+  normalizeClaimId,
 } from './common.mjs';
 import { inputDigest } from './analyze.mjs';
 import { closeCallReasons } from './report.mjs';
@@ -131,7 +132,8 @@ export function auditRunDirectory(runDir) {
   const haveClaims = Object.keys(knownClaims).length > 0;
   for (const [sIdx, sample] of (input?.chairSamples || []).entries()) {
     for (const c of sample?.cells || []) {
-      for (const cid of c?.evidence_claim_ids || []) {
+      for (const rawId of c?.evidence_claim_ids || []) {
+        const cid = normalizeClaimId(rawId);
         const claim = knownClaims[cid];
         const loc = `input.chairSamples[${sIdx}].cells[${c.option_id}|${c.criterion_id}]`;
         if (!claim) {
@@ -171,6 +173,8 @@ export function auditRunDirectory(runDir) {
     add('medium', 'report.md', '缺少 report.md。', '執行 report.mjs 產生報告。');
   } else if (winner && !reportMd.includes(`\`${winner}\``)) {
     add('high', 'report.md', `report.md 沒有提到程式計算的贏家 \`${winner}\`（可能是舊版或手寫報告）。`, '用 report.mjs 重新產生。');
+  } else if (analysis.seed_used !== undefined && !reportMd.includes(`隨機種子：${analysis.seed_used}`)) {
+    add('high', 'report.md', 'report.md 不是由目前的 analysis.json 產生（隨機種子不符，數字可能過期）。', '在最後一次 analyze.mjs 之後重新執行 report.mjs。');
   }
 
   // 8. MVP must be an actual debater

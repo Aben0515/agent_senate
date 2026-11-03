@@ -7,13 +7,13 @@
  * Usage: node ledger.mjs <init|turn|chair|facts|fallacies|index|scoreboard|transcript> <state.json> [options]
  */
 
-import { writeFileSync, existsSync } from 'node:fs';
+import { writeFileSync, existsSync, copyFileSync, renameSync, rmSync } from 'node:fs';
 import { parseArgs } from 'node:util';
 import {
-  PERSONAS, canonicalSpeaker, speakerPrefix, parseInTextRefs, isClaimId,
+  PERSONAS, canonicalSpeaker, speakerPrefix, parseInTextRefs, isClaimId, normalizeClaimId,
   readJson, readText, isMain, runCli, UsageError,
 } from './common.mjs';
-import { extractJsonFromText, normalizeRawClaim, VALID_KINDS, CLAIMS_BLOCK_RE } from './validate.mjs';
+import { extractJsonFromText, normalizeRawClaim, VALID_KINDS, findClaimsBlock } from './validate.mjs';
 
 /** Kept for backwards compatibility; the source of truth is PERSONAS in common.mjs. */
 export const SPEAKER_PREFIXES = Object.fromEntries(
@@ -27,6 +27,10 @@ export function getSpeakerPrefix(speakerId) {
 export const TURN_KINDS = ['opening', 'rebuttal', 'steelman', 'closing'];
 export const CHAIR_KINDS = ['opening', 'directive', 'devil_advocate', 'verdict', 'speech'];
 export const FACT_VERDICTS = ['plausible', 'questionable', 'likely_false', 'unverifiable'];
+/** Turn kinds that must carry a claims block (an empty `[]` is fine). */
+const CLAIMS_REQUIRED = ['opening', 'rebuttal'];
+/** Turn kinds where an in-text `【簡稱 #id】` quote is read as an attack. */
+const ATTACK_INFERENCE_KINDS = ['opening', 'rebuttal'];
 
 const KIND_LABELS = {
   opening: '開場陳述',
@@ -60,8 +64,15 @@ export function loadState(statePath) {
   return readJson(statePath, 'state.json');
 }
 
-export function saveState(statePath, state) {
-  writeFileSync(statePath, JSON.stringify(state, null, 2), 'utf8');
+/**
+ * Write state.json atomically and keep the previous version as state.json.bak,
+ * so `ledger.mjs undo` can revert the last registration.
+ */
+export function saveState(statePath, state, { backup = true } = {}) {
+  if (backup && existsSync(statePath)) copyFileSync(statePath, `${statePath}.bak`);
+  const tmp = `${statePath}.tmp`;
+  writeFileSync(tmp, JSON.stringify(state, null, 2), 'utf8');
+  renameSync(tmp, statePath);
 }
 
 function uniqueTurnId(state, base) {
@@ -80,8 +91,10 @@ function normRound(round) {
 }
 
 export function addChairTurn(state, { kind = 'speech', round = null, text }) {
+  if (!CHAIR_KINDS.includes(kind)) throw new Error(`未知的主席發言類型 --kind ${kind}（應為 ${CHAIR_KINDS.join(' / ')}）`);
   if (!text || !String(text).trim()) throw new Error('主席發言內容為空。');
   const r = normRound(round);
+  if (kind === 'directive' && r === null) throw new Error('主席指令必須帶 --round N，稽核靠它對應每一輪。');
   const turn = {
     id: uniqueTurnId(state, `chair_${kind}_${r !== null ? r : state.chair_events.length + 1}`),
     type: 'chair',
@@ -97,39 +110,48 @@ export function addChairTurn(state, { kind = 'speech', round = null, text }) {
 
 /**
  * Register a debater turn. Claim ids are always assigned here (`前綴.序號`);
- * ids written by the model are ignored.
+ * ids written by the model are ignored. Throws (leaving the ledger untouched)
+ * on anything that would silently lose data.
  *
  * Semantics:
- *  - attacks: the claim attacks an existing claim of ANOTHER speaker.
+ *  - attacks: the claim attacks an existing claim of ANOTHER speaker. In opening/rebuttal
+ *    turns an in-text `> 【簡稱 #id】` quote also counts as an attack; in steelman/closing
+ *    turns quotes are usually supportive, so only explicit `attacks` count.
  *  - concessions (`【讓步 #id】` or `concedes`): the speaker withdraws one of
  *    their OWN claims → status `conceded` (it can no longer be used as evidence).
  *    Conceding another speaker's claim is recorded as an acknowledgement only.
  */
 export function addDebaterTurn(state, { speaker, kind = 'rebuttal', round = null, text }) {
+  if (!TURN_KINDS.includes(kind)) throw new Error(`未知的發言類型 --kind ${kind}（應為 ${TURN_KINDS.join(' / ')}）`);
   if (!text || !String(text).trim()) throw new Error('辯手發言內容為空。');
   const speakerId = canonicalSpeaker(speaker);
   const prefix = speakerPrefix(speakerId);
   const r = normRound(round);
+  if (kind === 'rebuttal' && r === null) throw new Error('交叉質詢發言必須帶 --round N，稽核靠它計算輪數。');
   const warnings = [];
-  if (!TURN_KINDS.includes(kind)) warnings.push(`未知的發言類型 kind=${kind}（應為 ${TURN_KINDS.join(' / ')}）`);
-  if (kind === 'rebuttal' && r === null) warnings.push('交叉質詢發言未帶 --round，稽核無法計算輪數。');
-  state.speaker_counters[prefix] ??= 0;
 
   // 1. Parse the claims block.
+  const found = findClaimsBlock(text);
+  if (found.status === 'unclosed') {
+    throw new Error('```claims 區塊沒有結尾的 ```（輸出可能被截斷）。請要求辯手重新輸出完整發言後再登記。');
+  }
+  if (found.status === 'missing' && CLAIMS_REQUIRED.includes(kind)) {
+    throw new Error(`${kind} 發言必須在末尾附上 \`\`\`claims JSON 陣列（沒有新論點就寫 []）。請要求辯手補上後再登記。`);
+  }
+  if (found.fallback) warnings.push('claims 區塊用了 ```json 圍欄，已接受；請提醒辯手使用 ```claims。');
   let rawClaims = [];
-  const match = CLAIMS_BLOCK_RE.exec(text);
-  if (match) {
+  if (found.status === 'ok') {
     let parsed;
     try {
-      parsed = extractJsonFromText(match[1]);
+      parsed = extractJsonFromText(found.json);
     } catch (e) {
-      throw new Error(`發言中的 \`\`\`claims 區塊 JSON 解析失敗: ${e.message}`);
+      throw new Error(`發言中的 claims 區塊 JSON 解析失敗: ${e.message}`);
     }
-    rawClaims = Array.isArray(parsed) ? parsed : Array.isArray(parsed?.claims) ? parsed.claims : [];
-  } else {
-    warnings.push('發言沒有 ```claims 區塊，本回合不新增論點。');
+    if (Array.isArray(parsed)) rawClaims = parsed;
+    else if (Array.isArray(parsed?.claims)) rawClaims = parsed.claims;
+    else throw new Error('claims 區塊必須是 JSON 陣列。');
   }
-  const body = text.replace(CLAIMS_BLOCK_RE, '').trim();
+  const body = (found.block ? text.replace(found.block, '') : text).trim();
 
   // Validate everything before mutating state, so a bad turn leaves the ledger untouched.
   const normalized = rawClaims.map((raw, i) => {
@@ -147,6 +169,7 @@ export function addDebaterTurn(state, { speaker, kind = 'rebuttal', round = null
     return c;
   });
 
+  const isSettled = (claim) => claim && ['conceded', 'disputed_fact'].includes(claim.status);
   const ownClaim = (id) => state.claims[id] && state.claims[id].speaker === speakerId;
   const usableRef = (id, label) => {
     if (!isClaimId(id)) {
@@ -160,8 +183,12 @@ export function addDebaterTurn(state, { speaker, kind = 'rebuttal', round = null
     return true;
   };
 
+  state.speaker_counters[prefix] ??= 0;
+
   // 2. Register new claims with explicit attacks.
   const inText = parseInTextRefs(body);
+  for (const m of inText.malformed) warnings.push(`${m} 沒有可辨識的論點編號，讓步沒有生效。`);
+  const inferAttacks = ATTACK_INFERENCE_KINDS.includes(kind);
   const registered = [];
   const explicitlyAttacked = new Set();
   for (const c of normalized) {
@@ -187,6 +214,8 @@ export function addDebaterTurn(state, { speaker, kind = 'rebuttal', round = null
       kind: c.kind,
       supports_option_ids: c.supports,
       attacks_claim_ids: attacks,
+      // Targets that were already conceded/disputed when attacked: not a "landed" attack.
+      attacks_on_settled: [],
       concedes_claim_ids: [],
       status: 'open',
       attacked_by: [],
@@ -199,11 +228,13 @@ export function addDebaterTurn(state, { speaker, kind = 'rebuttal', round = null
 
   // In-text quote references that no claim declared explicitly: attribute them to the
   // turn's first new claim, so the attack still shows up in the claim graph.
-  for (const ref of inText.references) {
-    if (explicitlyAttacked.has(ref) || !state.claims[ref] || ownClaim(ref)) continue;
-    if (registered.some((c) => c.id === ref)) continue;
-    if (registered.length) registered[0].attacks_claim_ids.push(ref);
-    explicitlyAttacked.add(ref);
+  if (inferAttacks) {
+    for (const ref of inText.references) {
+      if (explicitlyAttacked.has(ref) || !state.claims[ref] || ownClaim(ref)) continue;
+      if (registered.some((c) => c.id === ref)) continue;
+      if (registered.length) registered[0].attacks_claim_ids.push(ref);
+      explicitlyAttacked.add(ref);
+    }
   }
 
   // 3. Apply attacks.
@@ -211,6 +242,7 @@ export function addDebaterTurn(state, { speaker, kind = 'rebuttal', round = null
   for (const c of registered) {
     for (const targetId of c.attacks_claim_ids) {
       const target = state.claims[targetId];
+      if (isSettled(target)) c.attacks_on_settled.push(targetId);
       target.attacked_by ??= [];
       if (!target.attacked_by.includes(c.id)) target.attacked_by.push(c.id);
       // Only open/plausible claims become "attacked"; conceded and disputed_fact are stronger states.
@@ -218,7 +250,7 @@ export function addDebaterTurn(state, { speaker, kind = 'rebuttal', round = null
       attackedNow.push(targetId);
     }
   }
-  if (!registered.length) {
+  if (!registered.length && inferAttacks) {
     for (const ref of inText.references) {
       if (state.claims[ref] && !ownClaim(ref)) attackedNow.push(ref);
     }
@@ -233,7 +265,6 @@ export function addDebaterTurn(state, { speaker, kind = 'rebuttal', round = null
     const target = state.claims[id];
     if (target.speaker === speakerId) {
       target.status = 'conceded';
-      target.conceded_in = null; // filled below once the turn id is known
       conceded.push(id);
     } else {
       target.acknowledged_by ??= []; // ledgers written by v0.3.0 lack this field
@@ -267,32 +298,37 @@ export function addDebaterTurn(state, { speaker, kind = 'rebuttal', round = null
   return { turn, new_claims: registered, warnings };
 }
 
+/**
+ * Record fact checks. All-or-nothing: an unknown claim id or an invalid verdict
+ * throws before anything is written, so a likely_false verdict can never be
+ * silently dropped.
+ */
 export function recordFactChecks(state, checks, { round = null } = {}) {
-  const warnings = [];
   const r = normRound(round);
-  const recorded = [];
-  for (const fc of checks) {
-    if (!fc || typeof fc !== 'object') continue;
-    const id = String(fc.claim_id ?? '').trim();
-    const verdict = String(fc.verdict ?? '').trim().toLowerCase();
-    if (!FACT_VERDICTS.includes(verdict)) {
-      warnings.push(`查核 ${id} 的 verdict 無效：${fc.verdict}（應為 ${FACT_VERDICTS.join(' / ')}）`);
+  const errors = [];
+  const entries = [];
+  for (const [i, fc] of checks.entries()) {
+    if (!fc || typeof fc !== 'object') {
+      errors.push(`checks[${i}] 不是物件`);
       continue;
     }
-    const entry = { ...fc, claim_id: id, verdict, round: fc.round ?? r };
-    const claim = state.claims[id];
-    if (!claim) {
-      warnings.push(`查核的論點不存在於索引：${id}`);
-    } else {
-      claim.fact_check = entry;
-      if (verdict === 'likely_false' && claim.status !== 'conceded') claim.status = 'disputed_fact';
-      else if (verdict === 'plausible' && claim.status === 'open') claim.status = 'plausible';
-    }
-    state.fact_checks.push(entry);
-    recorded.push(entry);
+    const id = normalizeClaimId(fc.claim_id);
+    const verdict = String(fc.verdict ?? '').trim().toLowerCase();
+    if (!FACT_VERDICTS.includes(verdict)) errors.push(`查核 ${id || `checks[${i}]`} 的 verdict 無效：${fc.verdict}（應為 ${FACT_VERDICTS.join(' / ')}）`);
+    if (!state.claims[id]) errors.push(`查核的論點不存在於索引：${fc.claim_id}`);
+    entries.push({ ...fc, claim_id: id, verdict, round: fc.round ?? r });
   }
-  if (recorded.length) {
-    const lines = recorded.map((fc) => {
+  if (errors.length) throw new Error(`事實查核未登記（全部或全不）：\n- ${errors.join('\n- ')}`);
+
+  for (const entry of entries) {
+    const claim = state.claims[entry.claim_id];
+    claim.fact_check = entry;
+    if (entry.verdict === 'likely_false' && claim.status !== 'conceded') claim.status = 'disputed_fact';
+    else if (entry.verdict === 'plausible' && claim.status === 'open') claim.status = 'plausible';
+    state.fact_checks.push(entry);
+  }
+  if (entries.length) {
+    const lines = entries.map((fc) => {
       const icon = { plausible: '✅', questionable: '⚠️', likely_false: '❌', unverifiable: '❔' }[fc.verdict];
       return `- ${icon} #${fc.claim_id} ${fc.verdict}${fc.note ? `：${fc.note}` : ''}${fc.correct_magnitude ? `（合理量級：${fc.correct_magnitude}）` : ''}`;
     });
@@ -305,26 +341,42 @@ export function recordFactChecks(state, checks, { round = null } = {}) {
       timestamp: new Date().toISOString(),
     });
   }
-  return { recorded: recorded.length, warnings };
+  return { recorded: entries.length, warnings: [] };
 }
 
+/** Record fallacies. All-or-nothing, like recordFactChecks. */
 export function recordFallacies(state, fallacies) {
-  const warnings = [];
-  for (const fa of fallacies) {
-    if (!fa || typeof fa !== 'object') continue;
-    const entry = { ...fa };
-    if (!entry.speaker_id && entry.claim_id && state.claims[entry.claim_id]) {
-      entry.speaker_id = state.claims[entry.claim_id].speaker;
+  const errors = [];
+  const entries = [];
+  for (const [i, fa] of fallacies.entries()) {
+    if (!fa || typeof fa !== 'object') {
+      errors.push(`fallacies[${i}] 不是物件`);
+      continue;
     }
+    const entry = { ...fa };
+    if (entry.claim_id) {
+      entry.claim_id = normalizeClaimId(entry.claim_id);
+      if (!state.claims[entry.claim_id]) errors.push(`謬誤指向的論點不存在：${fa.claim_id}`);
+    }
+    if (!entry.speaker_id && state.claims[entry.claim_id]) entry.speaker_id = state.claims[entry.claim_id].speaker;
     if (!entry.speaker_id) {
-      warnings.push(`謬誤缺少 speaker_id 且無法由 claim_id 推得：${JSON.stringify(fa)}`);
+      errors.push(`fallacies[${i}] 缺少 speaker_id 且無法由 claim_id 推得`);
       continue;
     }
     entry.speaker_id = canonicalSpeaker(entry.speaker_id);
-    if (entry.claim_id && !state.claims[entry.claim_id]) warnings.push(`謬誤指向的論點不存在：${entry.claim_id}`);
-    state.fallacies.push(entry);
+    entries.push(entry);
   }
-  return { warnings };
+  if (errors.length) throw new Error(`謬誤未登記（全部或全不）：\n- ${errors.join('\n- ')}`);
+  state.fallacies.push(...entries);
+  return { recorded: entries.length, warnings: [] };
+}
+
+/** Replace the brief stored in the ledger (Phase 6 locks the final criteria). */
+export function updateBrief(state, brief) {
+  if (!brief || !Array.isArray(brief.options) || !Array.isArray(brief.criteria)) {
+    throw new Error('brief.json 必須包含 options 與 criteria 陣列。');
+  }
+  state.brief = brief;
 }
 
 const STATUS_BADGES = {
@@ -349,7 +401,7 @@ export function renderClaimsIndex(state) {
       const fc = c.fact_check?.verdict === 'questionable' ? ' [⚠️存疑]' : c.fact_check?.verdict === 'unverifiable' ? ' [❔無法查證]' : '';
       const attacked = c.attacked_by?.length ? ` (⚔️來自: ${c.attacked_by.join(', ')})` : '';
       const ack = c.acknowledged_by?.length ? ` (🤝被承認: ${c.acknowledged_by.join(', ')})` : '';
-      return `- #${c.id} (${c.kind}, ${c.speaker}) [${badge}]${fc}${attacked}${ack} ${c.text} ／ 原文：「${c.quote}」`;
+      return `- ${c.id} (${c.kind}, ${c.speaker}) [${badge}]${fc}${attacked}${ack} ${c.text} ／ 原文：「${c.quote}」`;
     })
     .join('\n');
 }
@@ -372,6 +424,7 @@ export function computeScoreboard(state) {
   for (const t of state.turns || []) if (t.type === 'debater') ensure(canonicalSpeaker(t.speaker));
 
   const claims = state.claims || {};
+  const landed = {};
   for (const c of Object.values(claims)) {
     const sp = canonicalSpeaker(c.speaker);
     if (!board[sp]) continue;
@@ -379,11 +432,16 @@ export function computeScoreboard(state) {
     s.claims_count++;
     if (c.status === 'conceded') s.concessions_made++;
     if (['questionable', 'likely_false'].includes(c.fact_check?.verdict)) s.fact_flags++;
-    // Attack landed: the target was later conceded or found likely false.
+    // Attack landed: the target was conceded or found likely false AFTER being attacked.
+    // Counted once per (speaker, target); piling onto an already-settled claim earns nothing.
     for (const targetId of c.attacks_claim_ids || []) {
-      if (['conceded', 'disputed_fact'].includes(claims[targetId]?.status)) s.attacks_landed++;
+      if ((c.attacks_on_settled || []).includes(targetId)) continue;
+      if (!['conceded', 'disputed_fact'].includes(claims[targetId]?.status)) continue;
+      landed[sp] ??= new Set();
+      landed[sp].add(targetId);
     }
   }
+  for (const [sp, set] of Object.entries(landed)) board[sp].attacks_landed = set.size;
   for (const fa of state.fallacies || []) {
     const sp = canonicalSpeaker(fa.speaker_id);
     if (board[sp]) board[sp].fallacies_flagged++;
@@ -462,8 +520,10 @@ export function generateTranscriptMarkdown(state) {
 
 // ---------------------------------------------------------------------- CLI
 
-const USAGE = `用法：node ledger.mjs <init|turn|chair|facts|fallacies|index|next-ids|scoreboard|transcript> <state.json> [選項]
+const USAGE = `用法：node ledger.mjs <init|turn|chair|facts|fallacies|brief|undo|index|next-ids|scoreboard|transcript> <state.json> [選項]
   init       <state.json> --question "<題目>" [--brief brief.json] [--force]
+  brief      <state.json> --brief brief.json          （Phase 6 定案準則後更新記帳本裡的簡報）
+  undo       <state.json>                             （撤銷上一次登記，還原 state.json.bak）
   chair      <state.json> --kind <opening|directive|devil_advocate|verdict> [--round N] --file <chair.md>
   turn       <state.json> --speaker <persona_id> --kind <opening|rebuttal|steelman|closing> [--round N] --file <turn.md>
   facts      <state.json> --file <factcheck.json> [--round N]
@@ -482,7 +542,9 @@ function readListJson(values, key) {
   if (!values.file) throw new UsageError(`需要 --file <json>。\n${USAGE}`);
   const raw = readText(values.file, '--file');
   const parsed = extractJsonFromText(raw);
-  return Array.isArray(parsed) ? parsed : parsed[key] || [];
+  if (Array.isArray(parsed)) return parsed;
+  if (Array.isArray(parsed?.[key])) return parsed[key];
+  throw new Error(`${values.file} 必須是 JSON 陣列或 {"${key}":[…]}。`);
 }
 
 async function main() {
@@ -518,8 +580,23 @@ async function main() {
     return;
   }
 
+  if (cmd === 'undo') {
+    const bak = `${statePath}.bak`;
+    if (!existsSync(bak)) throw new Error(`沒有可撤銷的紀錄（找不到 ${bak}）。`);
+    const restored = readJson(bak, 'state.json.bak');
+    saveState(statePath, restored, { backup: false });
+    rmSync(bak);
+    print({ ok: true, message: '已撤銷上一次登記（只能撤銷一步）。', turns: restored.turns?.length ?? 0 });
+    return;
+  }
+
   const state = loadState(statePath);
-  if (cmd === 'chair') {
+  if (cmd === 'brief') {
+    if (!values.brief) throw new UsageError(`brief 需要 --brief <brief.json>。\n${USAGE}`);
+    updateBrief(state, readJson(values.brief, '--brief'));
+    saveState(statePath, state);
+    print({ ok: true, criteria: state.brief.criteria.map((c) => c.id) });
+  } else if (cmd === 'chair') {
     const turn = addChairTurn(state, { kind: values.kind || 'speech', round: values.round, text: readInput(values, positionals, '主席發言') });
     saveState(statePath, state);
     print({ ok: true, turn_id: turn.id });
